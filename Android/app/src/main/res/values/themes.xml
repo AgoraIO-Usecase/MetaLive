@@ -1,0 +1,30 @@
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.MetaLive" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#6F57EB</item>
+        <item name="colorAccent">#6F57EB</item>
+        <item name="colorPrimaryVariant">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+
+        <item name="android:windowBackground">@color/theme_window_bg_color</item>
+        <item name="contentPaddingTop">@dimen/theme_content_padding_v</item>
+        <item name="contentPaddingBottom">@dimen/theme_content_padding_v</item>
+        <item name="contentPaddingStart">@dimen/theme_content_padding_h</item>
+        <item name="contentPaddingEnd">@dimen/theme_content_padding_h</item>
+        <item name="iconPadding">@dimen/theme_icon_padding</item>
+
+        <item name="alertDialogTheme">@style/CommonAlertDialog.Theme.IOS</item>
+        <item name="alertDialogStyle">@style/CommonAlertDialog.IOS</item>
+    </style>
+
+
+</resources>
