@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_face_select_tab_content_height"
+        android:layout_gravity="bottom"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_face_select_tab_title_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+
+            <io.agora.uiwidget.function.editface.CustomGlassSwitchView
+                android:id="@+id/glass_color_switch"
+                android:layout_width="80dp"
+                android:layout_height="24dp"
+                app:backgroundColor="#F5F7FA"
+                app:borderColor="#EBEDF0"
+                app:borderWidth="1dp"
+                app:centerViewBackGroundColor="#8A9099"
+                app:checkedTextColor="#F5F7FA"
+                app:leftChecked="true"
+                app:leftText="镜框"
+                app:rightText="镜片"
+                app:textSize="12sp"
+                app:unCheckedTextColor="#A3A8AF" />
+
+
+            <io.agora.uiwidget.function.editface.color.ColorSelectView
+                android:id="@+id/color_recycler"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/white"
+                android:clipToPadding="false"
+                android:paddingLeft="29dp"
+                android:paddingRight="4dp"
+                android:scrollbars="none"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+
+        </LinearLayout>
+
+
+        <io.agora.uiwidget.function.editface.item.ItemSelectView
+            android:id="@+id/glasses_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </LinearLayout>
+
+</FrameLayout>

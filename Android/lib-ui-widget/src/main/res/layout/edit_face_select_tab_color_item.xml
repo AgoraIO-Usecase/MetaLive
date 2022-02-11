@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_face_select_tab_content_height"
+        android:layout_gravity="bottom"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
+
+        <io.agora.uiwidget.function.editface.color.ColorSelectView
+            android:id="@+id/color_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_face_select_tab_title_height"
+            android:paddingHorizontal="8dp"
+            android:scrollbars="none" />
+
+        <io.agora.uiwidget.function.editface.item.ItemSelectView
+            android:id="@+id/item_select_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+</FrameLayout>

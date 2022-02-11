@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_face_select_tab_content_height"
+        android:layout_gravity="bottom"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/color_seek_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_face_select_tab_title_height">
+
+            <io.agora.uiwidget.function.editface.seekbar.DiscreteSeekBar
+                android:id="@+id/color_seek_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                app:dsb_bg_thumbColor="@android:color/white"
+                app:dsb_bg_thumbSize="30dp"
+                app:dsb_indicatorColor="#EBBBA4"
+                app:dsb_indicatorElevation="0dp"
+                app:dsb_indicatorPopupEnabled="true"
+                app:dsb_max="100"
+                app:dsb_min="0"
+                app:dsb_progressColor="@android:color/transparent"
+                app:dsb_rippleColor="@android:color/transparent"
+                app:dsb_scrubberHeight="3dp"
+                app:dsb_thumbColor="#EBBBA4"
+                app:dsb_thumbSize="26dp"
+                app:dsb_trackBaseHeight="8dp"
+                app:dsb_trackColor="#000000"
+                app:dsb_trackHeight="15dp"
+                app:dsb_value="0" />
+        </FrameLayout>
+
+        <io.agora.uiwidget.function.editface.color.ColorSelectView
+            android:id="@+id/color_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_face_select_tab_title_height"
+            android:paddingHorizontal="4dp"
+            android:scrollbars="none" />
+
+        <io.agora.uiwidget.function.editface.item.ItemSelectView
+            android:id="@+id/shape_item_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+</FrameLayout>

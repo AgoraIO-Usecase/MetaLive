@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.agora.uiwidget.function.editface.item.MultipleSelectView
+        android:id="@+id/decoration_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_face_select_tab_content_height"
+        android:scrollbars="none"/>
+
+</FrameLayout>

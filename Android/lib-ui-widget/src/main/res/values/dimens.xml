@@ -133,5 +133,23 @@
     <dimen name="remote_small_control_text_padding_v">12dp</dimen>
 
 
+    <!-- EditFaceSelectView -->
+    <dimen name="edit_face_select_tab_content_height">220dp</dimen>
+    <dimen name="edit_face_select_tab_title_height">45dp</dimen>
+    <dimen name="edit_face_select_item_corner_radius">10dp</dimen>
+    <dimen name="edit_face_select_item_stroke_width">2dp</dimen>
+    <dimen name="edit_face_select_item_corner_radius_inner">8dp</dimen>
+    <dimen name="edit_face_select_color_space">15dp</dimen>
+    <dimen name="edit_face_select_color_width">35dp</dimen>
+    <dimen name="edit_face_select_item_space_h">4dp</dimen>
+    <dimen name="edit_face_select_item_space_v">8dp</dimen>
+    <dimen name="edit_face_select_item_width">8dp</dimen>
+    <dimen name="edit_face_select_item_height">60dp</dimen>
+    <dimen name="edit_face_select_item_content_size">56dp</dimen>
+    <dimen name="edit_face_select_item_content_inner_size">52dp</dimen>
+    <dimen name="edit_face_select_custom_glass_switch_width">80dp</dimen>
+    <dimen name="edit_face_select_custom_glass_switch_height">24dp</dimen>
+
+
 
 </resources>

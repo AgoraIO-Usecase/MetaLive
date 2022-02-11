@@ -8,5 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "MetaLive"
 include ':app'
-include ':lib-base'
 include ':lib-ui-widget'

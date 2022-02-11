@@ -32,4 +32,11 @@
     <color name="online_user_list_dialog_text_color">#656565</color>
     <color name="online_user_list_dialog_divider_color">#efefef</color>
 
+    <!-- EditFaceSelectView -->
+    <color name="edit_face_select_customer_switch_center_view">#8A9099</color>
+    <color name="edit_face_select_customer_switch_checked_text_color">#F5F7FA</color>
+    <color name="edit_face_select_customer_switch_unchecked_text_color">#A3A8AF</color>
+    <color name="edit_face_select_customer_switch_background">#F5F7FA</color>
+    <color name="edit_face_select_customer_switch_border">#EBEDF0</color>
+
 </resources>

@@ -1,5 +1,6 @@
 package io.agora.metalive
 
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import io.agora.metalive.databinding.RoomListActivityBinding
 import io.agora.metalive.databinding.RoomListCreateDialogViewBinding
+import io.agora.metalive.manager.RoomManager
 import io.agora.uiwidget.function.RoomListView
 import io.agora.uiwidget.utils.RandomUtil
 import io.agora.uiwidget.utils.StatusBarUtil
@@ -25,26 +27,10 @@ class RoomListActivity : AppCompatActivity() {
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
 
-        initListView()
-        mBinding.ivCreate.setOnClickListener {
-            val dialogViewBinding = RoomListCreateDialogViewBinding.inflate(LayoutInflater.from(this))
-            dialogViewBinding.ivRandom.setOnClickListener {
-                dialogViewBinding.etRoomName.setText(RandomUtil.randomLiveRoomName(this))
-            }
-            AlertDialog.Builder(this)
-                .setTitle(R.string.room_list_create_dialog_title)
-                .setView(dialogViewBinding.root)
-                .setPositiveButton(R.string.common_sure) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setNegativeButton(R.string.common_cancel) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
-        }
+        initView()
     }
 
-    private fun initListView() {
+    private fun initView() {
         val listAdapter = object :
             RoomListView.AbsRoomListAdapter<RoomManager.RoomInfo>() {
 
@@ -78,6 +64,27 @@ class RoomListActivity : AppCompatActivity() {
         }
         mBinding.listView.setListAdapter(listAdapter, 1)
 
+        mBinding.ivCreate.setOnClickListener {
+            val dialogViewBinding =
+                RoomListCreateDialogViewBinding.inflate(LayoutInflater.from(this))
+            dialogViewBinding.ivRandom.setOnClickListener {
+                dialogViewBinding.etRoomName.setText(RandomUtil.randomLiveRoomName(this))
+            }
+            AlertDialog.Builder(this)
+                .setTitle(R.string.room_list_create_dialog_title)
+                .setView(dialogViewBinding.root)
+                .setPositiveButton(R.string.common_sure) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.common_cancel) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
+
+        mBinding.ivEditFace.setOnClickListener {
+            startActivity(Intent(this, EditFaceActivity::class.java))
+        }
     }
 
 

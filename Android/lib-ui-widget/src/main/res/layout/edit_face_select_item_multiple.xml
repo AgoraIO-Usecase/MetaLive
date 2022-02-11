@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/edit_face_select_item_height"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center">
+
+    <RelativeLayout
+        android:id="@+id/rl_item"
+        android:layout_width="@dimen/edit_face_select_item_content_inner_size"
+        android:layout_height="@dimen/edit_face_select_item_content_inner_size"
+        android:layout_gravity="center">
+
+        <io.agora.uiwidget.function.editface.RoundImageView
+            android:id="@+id/bottom_item_img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/edit_face_select_item_bg"
+            android:cropToPadding="true"
+            android:scaleType="centerCrop"
+            app:round_radius="@dimen/edit_face_select_item_corner_radius" />
+
+        <TextView
+            android:id="@+id/tv_type_name"
+            android:layout_width="24dp"
+            android:layout_height="12dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/edit_face_select_item_multi_text_bg"
+            android:gravity="center"
+            android:textColor="@color/edit_face_select_item_multi_text_color"
+            tools:text="11223"
+            android:textSize="6sp" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/bottom_item_img_select"
+        android:layout_width="@dimen/edit_face_select_item_content_size"
+        android:layout_height="@dimen/edit_face_select_item_content_size"
+        android:layout_gravity="center"
+        android:background="@drawable/edit_face_select_selected_bg" />
+</FrameLayout>

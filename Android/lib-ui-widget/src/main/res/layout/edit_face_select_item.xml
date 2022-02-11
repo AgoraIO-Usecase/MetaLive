@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="@dimen/edit_face_select_item_height"
+             android:layout_gravity="center">
+
+    <io.agora.uiwidget.function.editface.RoundImageView
+        android:id="@+id/bottom_item_img"
+        android:layout_width="@dimen/edit_face_select_item_content_inner_size"
+        android:layout_height="@dimen/edit_face_select_item_content_inner_size"
+        android:layout_gravity="center"
+        android:background="@drawable/edit_face_select_item_bg"
+        android:cropToPadding="true"
+        android:scaleType="centerCrop"
+        app:round_radius="@dimen/edit_face_select_item_corner_radius"/>
+
+    <View
+        android:id="@+id/bottom_item_img_select"
+        android:layout_width="@dimen/edit_face_select_item_content_size"
+        android:layout_height="@dimen/edit_face_select_item_content_size"
+        android:layout_gravity="center"
+        android:background="@drawable/edit_face_select_selected_bg"/>
+</FrameLayout>
