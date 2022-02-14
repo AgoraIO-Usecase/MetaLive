@@ -2,8 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,14 +12,16 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/color_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/edit_face_select_tab_title_height"
             android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
             android:orientation="horizontal">
 
 
-            <io.agora.uiwidget.function.editface.CustomGlassSwitchView
-                android:id="@+id/glass_color_switch"
+            <io.agora.uiwidget.function.editface.CustomSwitchView
+                android:id="@+id/color_switch"
                 android:layout_width="80dp"
                 android:layout_height="24dp"
                 app:backgroundColor="#F5F7FA"
@@ -40,13 +41,10 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_marginStart="8dp"
                 android:background="@android:color/white"
                 android:clipToPadding="false"
-                android:paddingLeft="29dp"
-                android:paddingRight="4dp"
-                android:scrollbars="none"
-                android:visibility="gone"
-                tools:visibility="visible"/>
+                android:scrollbars="none"/>
 
 
         </LinearLayout>

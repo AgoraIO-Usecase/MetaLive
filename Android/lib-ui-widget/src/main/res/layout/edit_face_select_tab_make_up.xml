@@ -13,23 +13,26 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/color_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/edit_face_select_tab_title_height"
-            android:orientation="horizontal">
+            android:paddingHorizontal="8dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="@drawable/edit_face_selector_glass_switch_bg">
+                android:layout_height="match_parent">
 
 
                 <TextView
                     android:id="@+id/tv_check_name"
-                    android:layout_width="40dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="24dp"
                     android:textColor="#F5F7FA"
                     android:layout_gravity="center"
                     android:singleLine="true"
+                    android:paddingHorizontal="6dp"
                     android:background="@drawable/edit_face_select_item_make_up_text_bg"
                     android:gravity="center"
                     android:textSize="12sp"
@@ -42,11 +45,9 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
                 android:clipToPadding="false"
-                android:paddingHorizontal="8dp"
-                android:scrollbars="none"
-                android:visibility="gone"
-                tools:visibility="visible"/>
+                android:scrollbars="none"/>
 
         </LinearLayout>
 

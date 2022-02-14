@@ -12,6 +12,7 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginHorizontal="@dimen/edit_face_select_item_corner_radius"
         app:tabMode="scrollable"
         app:tabIndicator="@drawable/edit_face_select_indicator"/>
 

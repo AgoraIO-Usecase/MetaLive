@@ -16,7 +16,7 @@ import java.util.Map;
 
 import io.agora.uiwidget.R;
 import io.agora.uiwidget.function.editface.bean.MultipleItemInfo;
-import io.agora.uiwidget.function.editface.bean.PairBean;
+import io.agora.uiwidget.function.editface.bean.MultipleItemPair;
 
 public class MultipleSelectView extends RecyclerView {
     public static final String TAG = MultipleSelectView.class.getSimpleName();
@@ -26,6 +26,7 @@ public class MultipleSelectView extends RecyclerView {
     private MultipleItemAdapter mItemAdapter;
     private GridLayoutManager mGridLayoutManager;
     private MultipleItemAdapter.ItemSelectListener mItemSelectListener;
+    private ItemDecoration mItemDecoration;
 
     public MultipleSelectView(@NonNull Context context) {
         this(context, null);
@@ -39,7 +40,7 @@ public class MultipleSelectView extends RecyclerView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void init(List<MultipleItemInfo> itemList, Map<Integer, PairBean> pairBeanMap, int totalType) {
+    public void init(List<MultipleItemInfo> itemList, Map<Integer, MultipleItemPair> pairBeanMap, int totalType) {
         mItemAdapter = new MultipleItemAdapter(getContext(), itemList, pairBeanMap, totalType);
         init();
     }
@@ -50,7 +51,10 @@ public class MultipleSelectView extends RecyclerView {
         final int wL = getResources().getDimensionPixelSize(R.dimen.edit_face_select_item_space_h);
         final int hL = getResources().getDimensionPixelSize(R.dimen.edit_face_select_item_space_v);
         final int topNormalL = getResources().getDimensionPixelSize(R.dimen.edit_face_select_item_space_h);
-        addItemDecoration(new ItemDecoration() {
+        if(mItemDecoration != null){
+            removeItemDecoration(mItemDecoration);
+        }
+        mItemDecoration = new ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {
                 int index = parent.getChildAdapterPosition(view);
@@ -60,17 +64,17 @@ public class MultipleSelectView extends RecyclerView {
                 int bottom = index < spanCount ? 0 : topNormalL;
                 outRect.set(left, top, right, bottom);
             }
-        });
+        };
+        addItemDecoration(mItemDecoration);
 
         ((SimpleItemAnimator) getItemAnimator()).setSupportsChangeAnimations(false);
         mItemAdapter.setItemSelectListener(new MultipleItemAdapter.ItemSelectListener() {
             @Override
-            public boolean itemSelectListener(int type, int lastPos, boolean isSel, int position, int realPos) {
+            public void itemSelectListener(int type, int lastPos, boolean isSel, int position, int realPos) {
                 scrollToPosition(position);
                 if (mItemSelectListener != null) {
                     mItemSelectListener.itemSelectListener(type, lastPos, isSel, position, realPos);
                 }
-                return true;
             }
         });
     }

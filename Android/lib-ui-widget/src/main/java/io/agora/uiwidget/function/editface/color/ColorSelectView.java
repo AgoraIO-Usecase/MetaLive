@@ -22,6 +22,7 @@ public class ColorSelectView extends RecyclerView {
 
     private double[][] mColorList;
     private int mDefaultSelectColor;
+    private ItemDecoration mItemDecoration;
 
     public ColorSelectView(@NonNull Context context) {
         this(context, null);
@@ -43,7 +44,10 @@ public class ColorSelectView extends RecyclerView {
         setAdapter(mColorAdapter);
 
         final int l30 = getResources().getDimensionPixelSize(R.dimen.edit_face_select_color_space);
-        addItemDecoration(new ItemDecoration() {
+        if(mItemDecoration != null){
+            removeItemDecoration(mItemDecoration);
+        }
+        mItemDecoration = new ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {
                 int size = mColorList.length;
@@ -52,7 +56,8 @@ public class ColorSelectView extends RecyclerView {
                 int right = index == size - 1 ? l30 : 0;
                 outRect.set(left, 0, right, 0);
             }
-        });
+        };
+        addItemDecoration(mItemDecoration);
 
         ((SimpleItemAnimator) getItemAnimator()).setSupportsChangeAnimations(false);
         mColorAdapter.setColorSelectListener(new ColorAdapter.ColorSelectListener() {

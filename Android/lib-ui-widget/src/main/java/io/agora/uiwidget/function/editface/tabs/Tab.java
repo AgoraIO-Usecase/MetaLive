@@ -6,11 +6,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public abstract class Tab<T extends RecyclerView.ViewHolder> {
     public static final int VIEW_TYPE_IMAGE = 0;
     public static final int VIEW_TYPE_COLOR_ITEM = 1;
-    public static final int VIEW_TYPE_SHAPE = 2;
+    public static final int VIEW_TYPE_SEEK_COLOR_ITEM = 2;
     public static final int VIEW_TYPE_ITEM = 3;
-    public static final int VIEW_TYPE_MAKE_UP = 4;
+    public static final int VIEW_TYPE_COLOR_MULTIPLE_ITEM = 4;
     public static final int VIEW_TYPE_DECORATION = 5;
-    public static final int VIEW_TYPE_GLASSES = 6;
+    public static final int VIEW_TYPE_SWiTCH_COLOR_ITEM = 6;
 
 
     public final int viewType;

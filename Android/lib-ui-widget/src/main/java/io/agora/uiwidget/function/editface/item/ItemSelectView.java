@@ -27,6 +27,7 @@ public class ItemSelectView extends RecyclerView {
 
     private int size;
     private int mDefaultSelectItem;
+    private ItemDecoration mItemDecoration;
 
     public ItemSelectView(@NonNull Context context) {
         this(context, null);
@@ -64,7 +65,10 @@ public class ItemSelectView extends RecyclerView {
         final int wL = getResources().getDimensionPixelSize(R.dimen.edit_face_select_item_space_h);
         final int hL = getResources().getDimensionPixelSize(R.dimen.edit_face_select_item_space_v);
         final int topNormalL = getResources().getDimensionPixelSize(R.dimen.edit_face_select_item_space_h);
-        addItemDecoration(new ItemDecoration() {
+        if(mItemDecoration != null){
+            removeItemDecoration(mItemDecoration);
+        }
+        mItemDecoration = new ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {
                 int index = parent.getChildAdapterPosition(view);
@@ -74,7 +78,8 @@ public class ItemSelectView extends RecyclerView {
                 int bottom = index < spanCount ? 0 : topNormalL;
                 outRect.set(left, top, right, bottom);
             }
-        });
+        };
+        addItemDecoration(mItemDecoration);
         ((SimpleItemAnimator) getItemAnimator()).setSupportsChangeAnimations(false);
         mItemAdapter.setItemSelectListener(new ItemAdapter.ItemSelectListener() {
             @Override

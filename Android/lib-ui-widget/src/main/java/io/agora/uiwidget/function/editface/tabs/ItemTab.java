@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.Arrays;
+import java.util.List;
 
 import io.agora.uiwidget.R;
 import io.agora.uiwidget.function.editface.bean.ItemInfo;
@@ -14,34 +14,34 @@ import io.agora.uiwidget.function.editface.item.ItemAdapter;
 import io.agora.uiwidget.function.editface.item.ItemSelectView;
 
 public class ItemTab extends Tab<ItemTab.ItemTabViewHolder>{
+    private final List<ItemInfo> itemList;
+    private final int selectItem;
+    private final ItemAdapter.ItemSelectListener itemSelectListener;
 
-
-    public ItemTab(String title) {
+    public ItemTab(
+            String title,
+            List<ItemInfo> itemList,
+            int selectItem,
+            ItemAdapter.ItemSelectListener itemSelectListener
+    ) {
         super(title, VIEW_TYPE_ITEM);
+        this.itemList = itemList;
+        this.selectItem = selectItem;
+        this.itemSelectListener = itemSelectListener;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ItemTabViewHolder holder, int position) {
-
+        holder.itemSelectView.setItemControllerListener(itemSelectListener);
+        holder.itemSelectView.init(itemList, selectItem);
     }
 
     public static class ItemTabViewHolder extends RecyclerView.ViewHolder{
-        private ItemSelectView itemSelectView;
+        private final ItemSelectView itemSelectView;
 
         public ItemTabViewHolder(@NonNull ViewGroup parent) {
             super(LayoutInflater.from(parent.getContext()).inflate(R.layout.edit_face_select_tab_item, parent, false));
             itemSelectView = itemView.findViewById(R.id.item_recycler);
-
-            itemSelectView.setItemControllerListener(new ItemAdapter.ItemSelectListener() {
-                @Override
-                public boolean itemSelectListener(int lastPos, int position) {
-                    return true;
-                }
-            });
-            itemSelectView.init(Arrays.asList(
-                    new ItemInfo(R.drawable.user_profile_image_2),
-                    new ItemInfo(R.drawable.user_profile_image_1)
-            ), 0);
         }
     }
 }

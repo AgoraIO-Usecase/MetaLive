@@ -1,0 +1,59 @@
+{
+  "hatList": [
+    {
+      "gender": 2,
+      "bundle": "",
+      "icon": "edit_face_selector_item_none"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_1.bundle",
+      "icon": "hair_hat_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_2.bundle",
+      "icon": "hair_hat_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_3.bundle",
+      "icon": "hair_hat_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_4.bundle",
+      "icon": "hair_hat_4"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_5.bundle",
+      "icon": "hair_hat_5"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_6.bundle",
+      "icon": "hair_hat_6"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_7.bundle",
+      "icon": "hair_hat_7"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_8.bundle",
+      "icon": "hair_hat_8"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_9.bundle",
+      "icon": "hair_hat_9"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/hat/hair_hat_10.bundle",
+      "icon": "hair_hat_10"
+    }
+  ]
+}

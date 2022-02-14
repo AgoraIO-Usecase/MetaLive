@@ -18,12 +18,12 @@ import java.util.List;
 
 import io.agora.uiwidget.databinding.EditFaceSelectViewBinding;
 import io.agora.uiwidget.function.editface.tabs.ColorItemTab;
-import io.agora.uiwidget.function.editface.tabs.DecorationTab;
-import io.agora.uiwidget.function.editface.tabs.GlassesTab;
+import io.agora.uiwidget.function.editface.tabs.ColorMultipleItemTab;
 import io.agora.uiwidget.function.editface.tabs.ImageTab;
 import io.agora.uiwidget.function.editface.tabs.ItemTab;
-import io.agora.uiwidget.function.editface.tabs.MakeUpTab;
-import io.agora.uiwidget.function.editface.tabs.ShapeTab;
+import io.agora.uiwidget.function.editface.tabs.MultipleItemTab;
+import io.agora.uiwidget.function.editface.tabs.SeekColorItemTab;
+import io.agora.uiwidget.function.editface.tabs.SwitchColorItemTab;
 import io.agora.uiwidget.function.editface.tabs.Tab;
 
 public class EditFaceSelectView extends FrameLayout {
@@ -95,7 +95,7 @@ public class EditFaceSelectView extends FrameLayout {
         mViewBinding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mViewBinding.viewPager2.setCurrentItem(tab.getPosition(), false);
+                mViewBinding.viewPager2.setCurrentItem(tab.getPosition());
             }
 
             @Override
@@ -117,16 +117,16 @@ public class EditFaceSelectView extends FrameLayout {
                 return new ImageTab.ImageTabViewHolder(parent);
             case Tab.VIEW_TYPE_COLOR_ITEM:
                 return new ColorItemTab.ColorItemTabViewHolder(parent);
-            case Tab.VIEW_TYPE_SHAPE:
-                return new ShapeTab.ShapeTabViewHolder(parent);
+            case Tab.VIEW_TYPE_SEEK_COLOR_ITEM:
+                return new SeekColorItemTab.SeekColorTabViewHolder(parent);
             case Tab.VIEW_TYPE_ITEM:
                 return new ItemTab.ItemTabViewHolder(parent);
-            case Tab.VIEW_TYPE_MAKE_UP:
-                return new MakeUpTab.MakeUpTabViewHolder(parent);
+            case Tab.VIEW_TYPE_COLOR_MULTIPLE_ITEM:
+                return new ColorMultipleItemTab.ColorMultipleItemTabViewHolder(parent);
             case Tab.VIEW_TYPE_DECORATION:
-                return new DecorationTab.DecorationTabViewHolder(parent);
-            case Tab.VIEW_TYPE_GLASSES:
-                return new GlassesTab.GlassesTabViewHolder(parent);
+                return new MultipleItemTab.DecorationTabViewHolder(parent);
+            case Tab.VIEW_TYPE_SWiTCH_COLOR_ITEM:
+                return new SwitchColorItemTab.SwitchColorItemTabViewHolder(parent);
         }
         throw new IllegalArgumentException("cannot find view type: " + viewType);
     }

@@ -18,7 +18,7 @@ import java.util.Map;
 
 import io.agora.uiwidget.R;
 import io.agora.uiwidget.function.editface.bean.MultipleItemInfo;
-import io.agora.uiwidget.function.editface.bean.PairBean;
+import io.agora.uiwidget.function.editface.bean.MultipleItemPair;
 
 
 public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapter.ItemHolder> {
@@ -26,11 +26,11 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
     private final int totalType;
     private Context mContext;
     private List<MultipleItemInfo> itemList;
-    private Map<Integer, PairBean> pairMap;
+    private Map<Integer, MultipleItemPair> pairMap;
 
     private ItemSelectListener itemSelectListener;
 
-    public MultipleItemAdapter(Context context, List<MultipleItemInfo> itemList, Map<Integer, PairBean> pairBeanMap, int totalType) {
+    public MultipleItemAdapter(Context context, List<MultipleItemInfo> itemList, Map<Integer, MultipleItemPair> pairBeanMap, int totalType) {
         mContext = context;
         this.itemList = itemList;
         this.pairMap = pairBeanMap;
@@ -48,9 +48,9 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
         final int position = holder.getLayoutPosition();
         holder.mItemImg.setImageResource(getRes(position));
         MultipleItemInfo makeUpBundleRes = itemList.get(position);
-        PairBean pairBean = pairMap.get(makeUpBundleRes.getType());
+        MultipleItemPair multipleItemPair = pairMap.get(makeUpBundleRes.getType());
 
-        boolean isSel = pairBean.getSelectItemPos() == position;
+        boolean isSel = multipleItemPair != null && multipleItemPair.getSelectItemPos() == position;
         holder.mSelect.setVisibility(isSel ? View.VISIBLE : View.GONE);
 
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.rl_item.getLayoutParams();
@@ -68,7 +68,7 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
             @Override
             public void onClick(View v) {
                 if (itemSelectListener != null) {
-                    itemSelectListener.itemSelectListener(makeUpBundleRes.getType(), 0, isPosSel(position), position, position - pairBean.getFrontLength());
+                    itemSelectListener.itemSelectListener(makeUpBundleRes.getType(), 0, isPosSel(position), position, position - multipleItemPair.getFrontLength());
                     setSelectPosition(position);
                 }
             }
@@ -84,7 +84,7 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
         return itemList == null ? 0 : itemList.size();
     }
 
-    class ItemHolder extends RecyclerView.ViewHolder {
+    static class ItemHolder extends RecyclerView.ViewHolder {
         ImageView mItemImg;
         View mSelect;
         TextView tv_type_name;
@@ -104,15 +104,21 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
             return;
         }
         MultipleItemInfo makeUpBundleRes = itemList.get(selectPos);
-        PairBean pairBean = pairMap.get(makeUpBundleRes.getType());
-        if (pairBean.getSelectItemPos() == selectPos) {
+        MultipleItemPair multipleItemPair = pairMap.get(makeUpBundleRes.getType());
+        if(multipleItemPair == null){
+            multipleItemPair = new MultipleItemPair(0, 0);
+        }
+        if (multipleItemPair.getSelectItemPos() == selectPos) {
             if (selectPos > 0) {
-                pairBean.setSelectItemPos(0);
-                pairMap.put(makeUpBundleRes.getType(), pairBean);
+                multipleItemPair.setSelectItemPos(0);
+                pairMap.put(makeUpBundleRes.getType(), multipleItemPair);
                 notifyItemChanged(selectPos);
             }
             if (!hasSelectMakeUp()) {
-                PairBean makeBean = pairMap.get(totalType);
+                MultipleItemPair makeBean = pairMap.get(totalType);
+                if(makeBean == null){
+                    makeBean = new MultipleItemPair(0, 0);
+                }
                 if (makeBean.getSelectItemPos() != 0) {
                     makeBean.setSelectItemPos(0);
                     pairMap.put(totalType, makeBean);
@@ -121,9 +127,9 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
             }
             return;
         }
-        int oldSelectId = pairBean.getSelectItemPos();
-        pairBean.setSelectItemPos(selectPos);
-        pairMap.put(makeUpBundleRes.getType(), pairBean);
+        int oldSelectId = multipleItemPair.getSelectItemPos();
+        multipleItemPair.setSelectItemPos(selectPos);
+        pairMap.put(makeUpBundleRes.getType(), multipleItemPair);
         notifyItemChanged(selectPos);
         if (selectPos == 0) {
             initData();
@@ -134,7 +140,10 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
             notifyItemChanged(oldSelectId);
         }
         if (hasSelectMakeUp()) {
-            PairBean makeBean = pairMap.get(totalType);
+            MultipleItemPair makeBean = pairMap.get(totalType);
+            if(makeBean == null){
+                makeBean = new MultipleItemPair(0, 0);
+            }
             if (makeBean.getSelectItemPos() == 0) {
                 makeBean.setSelectItemPos(-1);
                 pairMap.put(totalType, makeBean);
@@ -146,8 +155,8 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
     private boolean hasSelectMakeUp() {
         boolean hasSelect = false;
         for (Integer key : pairMap.keySet()) {
-            PairBean pairBean = pairMap.get(key);
-            if (pairBean.getSelectItemPos() > 0) {
+            MultipleItemPair multipleItemPair = pairMap.get(key);
+            if (multipleItemPair != null && multipleItemPair.getSelectItemPos() > 0) {
                 hasSelect = true;
                 break;
             }
@@ -157,25 +166,25 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
 
     private void initData() {
         for (Integer key : pairMap.keySet()) {
-            PairBean pairBean = pairMap.get(key);
-            if (pairBean.getSelectItemPos() > 0) {
-                pairBean.setSelectItemPos(0);
-                pairMap.put(key, pairBean);
+            MultipleItemPair multipleItemPair = pairMap.get(key);
+            if (multipleItemPair != null && multipleItemPair.getSelectItemPos() > 0) {
+                multipleItemPair.setSelectItemPos(0);
+                pairMap.put(key, multipleItemPair);
             }
         }
     }
 
     private boolean isPosSel(int pos) {
         MultipleItemInfo makeUpBundleRes = itemList.get(pos);
-        PairBean pairBean = pairMap.get(makeUpBundleRes.getType());
-        return pairBean.getSelectItemPos() != pos;
+        MultipleItemPair multipleItemPair = pairMap.get(makeUpBundleRes.getType());
+        return multipleItemPair != null && multipleItemPair.getSelectItemPos() != pos;
     }
 
     public int getLastPos(int pos) {
         MultipleItemInfo makeUpBundleRes = itemList.get(pos);
-        PairBean pairBean = pairMap.get(makeUpBundleRes.getType());
-        if (pairBean.getSelectItemPos() == pos) return -1;
-        int oldSelectId = pairBean.getSelectItemPos();
+        MultipleItemPair multipleItemPair = pairMap.get(makeUpBundleRes.getType());
+        if (multipleItemPair != null && multipleItemPair.getSelectItemPos() == pos) return -1;
+        int oldSelectId = multipleItemPair != null ? multipleItemPair.getSelectItemPos() : -1;
         return oldSelectId;
     }
 
@@ -184,6 +193,6 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<MultipleItemAdapte
     }
 
     public interface ItemSelectListener {
-        boolean itemSelectListener(int type, int lastPos, boolean isSel, int position, int realPos);
+        void itemSelectListener(int type, int lastPos, boolean isSel, int position, int realPos);
     }
 }
