@@ -64,7 +64,7 @@ class MainViewController: UIViewController {
         let rightButton = UIBarButtonItem(image: img,
                                           style: .plain,
                                           target: self,
-                                          action: #selector(buttonTap))
+                                          action: #selector(editButtonTap))
         
         navigationItem.rightBarButtonItem = rightButton
     }
@@ -74,8 +74,10 @@ class MainViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
-        let infos = ["最长的电源", "最长的电源", "最长的电源"].map({ Info(title: $0) })
+        let infos = [String](repeating: "最长的电影", count: 30).map({ Info(title: $0) })
         update(infos: infos)
+        
+        createButton.addTarget(self, action: #selector(createButtonTap), for: .touchUpInside)
     }
     
     func update(infos: [Info]) {
@@ -83,12 +85,14 @@ class MainViewController: UIViewController {
         tableView.reloadData()
     }
     
-    @objc func buttonTap() {
-//        let infos = AEAViewController.createTestData()
-//        let vc = AEAViewController(infos: infos)
-//        vc.modalPresentationStyle = .fullScreen
-//        present(vc, animated: true, completion: nil)
-        
+    @objc func editButtonTap() {
+        let infos = AEAViewController.createTestData()
+        let vc = AEAViewController(infos: infos)
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true, completion: nil)
+    }
+    
+    @objc func createButtonTap() {
         let vc = TextInputAlertVC()
         vc.show(in: self)
     }
