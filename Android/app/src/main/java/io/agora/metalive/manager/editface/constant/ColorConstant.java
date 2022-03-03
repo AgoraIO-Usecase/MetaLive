@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.agora.uiwidget.function.editface.seekbar.ColorPickGradient;
-
 /**
  * Created by tujh on 2018/11/6.
  */

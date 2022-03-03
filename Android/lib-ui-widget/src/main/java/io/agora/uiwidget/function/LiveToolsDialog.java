@@ -33,21 +33,24 @@ public class LiveToolsDialog extends BottomSheetDialog {
     private LiveToolLayoutBinding mBinding;
     private final List<ToolItem> showToolItems = new ArrayList<>();
 
-
     public LiveToolsDialog(@NonNull Context context) {
-        this(context, R.style.BottomSheetDialog);
+        this(context, R.style.BottomSheetDialog, false);
     }
 
-    public LiveToolsDialog(@NonNull Context context, int theme) {
+    public LiveToolsDialog(@NonNull Context context, boolean dartText) {
+        this(context, R.style.BottomSheetDialog, dartText);
+    }
+
+    public LiveToolsDialog(@NonNull Context context, int theme, boolean dartText) {
         super(context, theme);
-        init();
+        init(dartText);
     }
 
-    private void init() {
+    private void init(boolean dartText) {
         setCanceledOnTouchOutside(true);
         mBinding = LiveToolLayoutBinding.inflate(LayoutInflater.from(getContext()));
         setContentView(mBinding.getRoot());
-        StatusBarUtil.hideStatusBar(getWindow(), false);
+        StatusBarUtil.hideStatusBar(getWindow(), dartText);
         mBinding.liveToolRecycler.setLayoutManager(new GridLayoutManager(getContext(), 4));
         mBinding.liveToolRecycler.setAdapter(new ToolsAdapter());
     }

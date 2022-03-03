@@ -5,14 +5,16 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import io.agora.metalive.databinding.EditFaceActivityBinding
 import io.agora.metalive.manager.EditFaceManager
+import io.agora.metalive.manager.RtcManager
 import io.agora.metalive.manager.editface.EditFaceItemManager
 import io.agora.metalive.manager.editface.constant.ColorConstant
+import io.agora.metalive.manager.editface.constant.ColorPickGradient
 import io.agora.metalive.manager.editface.constant.FilePathFactory
 import io.agora.metalive.manager.editface.shape.EditParamFactory
 import io.agora.uiwidget.function.editface.bean.ItemInfo
 import io.agora.uiwidget.function.editface.bean.MultipleItemInfo
-import io.agora.uiwidget.function.editface.seekbar.ColorPickGradient
 import io.agora.uiwidget.function.editface.tabs.*
+import io.agora.uiwidget.utils.StatusBarUtil
 
 class EditFaceActivity : AppCompatActivity() {
 
@@ -27,11 +29,22 @@ class EditFaceActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
 
-        EditFaceManager.init(this)
         editFaceItemManager.init()
         initSelectView()
+        mBinding.ivBack.setOnClickListener { onBackPressed() }
+
+        RtcManager.getInstance().renderLocalAvatarVideo(mBinding.localContainer)
+
+        EditFaceManager.getInstance().start()
+    }
+
+    override fun onBackPressed() {
+        RtcManager.getInstance().reset(true)
+        EditFaceManager.getInstance().stop()
+        super.onBackPressed()
     }
 
     private fun initSelectView() {
@@ -50,6 +63,7 @@ class EditFaceActivity : AppCompatActivity() {
                     FilePathFactory.hairBundleRes().map { ItemInfo(it.resId) },
                     mAvatarP2A?.hairIndex ?: 0,
                     { lastPos, position -> true },
+
                     ColorConstant.hair_color,
                     mAvatarP2A?.hairColorValue?.toInt() ?: 0,
                     { }

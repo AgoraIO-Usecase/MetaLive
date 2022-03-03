@@ -1,0 +1,4 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_activated="false" android:drawable="@drawable/room_detail_icon_raisehand_normal"/>
+    <item android:state_activated="true" android:drawable="@drawable/room_detail_icon_raisehand_actived"/>
+</selector>

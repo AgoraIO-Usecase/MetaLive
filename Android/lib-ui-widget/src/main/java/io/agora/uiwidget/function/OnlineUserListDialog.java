@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -23,25 +24,29 @@ public class OnlineUserListDialog extends BottomSheetDialog {
     private OnlineUserListDialogLayoutBinding mBinding;
 
     public OnlineUserListDialog(@NonNull Context context) {
-        this(context, R.style.BottomSheetDialog);
+        this(context, false);
     }
 
-    public OnlineUserListDialog(@NonNull Context context, int theme) {
+    public OnlineUserListDialog(@NonNull Context context, boolean darkText) {
+        this(context, R.style.BottomSheetDialog, darkText);
+    }
+
+    public OnlineUserListDialog(@NonNull Context context, int theme, boolean darkText) {
         super(context, theme);
-        init();
+        init(darkText);
     }
 
-    private void init() {
+    private void init(boolean darkText) {
         setCanceledOnTouchOutside(true);
         mBinding = OnlineUserListDialogLayoutBinding.inflate(LayoutInflater.from(getContext()));
         setContentView(mBinding.getRoot());
-        StatusBarUtil.hideStatusBar(getWindow(), false);
+        StatusBarUtil.hideStatusBar(getWindow(), darkText);
 
         mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(
                 getContext(), LinearLayoutManager.VERTICAL, false));
     }
 
-    public <T> OnlineUserListDialog setListAdapter(AbsListItemAdapter<T> adapter){
+    public OnlineUserListDialog setListAdapter(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
         mBinding.recyclerView.setAdapter(adapter);
         return this;
     }
@@ -51,17 +56,24 @@ public class OnlineUserListDialog extends BottomSheetDialog {
         super.show();
     }
 
-    public static abstract class AbsListItemAdapter<T> extends RecyclerView.Adapter<BindingViewHolder<OnlineUserListDialogItemBinding>>{
+    public static abstract class DefaultListItemAdapter<T> extends AbsListItemAdapter<T, OnlineUserListDialogItemBinding> {
+        @Override
+        protected OnlineUserListDialogItemBinding onCreateViewBinding(LayoutInflater inflater, ViewGroup parent) {
+            return OnlineUserListDialogItemBinding.inflate(inflater, parent, false);
+        }
+    }
+
+    public static abstract class AbsListItemAdapter<T, B extends ViewBinding> extends RecyclerView.Adapter<BindingViewHolder<B>> {
         private final List<T> mList = new ArrayList<>();
 
         @NonNull
         @Override
-        public final BindingViewHolder<OnlineUserListDialogItemBinding> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new BindingViewHolder<>(OnlineUserListDialogItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        public final BindingViewHolder<B> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new BindingViewHolder<B>(onCreateViewBinding(LayoutInflater.from(parent.getContext()), parent));
         }
 
         @Override
-        public final void onBindViewHolder(@NonNull BindingViewHolder<OnlineUserListDialogItemBinding> holder, int position) {
+        public final void onBindViewHolder(@NonNull BindingViewHolder<B> holder, int position) {
             T item = mList.get(position);
             onItemUpdate(holder, position, item);
         }
@@ -71,13 +83,15 @@ public class OnlineUserListDialog extends BottomSheetDialog {
             return mList.size();
         }
 
-        public AbsListItemAdapter<T> resetAll(List<T> list){
+        public AbsListItemAdapter<T, B> resetAll(List<T> list) {
             mList.clear();
             mList.addAll(list);
             notifyDataSetChanged();
             return this;
         }
 
-        protected abstract void onItemUpdate(BindingViewHolder<OnlineUserListDialogItemBinding> holder, int position, T item);
+        protected abstract B onCreateViewBinding(LayoutInflater inflater, ViewGroup parent);
+
+        protected abstract void onItemUpdate(BindingViewHolder<B> holder, int position, T item);
     }
 }

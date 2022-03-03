@@ -51,20 +51,24 @@ public class GiftGridDialog extends BottomSheetDialog {
     private OnGiftSendClickListener sendClickListener;
 
     public GiftGridDialog(@NonNull Context context) {
-        this(context, R.style.BottomSheetDialog);
+        this(context, R.style.BottomSheetDialog, false);
     }
 
-    public GiftGridDialog(@NonNull Context context, int theme) {
+    public GiftGridDialog(@NonNull Context context, boolean dartText) {
+        this(context, R.style.BottomSheetDialog, dartText);
+    }
+
+    public GiftGridDialog(@NonNull Context context, int theme, boolean dartText) {
         super(context, theme);
-        init();
+        init(dartText);
     }
 
-    private void init() {
+    private void init(boolean dartText) {
         giftItemList.addAll(DEFAULT_GIFT_LIST);
         setCanceledOnTouchOutside(true);
         mBinding = GiftGridDialogLayoutBinding.inflate(LayoutInflater.from(getContext()));
         setContentView(mBinding.getRoot());
-        StatusBarUtil.hideStatusBar(getWindow(), false);
+        StatusBarUtil.hideStatusBar(getWindow(), dartText);
         mBinding.giftGridRecycler.setLayoutManager(new GridLayoutManager(getContext(), 4));
         mAdapter = new GiftItemAdapter();
         mBinding.giftGridRecycler.setAdapter(mAdapter);

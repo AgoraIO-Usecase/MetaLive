@@ -10,6 +10,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,7 @@ public class LiveRoomMessageListView extends RecyclerView {
 
     private static final int MESSAGE_TEXT_COLOR = Color.rgb(196, 196, 196);
     private static final int MESSAGE_TEXT_COLOR_LIGHT = Color.argb(101, 35, 35, 35);
-    private static final int MAX_SAVED_MESSAGE = 50;
+
     private static final int MESSAGE_ITEM_MARGIN = 16;
 
     private LiveRoomMessageAdapter<?> mAdapter;
@@ -38,6 +39,7 @@ public class LiveRoomMessageListView extends RecyclerView {
 
     private boolean mLightMode;
     private boolean mNarrow = false;
+
 
     public LiveRoomMessageListView(@NonNull Context context) {
         this(context, null);
@@ -108,9 +110,18 @@ public class LiveRoomMessageListView extends RecyclerView {
     }
 
     public abstract static class LiveRoomMessageAdapter<T> extends Adapter<MessageListViewHolder> {
+        private final int maxSavedMessageCount;
         private final ArrayList<T> mMessageList = new ArrayList<>();
         private boolean isLight = false;
         private boolean isNarrow = false;
+
+        public LiveRoomMessageAdapter() {
+            this(50);
+        }
+
+        public LiveRoomMessageAdapter(int maxSavedMessageCount) {
+            this.maxSavedMessageCount = maxSavedMessageCount;
+        }
 
         @NonNull
         @Override
@@ -137,10 +148,12 @@ public class LiveRoomMessageListView extends RecyclerView {
 
         public void addMessage(T item) {
             int size = mMessageList.size();
-            if (size == MAX_SAVED_MESSAGE) {
-                mMessageList.remove(0);
+            if (size == maxSavedMessageCount) {
                 mMessageList.add(item);
-                notifyDataSetChanged();
+                notifyItemInserted(size);
+
+                mMessageList.remove(0);
+                notifyItemRemoved(0);
             }else{
                 mMessageList.add(item);
                 notifyItemInserted(size);
@@ -156,11 +169,23 @@ public class LiveRoomMessageListView extends RecyclerView {
         private final AppCompatImageView giftIconIv;
         private final View layout;
 
+        private final SparseArray<View> viewSparseArray = new SparseArray<>();
+
         MessageListViewHolder(@NonNull View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.live_message_item_text);
             giftIconIv = itemView.findViewById(R.id.live_message_gift_icon);
             layout = itemView.findViewById(R.id.live_message_item_layout);
+        }
+
+        public @Nullable <T extends View>  T getViewById(int id){
+            View view = viewSparseArray.get(id);
+            if(view != null){
+                return (T) view;
+            }
+            T viewFound = itemView.findViewById(id);
+            viewSparseArray.put(id, viewFound);
+            return viewFound;
         }
 
         public void setupMessage(String user, String message, @DrawableRes int giftIcon) {

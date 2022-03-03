@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/online_user_list_dialog_height"
+    android:minHeight="@dimen/online_user_list_dialog_height"
     android:orientation="vertical"
     android:background="@drawable/online_user_list_dialog_bg">
     <androidx.appcompat.widget.AppCompatTextView

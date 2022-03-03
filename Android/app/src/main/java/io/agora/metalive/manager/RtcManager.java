@@ -33,7 +33,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.TextureView;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -190,7 +193,7 @@ public class RtcManager {
 
     private RtcManager(){}
 
-    public void init(Context context, String appId, OnInitializeListener listener) {
+    public void init(Context context, String appId, @Nullable OnInitializeListener listener) {
         if (isInitialized) {
             return;
         }
@@ -347,7 +350,7 @@ public class RtcManager {
         }
         long startTime = System.currentTimeMillis();
         TextureView avatarSurfaceView = new TextureView(container.getContext());
-
+        avatarSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         container.addView(avatarSurfaceView);
         engine.startPreview();
         VideoCanvas videoCanvas = new VideoCanvas(avatarSurfaceView, RENDER_MODE_HIDDEN);

@@ -1,9 +1,9 @@
 package io.agora.uiwidget.function;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 
@@ -21,27 +21,30 @@ public class TextInputDialog extends BottomSheetDialog {
     private OnSendClickListener onSendClickListener;
 
     public TextInputDialog(@NonNull Context context) {
-        this(context, R.style.BottomSheetDialog);
+        this(context, false);
     }
 
-    public TextInputDialog(@NonNull Context context, int theme) {
+    public TextInputDialog(@NonNull Context context, boolean dartText) {
+        this(context, R.style.BottomSheetDialog, dartText);
+    }
+
+    public TextInputDialog(@NonNull Context context, int theme, boolean dartText) {
         super(context, theme);
-        init();
+        init(dartText);
     }
 
-    private void init(){
+    private void init(boolean dartText){
         setCanceledOnTouchOutside(true);
         mBinding = TextInputDialogLayoutBinding.inflate(LayoutInflater.from(getContext()));
         setContentView(mBinding.getRoot());
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        StatusBarUtil.hideStatusBar(getWindow(), false);
+        StatusBarUtil.hideStatusBar(getWindow(), dartText);
 
         mBinding.editText.setOnEditorActionListener((v, actionId, event) -> {
             if(actionId == EditorInfo.IME_ACTION_SEND){
                 if(onSendClickListener != null && !TextUtils.isEmpty(v.getText())){
-                    onSendClickListener.onSendClicked(v, v.getText().toString());
+                    onSendClickListener.onSendClicked(TextInputDialog.this, v.getText().toString());
                 }
-                dismiss();
                 return true;
             }
             return false;
@@ -66,6 +69,6 @@ public class TextInputDialog extends BottomSheetDialog {
     }
 
     public interface OnSendClickListener {
-        void onSendClicked(View v, String text);
+        void onSendClicked(Dialog dialog, String text);
     }
 }

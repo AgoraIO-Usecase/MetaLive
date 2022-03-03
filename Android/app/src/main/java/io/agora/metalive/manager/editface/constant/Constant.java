@@ -32,7 +32,7 @@ public abstract class Constant {
     public static String web_url_check = "";
     public static String netType = "";//请求的风格类型
 
-    public static final String filePath = EditFaceManager.INSTANCE.getContext().getExternalCacheDir().getAbsolutePath()
+    public static final String filePath = EditFaceManager.getInstance().getContext().getExternalCacheDir().getAbsolutePath()
             + File.separator + "FaceUnity" + File.separator + APP_NAME + File.separator;
 
     public static final String versionPath = filePath + "versionPath.json";//版本号

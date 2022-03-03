@@ -32,7 +32,7 @@ public class JsonUtils {
     private Context context;
 
     public JsonUtils() {
-        this.context = EditFaceManager.INSTANCE.getContext();
+        this.context = EditFaceManager.getInstance().getContext();
     }
 
 

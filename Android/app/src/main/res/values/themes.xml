@@ -24,7 +24,7 @@
 
         <item name="alertDialogTheme">@style/CommonAlertDialog.Theme.IOS</item>
         <item name="alertDialogStyle">@style/CommonAlertDialog.IOS</item>
-    </style>
 
+    </style>
 
 </resources>

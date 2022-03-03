@@ -4,6 +4,12 @@
     <dimen name="theme_content_padding_v">16dp</dimen>
     <dimen name="theme_content_padding_h">32dp</dimen>
     <dimen name="theme_icon_padding">8dp</dimen>
+    <dimen name="theme_btn_radius">99dp</dimen>
+    <dimen name="theme_btn_padding_h">2dp</dimen>
+    <dimen name="theme_btn_padding_v">4dp</dimen>
+
+    <dimen name="live_bottom_btn_margin">9dp</dimen>
+    <dimen name="text_input_dialog_content_height">52dp</dimen>
 
 
 </resources>
