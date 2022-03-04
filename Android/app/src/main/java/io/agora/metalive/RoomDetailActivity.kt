@@ -4,15 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import io.agora.metalive.databinding.RoomDetailActivityBinding
+import io.agora.metalive.databinding.RoomDetailRaisehandItemBinding
 import io.agora.metalive.manager.EditFaceManager
 import io.agora.metalive.manager.RoomManager
 import io.agora.metalive.manager.RtcManager
 import io.agora.uiwidget.basic.BindingViewHolder
-import io.agora.uiwidget.databinding.OnlineUserListDialogItemBinding
 import io.agora.uiwidget.function.*
 import io.agora.uiwidget.utils.ImageUtil
 import io.agora.uiwidget.utils.RandomUtil
@@ -26,7 +28,7 @@ class RoomDetailActivity : AppCompatActivity() {
 
     private val mMsgAdapter by lazy {
         object :
-            LiveRoomMessageListView.LiveRoomMessageAdapter<RoomManager.MessageInfo>(3) {
+            LiveRoomMessageListView.LiveRoomMessageAdapter<RoomManager.MessageInfo>() {
 
             override fun onItemUpdate(
                 holder: LiveRoomMessageListView.MessageListViewHolder,
@@ -130,37 +132,53 @@ class RoomDetailActivity : AppCompatActivity() {
             .setFun4ImageResource(R.drawable.room_detail_icon_raisehand)
             .setFun4Activated(true)
             .setFun4Background(null)
+            .setFun4Dot(true)
             .setFun4ClickListener {
                 mBinding.liveBottomView.apply {
                     isFun4Activated = !isFun4Activated
+                    setFun4Dot(isFun4Activated)
                 }
 
-                object: OnlineUserListDialog.DefaultListItemAdapter<RoomManager.UserInfo>(){
+                object: OnlineUserListDialog.AbsListItemAdapter<RoomManager.UserInfo, RoomDetailRaisehandItemBinding>(){
+
+                    override fun onCreateViewBinding(
+                        inflater: LayoutInflater,
+                        parent: ViewGroup
+                    ) = RoomDetailRaisehandItemBinding.inflate(inflater, parent, false)
+
 
                     override fun onItemUpdate(
-                        holder: BindingViewHolder<OnlineUserListDialogItemBinding>,
+                        holder: BindingViewHolder<RoomDetailRaisehandItemBinding>,
                         position: Int,
-                        item: RoomManager.UserInfo?
+                        item: RoomManager.UserInfo
                     ) {
-                        holder.binding.ivIcon.apply {
+                        holder.binding.ivAvatar.apply {
                             ImageUtil.setDrawableRound(context, this, RandomUtil.randomLiveRoomIcon(), 999.0f)
                         }
-                        holder.binding.tvName.apply {
+                        holder.binding.tvUserName.apply {
                             text = RandomUtil.randomUserName(context)
                         }
-                        holder.binding.tvStatus.apply {
-                            isActivated = true
-                            setText(R.string.online_user_list_dialog_invite)
+
+                        when(item.status){
+                            RoomManager.OnlineStatus.ONLINE -> {
+                                holder.binding.btnRefuse.isVisible = false
+                                holder.binding.btnAccept.isVisible = false
+                                holder.binding.btnOffline.isVisible = true
+                            }
+                            RoomManager.OnlineStatus.OFFLINE -> {
+                                holder.binding.btnRefuse.isVisible = true
+                                holder.binding.btnAccept.isVisible = true
+                                holder.binding.btnOffline.isVisible = false
+                            }
                         }
                     }
                 }.apply {
-                    resetAll(listOf(RoomManager.UserInfo(), RoomManager.UserInfo()))
+                    resetAll(listOf(RoomManager.UserInfo(RoomManager.OnlineStatus.OFFLINE), RoomManager.UserInfo(RoomManager.OnlineStatus.OFFLINE), RoomManager.UserInfo(RoomManager.OnlineStatus.ONLINE)))
                     OnlineUserListDialog(this@RoomDetailActivity, true)
+                        .setListTitle(getString(R.string.room_detail_raisehand_title))
                         .setListAdapter(this)
                         .show()
                 }
-
-
             }
     }
 

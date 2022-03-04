@@ -15,6 +15,7 @@
 
         <activity
             android:name=".RoomListActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,10 +26,12 @@
 
         <activity
             android:name=".RoomDetailActivity"
+            android:screenOrientation="behind"
             android:exported="true"/>
 
         <activity
             android:name=".EditFaceActivity"
+            android:screenOrientation="behind"
             android:exported="true"/>
 
     </application>

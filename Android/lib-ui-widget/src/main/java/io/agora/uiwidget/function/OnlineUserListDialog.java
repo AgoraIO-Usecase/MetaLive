@@ -51,6 +51,11 @@ public class OnlineUserListDialog extends BottomSheetDialog {
         return this;
     }
 
+    public OnlineUserListDialog setListTitle(CharSequence title) {
+        mBinding.tvTitle.setText(title);
+        return this;
+    }
+
     @Override
     public void show() {
         super.show();

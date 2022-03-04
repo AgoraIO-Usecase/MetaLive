@@ -13,6 +13,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import io.agora.uiwidget.R;
+import q.rorbin.badgeview.QBadgeView;
 
 
 public class LiveBottomView extends RelativeLayout{
@@ -31,6 +32,7 @@ public class LiveBottomView extends RelativeLayout{
     private AppCompatImageView mFun2;
     private AppCompatImageView mFun3;
     private AppCompatImageView mFun4;
+    private QBadgeView mFun4QBadgeView;
     private AppCompatTextView mInputText;
     private boolean mLight = false;
 
@@ -64,6 +66,7 @@ public class LiveBottomView extends RelativeLayout{
         mInputText = findViewById(R.id.live_bottom_message_input_hint);
         mCancel = findViewById(R.id.live_bottom_btn_close);
         mMore = findViewById(R.id.live_bottom_btn_more);
+        mFun4QBadgeView = new QBadgeView(getContext());
     }
 
     public LiveBottomView setupInputText(boolean visible, OnClickListener listener){
@@ -198,6 +201,15 @@ public class LiveBottomView extends RelativeLayout{
 
     public LiveBottomView setFun4Background(Drawable drawable){
         mFun4.setBackgroundDrawable(drawable);
+        return this;
+    }
+
+    public LiveBottomView setFun4Dot(boolean visible){
+        if(visible){
+            mFun4QBadgeView.bindTarget(mFun4).setBadgeText("");
+        }else{
+            mFun4QBadgeView.bindTarget(mFun4).hide(false);
+        }
         return this;
     }
 

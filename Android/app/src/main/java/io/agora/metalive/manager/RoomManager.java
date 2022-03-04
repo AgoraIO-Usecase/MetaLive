@@ -6,8 +6,11 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.IntDef;
 
 import java.io.Serializable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -386,7 +389,21 @@ public class RoomManager {
     }
 
     public static final class UserInfo {
+        // 0: 未上麦，1: 已上麦
+        @OnlineStatus
+        public int status;
 
+        public UserInfo(int status) {
+            this.status = status;
+        }
+    }
+
+
+    @IntDef({OnlineStatus.ONLINE, OnlineStatus.OFFLINE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface OnlineStatus{
+        public static final int OFFLINE = 0;
+        public static final int ONLINE = 1;
     }
 
 
