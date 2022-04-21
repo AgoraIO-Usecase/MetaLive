@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import io.agora.uiwidget.R;
 import io.agora.uiwidget.function.editface.OnTabItemSelectedListener;
-import io.agora.uiwidget.utils.ImageUtil;
+import io.agora.uiwidget.utils.UIUtil;
 
 public class ImageTab extends Tab<ImageTab.ImageTabViewHolder> {
 
@@ -62,8 +62,8 @@ public class ImageTab extends Tab<ImageTab.ImageTabViewHolder> {
         }
 
         public void setImageDrawable(int ivDrawable01, int ivDrawable02) {
-            ImageUtil.setDrawableRound(itemView.getContext(), iv01, ivDrawable01, itemView.getContext().getResources().getDimension(R.dimen.edit_face_select_item_corner_radius_inner));
-            ImageUtil.setDrawableRound(itemView.getContext(), iv02, ivDrawable02, itemView.getContext().getResources().getDimension(R.dimen.edit_face_select_item_corner_radius_inner));
+            iv01.setImageDrawable(UIUtil.getRoundDrawable(itemView.getContext(), ivDrawable01, itemView.getContext().getResources().getDimension(R.dimen.edit_face_select_item_corner_radius_inner)));
+            iv02.setImageDrawable(UIUtil.getRoundDrawable(itemView.getContext(), ivDrawable02, itemView.getContext().getResources().getDimension(R.dimen.edit_face_select_item_corner_radius_inner)));
         }
 
         public void setSelected(int position) {

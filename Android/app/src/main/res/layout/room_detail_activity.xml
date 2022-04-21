@@ -16,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/iv_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
@@ -24,16 +25,20 @@
             android:src="@drawable/cmm_btn_back" />
 
         <TextView
+            android:id="@+id/tv_room_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:maxWidth="200dp"
             android:textColor="@color/black"
-            android:textSize="26sp"
+            android:textSize="18sp"
             android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="marquee"
             tools:text="Join Me" />
 
         <TextView
+            android:id="@+id/tv_user_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"

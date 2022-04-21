@@ -2,13 +2,12 @@ package io.agora.metalive.manager.editface.core;
 
 import android.content.Context;
 
-import com.faceunity.wrapper.faceunity;
-
 import java.util.Arrays;
 
 import io.agora.metalive.manager.RtcManager;
 import io.agora.metalive.manager.editface.constant.FilePathFactory;
 import io.agora.metalive.manager.editface.core.base.BaseCore;
+import io.agora.rtc2.Constants;
 import io.agora.rtc2.video.AvatarItemType;
 import io.agora.rtc2.video.AvatarOptionValue;
 
@@ -183,8 +182,11 @@ public class PTACore extends BaseCore {
     @Override
     public float[] getLandmarksData() {
         Arrays.fill(landmarksData, 0.0f);
-        if (isNeedTrackFace )
-            faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
+        if (isNeedTrackFace ) {
+            AvatarOptionValue outValue = new AvatarOptionValue();
+            RtcManager.getInstance().GetGeneratorOptions("landmarks", Constants.AvatarValueType.FloatArray, outValue);
+            landmarksData = outValue.getFloatValueArray();
+        }
         return landmarksData;
     }
 }

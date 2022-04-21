@@ -10,3 +10,9 @@ dependencyResolutionManagement {
 rootProject.name = "MetaLive"
 include ':app'
 include ':lib-ui-widget'
+
+def sdkPath = new File(settingsDir, '../../SyncManager-Android/rtmSyncManager')
+if(sdkPath.exists()){
+    include ':rtmSyncManager'
+    project(':rtmSyncManager').projectDir = sdkPath
+}

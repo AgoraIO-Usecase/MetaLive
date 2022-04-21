@@ -22,9 +22,18 @@
         <item name="contentPaddingEnd">@dimen/theme_content_padding_h</item>
         <item name="iconPadding">@dimen/theme_icon_padding</item>
 
-        <item name="alertDialogTheme">@style/CommonAlertDialog.Theme.IOS</item>
-        <item name="alertDialogStyle">@style/CommonAlertDialog.IOS</item>
+        <item name="alertDialogTheme">@style/CommonAlertDialog.Theme.MetaLive</item>
+        <item name="alertDialogStyle">@style/CommonAlertDialog.MetaLive</item>
 
+    </style>
+
+    <style name="CommonAlertDialog.MetaLive" parent="AlertDialog.AppCompat">
+        <item name="android:layout">@layout/theme_alert_layout</item>
+    </style>
+
+    <style name="CommonAlertDialog.Theme.MetaLive" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/theme_alert_bg</item>
+        <item name="android:windowAnimationStyle">@style/Animation.AppCompat.DropDownUp</item>
     </style>
 
 </resources>

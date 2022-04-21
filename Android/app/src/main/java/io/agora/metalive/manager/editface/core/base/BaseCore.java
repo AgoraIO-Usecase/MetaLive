@@ -2,13 +2,12 @@ package io.agora.metalive.manager.editface.core.base;
 
 import android.content.Context;
 
-import com.faceunity.wrapper.faceunity;
-
 import java.util.Arrays;
 
 import io.agora.metalive.manager.RtcManager;
 import io.agora.metalive.manager.editface.constant.FilePathFactory;
 import io.agora.metalive.manager.editface.core.FUPTARenderer;
+import io.agora.metalive.manager.editface.entity.AvatarInfo;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.video.AvatarItemType;
 import io.agora.rtc2.video.AvatarOptionValue;
@@ -26,7 +25,7 @@ public abstract class BaseCore {
 
 
     protected float[] landmarksData = new float[150];
-    protected faceunity.AvatarInfo avatarInfo = new faceunity.AvatarInfo();
+    protected AvatarInfo avatarInfo = new AvatarInfo();
     protected float[] faceRectData = new float[4];
 
     public BaseCore(Context context, FUPTARenderer fuP2ARenderer) {

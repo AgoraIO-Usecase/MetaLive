@@ -14,7 +14,8 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/preview_control_shadow_height"
-        android:background="@drawable/preview_control_shadow_bg"/>
+        android:background="@drawable/preview_control_shadow_bg"
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:id="@+id/preview_control_top_btn_layout"

@@ -3,9 +3,7 @@ package io.agora.uiwidget.function;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -14,14 +12,15 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import java.util.ArrayList;
-import java.util.List;
+import androidx.viewbinding.ViewBinding;
 
 import io.agora.uiwidget.R;
+import io.agora.uiwidget.basic.BindingSingleAdapter;
+import io.agora.uiwidget.basic.BindingViewHolder;
+import io.agora.uiwidget.databinding.RoomListItemBinding;
 
 public class RoomListView extends FrameLayout {
-    private static final int SPAN_COUNT = 2;
+
     private static final int REFRESH_DELAY = 1000 * 60;
 
     private RecyclerView mRecyclerView;
@@ -29,7 +28,8 @@ public class RoomListView extends FrameLayout {
     private View mNoDataBg;
     private View mNetworkErrorBg;
 
-    private AbsRoomListAdapter<?> mListAdapter;
+    private int mSpanCount = 2;
+    private CustRoomListAdapter<?, ?> mListAdapter;
     private final Runnable mPageRefreshRunnable = new Runnable() {
         @Override
         public void run() {
@@ -65,7 +65,8 @@ public class RoomListView extends FrameLayout {
 
         mRecyclerView = findViewById(R.id.room_list_recycler);
         mRecyclerView.setVisibility(View.VISIBLE);
-
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), mSpanCount));
+        mRecyclerView.addItemDecoration(new RoomListItemDecoration());
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -103,17 +104,20 @@ public class RoomListView extends FrameLayout {
         mNetworkErrorBg.setVisibility(View.GONE);
     }
 
-    public <Data> void setListAdapter(AbsRoomListAdapter<Data> listAdapter) {
-        setListAdapter(listAdapter, SPAN_COUNT);
+    public void setSpanCount(int spanCount){
+        mSpanCount = spanCount;
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), mSpanCount));
     }
 
-    public <Data> void setListAdapter(AbsRoomListAdapter<Data> listAdapter, int spanCount) {
+    public <Data> void setListAdapter(AbsRoomListAdapter<Data> listAdapter) {
+        setListAdapter((CustRoomListAdapter<Data, RoomListItemBinding>)listAdapter);
+    }
+
+    public <Data, Binding extends ViewBinding> void setListAdapter(CustRoomListAdapter<Data, Binding> listAdapter) {
         if (mListAdapter != null) {
             mListAdapter.releaseInner();
         }
         mListAdapter = listAdapter;
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), spanCount));
-        mRecyclerView.addItemDecoration(new RoomListItemDecoration(spanCount));
         mRecyclerView.setAdapter(mListAdapter);
         if (mListAdapter != null) {
             mListAdapter.onNetErrorRun = () -> {
@@ -148,10 +152,8 @@ public class RoomListView extends FrameLayout {
     private class RoomListItemDecoration extends RecyclerView.ItemDecoration {
 
         private final int mItemSpacing;
-        private int spanCount;
 
-        private RoomListItemDecoration(int spanCount) {
-            this.spanCount = spanCount;
+        private RoomListItemDecoration() {
             mItemSpacing = getResources().getDimensionPixelSize(R.dimen.room_list_item_margin);
         }
 
@@ -167,77 +169,66 @@ public class RoomListView extends FrameLayout {
             outRect.top = half;
             outRect.bottom = half;
 
-            if (position < spanCount) {
+            if (position < mSpanCount) {
                 outRect.top = mItemSpacing;
             } else {
-                int remain = total % spanCount;
-                if (remain == 0) remain = SPAN_COUNT;
+                int remain = total % mSpanCount;
+                if (remain == 0) remain = mSpanCount;
                 if (position + remain >= total) {
                     outRect.bottom = mItemSpacing;
                 }
             }
 
-            if (position % spanCount == 0) {
+            if (position % mSpanCount == 0) {
                 outRect.left = mItemSpacing;
-                outRect.right = mItemSpacing / spanCount;
+                outRect.right = mItemSpacing / 2;
             } else {
-                outRect.left = mItemSpacing / spanCount;
+                outRect.left = mItemSpacing / 2;
                 outRect.right = mItemSpacing;
             }
         }
     }
 
-    public static final class RoomListItemViewHolder extends RecyclerView.ViewHolder {
+    public static final class RoomListItemViewHolder extends BindingViewHolder<RoomListItemBinding> {
         public final View bgView;
         public final View participantsLayout;
         public final TextView participantsCount;
         public final TextView roomName;
 
-        public RoomListItemViewHolder(@NonNull View itemView) {
+        public RoomListItemViewHolder(@NonNull RoomListItemBinding itemView) {
             super(itemView);
-            bgView = itemView.findViewById(R.id.room_list_item_background);
-            participantsLayout = itemView.findViewById(R.id.room_list_participants_layout);
-            participantsCount = itemView.findViewById(R.id.room_list_item_participant_count);
-            roomName = itemView.findViewById(R.id.room_list_item_room_name);
+            bgView = itemView.roomListItemBackground;
+            participantsLayout = itemView.roomListParticipantsLayout;
+            participantsCount = itemView.roomListItemParticipantCount;
+            roomName = itemView.roomListItemRoomName;
         }
 
     }
 
-    public abstract static class AbsRoomListAdapter<Data> extends RecyclerView.Adapter<RoomListItemViewHolder> {
-        public final List<Data> mDataList = new ArrayList<>();
+    public abstract static class AbsRoomListAdapter<Data> extends CustRoomListAdapter<Data, RoomListItemBinding> {
+
+        @Override
+        protected void onItemUpdate(BindingViewHolder<RoomListItemBinding> holder, Data item) {
+            onItemUpdate(new RoomListItemViewHolder(holder.binding), item);
+        }
+
+        protected abstract void onItemUpdate(RoomListItemViewHolder holder, Data item);
+
+    }
+
+    public abstract static class CustRoomListAdapter<Data, Binding extends ViewBinding> extends BindingSingleAdapter<Data, Binding> {
         private Runnable onDataListUpdateRun;
         private Runnable onNetErrorRun;
 
-        @NonNull
         @Override
-        public final RoomListItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new RoomListItemViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.room_list_item, parent, false));
-        }
-
-        @Override
-        public final void onBindViewHolder(@NonNull RoomListItemViewHolder holder, int position) {
-            Data data = mDataList.get(position);
+        public final void onBindViewHolder(@NonNull BindingViewHolder<Binding> holder, int position) {
+            Data data = getItem(position);
             onItemUpdate(holder, data);
-        }
-
-        @Override
-        public final int getItemCount() {
-            return mDataList.size();
         }
 
         private void releaseInner() {
             onDataListUpdateRun = null;
             onNetErrorRun = null;
-        }
-
-        public final void addAll(List<Data> list){
-            if(list == null || list.size() == 0){
-                return;
-            }
-            int start = mDataList.size();
-            mDataList.addAll(list);
-            notifyItemRangeInserted(start, list.size());
-            triggerDataListUpdateRun();
         }
 
         public final void triggerNetErrorRun() {
@@ -252,7 +243,7 @@ public class RoomListView extends FrameLayout {
             }
         }
 
-        protected abstract void onItemUpdate(@NonNull RoomListItemViewHolder holder, @NonNull Data item);
+        protected abstract void onItemUpdate(@NonNull BindingViewHolder<Binding> holder, @NonNull Data item);
 
         protected abstract void onRefresh();
 

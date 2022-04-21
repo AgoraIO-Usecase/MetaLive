@@ -98,7 +98,7 @@ public class RtcManager {
     public static final int AVATAR_ITEM_TYPE_OTHER_03 = 1003;
     public static final int AVATAR_ITEM_TYPE_OTHER_04 = 1004;
     public static final int AVATAR_ITEM_TYPE_OTHER_05 = 1005;
-    public static final int AVATAR_ITEM_TYPE_BODY     = 1006;
+    public static final int AVATAR_ITEM_TYPE_BODY = 1006;
     public static final int AVATAR_ITEM_TYPE_ER_SHI = 1007;
     public static final int AVATAR_ITEM_TYPE_JIAO_SHI = 1008;
     public static final int AVATAR_ITEM_TYPE_SHOU_SHI = 1009;
@@ -180,10 +180,10 @@ public class RtcManager {
     };
 
 
-    public static RtcManager getInstance(){
-        if(INSTANCE == null){
-            synchronized (RtcManager.class){
-                if(INSTANCE== null){
+    public static RtcManager getInstance() {
+        if (INSTANCE == null) {
+            synchronized (RtcManager.class) {
+                if (INSTANCE == null) {
                     INSTANCE = new RtcManager();
                 }
             }
@@ -191,7 +191,8 @@ public class RtcManager {
         return INSTANCE;
     }
 
-    private RtcManager(){}
+    private RtcManager() {
+    }
 
     public void init(Context context, String appId, @Nullable OnInitializeListener listener) {
         if (isInitialized) {
@@ -200,7 +201,7 @@ public class RtcManager {
         try {
             // 0. create engine
             long startTime = System.currentTimeMillis();
-            engine = (RtcEngineEx)RtcEngineEx.create(context.getApplicationContext(), appId, new IRtcEngineEventHandler() {
+            engine = (RtcEngineEx) RtcEngineEx.create(context.getApplicationContext(), appId, new IRtcEngineEventHandler() {
                 @Override
                 public void onWarning(int warn) {
                     super.onWarning(warn);
@@ -256,7 +257,7 @@ public class RtcManager {
                     super.onStreamMessage(uid, streamId, data);
                     Log.d(TAG, "onStreamMessage uid=" + uid + ",streamId=" + streamId + ",data=" + new String(data));
                     OnStreamMessageListener listener = dataStreamListener.get(streamId);
-                    if(listener != null){
+                    if (listener != null) {
                         listener.onMessageReceived(streamId, uid, new String(data));
                     }
                 }
@@ -300,9 +301,9 @@ public class RtcManager {
             engine.enableAudio();
 
             engine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(cameraDirection, new CameraCapturerConfiguration.CaptureFormat(encoderConfiguration.dimensions.width, encoderConfiguration.dimensions.height, encoderConfiguration.frameRate)));
-            if(cameraDirection == CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT){
+            if (cameraDirection == CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT) {
                 encoderConfiguration.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_ENABLED;
-            }else{
+            } else {
                 encoderConfiguration.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED;
             }
 
@@ -319,13 +320,13 @@ public class RtcManager {
         this.onVideoFrameRenderListener = onVideoFrameRenderListener;
     }
 
-    public int createDataStream(String channelId, OnStreamMessageListener listener){
-        if(engine == null){
+    public int createDataStream(String channelId, OnStreamMessageListener listener) {
+        if (engine == null) {
             return 0;
         }
 
         RtcConnection rtcConnection = connectionMap.get(channelId);
-        if(rtcConnection == null){
+        if (rtcConnection == null) {
             return 0;
         }
         int dataStream = engine.createDataStreamEx(new DataStreamConfig(), rtcConnection);
@@ -333,12 +334,12 @@ public class RtcManager {
         return dataStream;
     }
 
-    public void sendDataStreamMsg(String channelId, int streamId, String msg){
-        if(engine == null){
+    public void sendDataStreamMsg(String channelId, int streamId, String msg) {
+        if (engine == null) {
             return;
         }
         RtcConnection rtcConnection = connectionMap.get(channelId);
-        if(rtcConnection == null){
+        if (rtcConnection == null) {
             return;
         }
         engine.sendStreamMessageEx(streamId, msg.getBytes(StandardCharsets.UTF_8), rtcConnection);
@@ -348,6 +349,7 @@ public class RtcManager {
         if (engine == null) {
             return;
         }
+        container.removeAllViews();
         long startTime = System.currentTimeMillis();
         TextureView avatarSurfaceView = new TextureView(container.getContext());
         avatarSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -378,20 +380,20 @@ public class RtcManager {
         }
 
         int _uid = LOCAL_RTC_UID;
-        if(!TextUtils.isEmpty(uid)){
+        if (!TextUtils.isEmpty(uid)) {
             try {
                 _uid = Integer.parseInt(uid);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         ChannelMediaOptions options = new ChannelMediaOptions();
-        options.publishCameraTrack = !isPublishAvatarTrack;
-        options.publishAvatarTrack = isPublishAvatarTrack;
-        options.publishAudioTrack = true;
+        options.publishCameraTrack = publish && !isPublishAvatarTrack;
+        options.publishAvatarTrack = publish && isPublishAvatarTrack;
+        options.publishAudioTrack = publish;
         options.autoSubscribeAudio = true;
         options.autoSubscribeVideo = true;
-        options.clientRoleType = publish ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE;
+        options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
         mediaOptionsHashMap.put(channelId, options);
 
         RtcConnection connection = new RtcConnection(channelId, _uid);
@@ -435,12 +437,33 @@ public class RtcManager {
             public void onStreamMessage(int uid, int streamId, byte[] data) {
                 super.onStreamMessage(uid, streamId, data);
                 OnStreamMessageListener listener = dataStreamListener.get(streamId);
-                if(listener != null){
+                if (listener != null) {
                     listener.onMessageReceived(streamId, uid, new String(data));
                 }
             }
         });
         Log.i(TAG, String.format("joinChannel channel %s ret %d", channelId, ret));
+    }
+
+    public void setPublishTracks(String channelId, boolean publish) {
+        if (engine == null) {
+            return;
+        }
+
+        ChannelMediaOptions options = new ChannelMediaOptions();
+        options.publishCameraTrack = publish && !isPublishAvatarTrack;
+        options.publishAvatarTrack = publish && isPublishAvatarTrack;
+        options.publishAudioTrack = publish;
+        options.autoSubscribeAudio = true;
+        options.autoSubscribeVideo = true;
+        options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+
+        RtcConnection rtcConnection = connectionMap.get(channelId);
+        if (rtcConnection != null) {
+            engine.updateChannelMediaOptionsEx(options, rtcConnection);
+        } else {
+            engine.updateChannelMediaOptions(options);
+        }
     }
 
     public boolean isPublishAvatarTrack() {
@@ -449,19 +472,19 @@ public class RtcManager {
 
     public void setOnMediaOptionUpdateListener(OnMediaOptionUpdateListener onMediaOptionUpdateListener) {
         this.onMediaOptionUpdateListener = onMediaOptionUpdateListener;
-        if(onMediaOptionUpdateListener != null){
+        if (onMediaOptionUpdateListener != null) {
             onMediaOptionUpdateListener.onMediaOptionUpdated();
         }
     }
 
-    public void updateChannelTrack(String channelId, boolean isPublishAvatarTrack){
+    public void updateChannelTrack(String channelId, boolean isPublishAvatarTrack) {
         RtcConnection rtcConnection = connectionMap.get(channelId);
-        if(rtcConnection == null){
+        if (rtcConnection == null) {
             return;
         }
-        if(isPublishAvatarTrack != this.isPublishAvatarTrack){
+        if (isPublishAvatarTrack != this.isPublishAvatarTrack) {
             ChannelMediaOptions channelMediaOptions = mediaOptionsHashMap.get(channelId);
-            if(channelMediaOptions == null){
+            if (channelMediaOptions == null) {
                 return;
             }
             channelMediaOptions.publishCameraTrack = !isPublishAvatarTrack;
@@ -469,7 +492,7 @@ public class RtcManager {
             engine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection);
             engine.setVideoEncoderConfigurationEx(encoderConfiguration, rtcConnection);
             this.isPublishAvatarTrack = isPublishAvatarTrack;
-            if(onMediaOptionUpdateListener != null){
+            if (onMediaOptionUpdateListener != null) {
                 onMediaOptionUpdateListener.onMediaOptionUpdated();
             }
         }
@@ -479,6 +502,7 @@ public class RtcManager {
         if (engine == null) {
             return;
         }
+        container.removeAllViews();
         TextureView view = new TextureView(container.getContext());
         container.addView(view);
         engine.setupRemoteVideoEx(new VideoCanvas(view, RENDER_MODE_HIDDEN, uid), connectionMap.get(channelId));
@@ -495,7 +519,7 @@ public class RtcManager {
 
         if (engine != null) {
             engine.leaveChannel();
-            if(isStopPreview){
+            if (isStopPreview) {
                 engine.stopPreview();
                 engine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(cameraDirection, new CameraCapturerConfiguration.CaptureFormat(encoderConfiguration.dimensions.width, encoderConfiguration.dimensions.height, encoderConfiguration.frameRate)));
             }
@@ -504,36 +528,60 @@ public class RtcManager {
         onMediaOptionUpdateListener = null;
     }
 
-    public void muteLocalAudio(boolean mute){
-        if(engine == null){
+    public void muteLocalAudio(boolean mute) {
+        if (engine == null) {
             return;
         }
         engine.enableLocalAudio(!mute);
     }
 
-    public void disableAvatarGeneratorItems(int type){
+    public void muteRemoteVideo(String roomId, int uid, boolean mute) {
+        if (engine == null) {
+            return;
+        }
+        RtcConnection rtcConnection = connectionMap.get(roomId);
+        if (rtcConnection != null) {
+            engine.muteRemoteVideoStreamEx(uid, mute, rtcConnection);
+        } else {
+            engine.muteRemoteVideoStream(uid, mute);
+        }
+    }
+
+    public void muteRemoteAudio(String roomId, int uid, boolean mute) {
+        if (engine == null) {
+            return;
+        }
+        RtcConnection rtcConnection = connectionMap.get(roomId);
+        if (rtcConnection != null) {
+            engine.muteRemoteAudioStreamEx(uid, mute, rtcConnection);
+        } else {
+            engine.muteRemoteAudioStream(uid, mute);
+        }
+    }
+
+    public void disableAvatarGeneratorItems(int type) {
         this.enableAvatarGeneratorItems(false, type, "", true);
     }
 
-    public void enableAvatarGeneratorItems(int type, String bundlePath){
+    public void enableAvatarGeneratorItems(int type, String bundlePath) {
         this.enableAvatarGeneratorItems(true, type, bundlePath, false);
     }
 
-    public void enableAvatarGeneratorItems(int type, String bundlePath, boolean replaceOld){
+    public void enableAvatarGeneratorItems(int type, String bundlePath, boolean replaceOld) {
         this.enableAvatarGeneratorItems(true, type, bundlePath, replaceOld);
     }
 
-    private void enableAvatarGeneratorItems(boolean enable, int type, String bundlePath, boolean replaceOld){
-        if(avatarEngine == null){
+    private void enableAvatarGeneratorItems(boolean enable, int type, String bundlePath, boolean replaceOld) {
+        if (avatarEngine == null) {
             return;
         }
         Log.d(TAG, "Avatar >> enableAvatarGeneratorItems enable=" + enable + ", type=" + type + ", bundlePath=" + bundlePath + ", replaceOld=" + replaceOld);
         String oldBundlePath = avatarItemEnableMap.get(type);
-        if(Objects.equals(bundlePath, oldBundlePath) && !replaceOld){
+        if (Objects.equals(bundlePath, oldBundlePath) && !replaceOld) {
             return;
         }
         String setBundlePath = bundlePath;
-        if(TextUtils.isEmpty(setBundlePath)){
+        if (TextUtils.isEmpty(setBundlePath)) {
             enable = false;
             setBundlePath = avatarItemEnableMap.get(type);
         }
@@ -541,8 +589,8 @@ public class RtcManager {
         avatarEngine.enableAvatarGeneratorItems(enable, type, setBundlePath);
     }
 
-    public void setGeneratorOptions(String option, AvatarOptionValue value){
-        if(avatarEngine == null){
+    public void setGeneratorOptions(String option, AvatarOptionValue value) {
+        if (avatarEngine == null) {
             return;
         }
 
@@ -550,29 +598,26 @@ public class RtcManager {
         avatarEngine.setGeneratorOptions(option, value);
     }
 
-    public void GetGeneratorOptions(String option, Constants.AvatarValueType type, AvatarOptionValue outValue){
-        if(avatarEngine == null){
+    public void GetGeneratorOptions(String option, Constants.AvatarValueType type, AvatarOptionValue outValue) {
+        if (avatarEngine == null) {
             return;
         }
         avatarEngine.GetGeneratorOptions(option, type, outValue);
         Log.d(TAG, "Avatar >> GetGeneratorOptions option=" + option + ", type=" + type + ", outValue=" + toString(outValue));
     }
 
-    private String toString(AvatarOptionValue value){
+    private String toString(AvatarOptionValue value) {
         StringBuilder sb = new StringBuilder("{");
         sb.append("type=").append(value.type).append(",");
 
         String valueStr = "";
-        if(value.type == Constants.AvatarValueType.DoubleArray){
+        if (value.type == Constants.AvatarValueType.DoubleArray) {
             valueStr = Arrays.toString((double[]) value.value);
-        }
-        else if(value.type == Constants.AvatarValueType.UInt8Array){
+        } else if (value.type == Constants.AvatarValueType.UInt8Array) {
             valueStr = Arrays.toString((int[]) value.value);
-        }
-        else if(value.type == Constants.AvatarValueType.FloatArray){
+        } else if (value.type == Constants.AvatarValueType.FloatArray) {
             valueStr = Arrays.toString((float[]) value.value);
-        }
-        else {
+        } else {
             valueStr = String.valueOf(value.value);
         }
         sb.append("value=").append(valueStr).append("}");
@@ -580,21 +625,21 @@ public class RtcManager {
     }
 
     public void destroy() {
-        if(avatarEngine != null){
+        if (avatarEngine != null) {
             Set<Integer> avatarItemIds = avatarItemEnableMap.keySet();
             for (Integer id : avatarItemIds) {
-                if(id == null){
+                if (id == null) {
                     continue;
                 }
                 String bundlePath = avatarItemEnableMap.get(id);
-                if(!TextUtils.isEmpty(bundlePath)){
+                if (!TextUtils.isEmpty(bundlePath)) {
                     disableAvatarGeneratorItems(id);
                 }
             }
             avatarItemEnableMap.clear();
             avatarEngine = null;
         }
-        if(engine != null){
+        if (engine != null) {
             engine.leaveChannel();
             engine.stopPreview();
             RtcEngine.destroy();
@@ -620,7 +665,7 @@ public class RtcManager {
         void onUserOffline(String channelId, int uid);
     }
 
-    public interface OnVideoFrameRenderListener{
+    public interface OnVideoFrameRenderListener {
         void onVideoFrameRender(VideoFrame videoFrame);
     }
 

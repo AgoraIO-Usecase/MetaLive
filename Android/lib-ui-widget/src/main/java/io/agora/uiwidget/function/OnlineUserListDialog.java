@@ -2,19 +2,18 @@ package io.agora.uiwidget.function;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.uiwidget.R;
+import io.agora.uiwidget.basic.BindingSingleAdapter;
 import io.agora.uiwidget.basic.BindingViewHolder;
 import io.agora.uiwidget.databinding.OnlineUserListDialogItemBinding;
 import io.agora.uiwidget.databinding.OnlineUserListDialogLayoutBinding;
@@ -42,8 +41,8 @@ public class OnlineUserListDialog extends BottomSheetDialog {
         setContentView(mBinding.getRoot());
         StatusBarUtil.hideStatusBar(getWindow(), darkText);
 
-        mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(
-                getContext(), LinearLayoutManager.VERTICAL, false));
+        mBinding.recyclerView.setLayoutManager(new GridLayoutManager(
+                getContext(), 1));
     }
 
     public OnlineUserListDialog setListAdapter(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
@@ -61,41 +60,21 @@ public class OnlineUserListDialog extends BottomSheetDialog {
         super.show();
     }
 
-    public static abstract class DefaultListItemAdapter<T> extends AbsListItemAdapter<T, OnlineUserListDialogItemBinding> {
-        @Override
-        protected OnlineUserListDialogItemBinding onCreateViewBinding(LayoutInflater inflater, ViewGroup parent) {
-            return OnlineUserListDialogItemBinding.inflate(inflater, parent, false);
-        }
-    }
+    public static abstract class DefaultListItemAdapter<T> extends AbsListItemAdapter<T, OnlineUserListDialogItemBinding> { }
 
-    public static abstract class AbsListItemAdapter<T, B extends ViewBinding> extends RecyclerView.Adapter<BindingViewHolder<B>> {
-        private final List<T> mList = new ArrayList<>();
-
-        @NonNull
-        @Override
-        public final BindingViewHolder<B> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new BindingViewHolder<B>(onCreateViewBinding(LayoutInflater.from(parent.getContext()), parent));
-        }
+    public static abstract class AbsListItemAdapter<T, B extends ViewBinding> extends BindingSingleAdapter<T, B> {
 
         @Override
         public final void onBindViewHolder(@NonNull BindingViewHolder<B> holder, int position) {
-            T item = mList.get(position);
+            T item = getItem(position);
             onItemUpdate(holder, position, item);
         }
 
-        @Override
-        public final int getItemCount() {
-            return mList.size();
-        }
-
         public AbsListItemAdapter<T, B> resetAll(List<T> list) {
-            mList.clear();
-            mList.addAll(list);
-            notifyDataSetChanged();
+            removeAll();
+            insertAll(list);
             return this;
         }
-
-        protected abstract B onCreateViewBinding(LayoutInflater inflater, ViewGroup parent);
 
         protected abstract void onItemUpdate(BindingViewHolder<B> holder, int position, T item);
     }

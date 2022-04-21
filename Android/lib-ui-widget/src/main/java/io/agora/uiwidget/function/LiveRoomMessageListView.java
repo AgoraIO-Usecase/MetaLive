@@ -10,10 +10,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -22,24 +19,25 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
+import androidx.viewbinding.ViewBinding;
 
 import io.agora.uiwidget.R;
+import io.agora.uiwidget.basic.BindingSingleAdapter;
+import io.agora.uiwidget.basic.BindingViewHolder;
+import io.agora.uiwidget.databinding.LiveRoomMessageListItemLayoutBinding;
 
 public class LiveRoomMessageListView extends RecyclerView {
 
     private static final int MESSAGE_TEXT_COLOR = Color.rgb(196, 196, 196);
     private static final int MESSAGE_TEXT_COLOR_LIGHT = Color.argb(101, 35, 35, 35);
-
+    private static final int MAX_SAVED_MESSAGE = 50;
     private static final int MESSAGE_ITEM_MARGIN = 16;
 
-    private LiveRoomMessageAdapter<?> mAdapter;
+    private AbsMessageAdapter<?, ?> mAdapter;
     private LinearLayoutManager mLayoutManager;
 
     private boolean mLightMode;
     private boolean mNarrow = false;
-
 
     public LiveRoomMessageListView(@NonNull Context context) {
         this(context, null);
@@ -71,8 +69,8 @@ public class LiveRoomMessageListView extends RecyclerView {
 
     @Override
     public void setAdapter(@Nullable Adapter adapter) {
-        if (adapter instanceof LiveRoomMessageAdapter) {
-            mAdapter = (LiveRoomMessageAdapter<?>) adapter;
+        if (adapter instanceof AbsMessageAdapter) {
+            mAdapter = (AbsMessageAdapter<?, ?>) adapter;
             mAdapter.isLight = mLightMode;
             mAdapter.isNarrow = mNarrow;
             mAdapter.registerAdapterDataObserver(new AdapterDataObserver() {
@@ -90,12 +88,12 @@ public class LiveRoomMessageListView extends RecyclerView {
             });
             super.setAdapter(adapter);
         } else {
-            throw new RuntimeException("the adapter must be instance of LiveRoomMessageAdapter");
+            throw new RuntimeException("the adapter must be instance of AbsMessageAdapter or LiveRoomMessageAdapter");
         }
     }
 
     private void scrollToBottom() {
-        if(mAdapter == null){
+        if (mAdapter == null) {
             return;
         }
         mLayoutManager.scrollToPositionWithOffset(Math.max(0, mAdapter.getItemCount() - 1), 0);
@@ -109,59 +107,44 @@ public class LiveRoomMessageListView extends RecyclerView {
         }
     }
 
-    public abstract static class LiveRoomMessageAdapter<T> extends Adapter<MessageListViewHolder> {
-        private final int maxSavedMessageCount;
-        private final ArrayList<T> mMessageList = new ArrayList<>();
-        private boolean isLight = false;
-        private boolean isNarrow = false;
-
-        public LiveRoomMessageAdapter() {
-            this(50);
-        }
-
-        public LiveRoomMessageAdapter(int maxSavedMessageCount) {
-            this.maxSavedMessageCount = maxSavedMessageCount;
-        }
-
-        @NonNull
-        @Override
-        public final MessageListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new MessageListViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.live_room_message_list_item_layout, parent, false));
-        }
+    public abstract static class LiveRoomMessageAdapter<T> extends AbsMessageAdapter<T, LiveRoomMessageListItemLayoutBinding> {
 
         @Override
-        public final void onBindViewHolder(@NonNull MessageListViewHolder holder, int position) {
-            holder.isLight = isLight;
-            holder.isNarrow = isNarrow;
-
-            T item = mMessageList.get(position);
-            onItemUpdate(holder, item, position);
-        }
-
-        @Override
-        public final int getItemCount() {
-            return mMessageList.size();
+        protected void onItemUpdate(BindingViewHolder<LiveRoomMessageListItemLayoutBinding> holder, T item, int position) {
+            MessageListViewHolder _holder = new MessageListViewHolder(holder.binding);
+            _holder.isLight = isLight;
+            _holder.isNarrow = isNarrow;
+            onItemUpdate(_holder, item, position);
         }
 
         protected abstract void onItemUpdate(MessageListViewHolder holder, T item, int position);
 
-        public void addMessage(T item) {
-            int size = mMessageList.size();
-            if (size == maxSavedMessageCount) {
-                mMessageList.add(item);
-                notifyItemInserted(size);
+    }
 
-                mMessageList.remove(0);
-                notifyItemRemoved(0);
-            }else{
-                mMessageList.add(item);
-                notifyItemInserted(size);
+    public abstract static class AbsMessageAdapter<T, Binding extends ViewBinding> extends BindingSingleAdapter<T, Binding> {
+        protected boolean isLight = false;
+        protected boolean isNarrow = false;
+
+        @Override
+        public final void onBindViewHolder(@NonNull BindingViewHolder<Binding> holder, int position) {
+            T item = getItem(position);
+            onItemUpdate(holder, item, position);
+        }
+
+        protected abstract void onItemUpdate(@NonNull BindingViewHolder<Binding> holder, @NonNull T item, int position);
+
+        public void addMessage(T item) {
+            int size = getItemCount();
+            if (size == MAX_SAVED_MESSAGE) {
+                remove(0);
+                insertLast(item);
+            } else {
+                insertLast(item);
             }
         }
     }
 
-    public static class MessageListViewHolder extends ViewHolder {
+    public static class MessageListViewHolder extends BindingViewHolder<LiveRoomMessageListItemLayoutBinding> {
         private boolean isLight = false;
         private boolean isNarrow = false;
 
@@ -169,23 +152,11 @@ public class LiveRoomMessageListView extends RecyclerView {
         private final AppCompatImageView giftIconIv;
         private final View layout;
 
-        private final SparseArray<View> viewSparseArray = new SparseArray<>();
-
-        MessageListViewHolder(@NonNull View itemView) {
+        MessageListViewHolder(@NonNull LiveRoomMessageListItemLayoutBinding itemView) {
             super(itemView);
-            messageText = itemView.findViewById(R.id.live_message_item_text);
-            giftIconIv = itemView.findViewById(R.id.live_message_gift_icon);
-            layout = itemView.findViewById(R.id.live_message_item_layout);
-        }
-
-        public @Nullable <T extends View>  T getViewById(int id){
-            View view = viewSparseArray.get(id);
-            if(view != null){
-                return (T) view;
-            }
-            T viewFound = itemView.findViewById(id);
-            viewSparseArray.put(id, viewFound);
-            return viewFound;
+            messageText = itemView.liveMessageItemText;
+            giftIconIv = itemView.liveMessageGiftIcon;
+            layout = itemView.liveMessageItemLayout;
         }
 
         public void setupMessage(String user, String message, @DrawableRes int giftIcon) {
@@ -213,10 +184,10 @@ public class LiveRoomMessageListView extends RecyclerView {
                         user.length() + 2, messageSpan.length(),
                         Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             }
-            if(giftIcon != View.NO_ID){
+            if (giftIcon != View.NO_ID) {
                 giftIconIv.setImageResource(giftIcon);
                 giftIconIv.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 giftIconIv.setVisibility(View.GONE);
             }
 

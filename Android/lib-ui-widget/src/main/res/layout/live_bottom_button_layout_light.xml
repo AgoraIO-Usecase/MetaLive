@@ -2,11 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/live_bottom_layout_height"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/live_bottom_message_input_hint"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="@dimen/live_bottom_layout_height"
         android:layout_marginEnd="@dimen/live_bottom_btn_margin"
         android:background="@drawable/live_bottom_button_input_bg_light"
@@ -20,13 +22,13 @@
         android:textSize="@dimen/live_bottom_text_size" />
 
     <HorizontalScrollView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -59,7 +61,7 @@
                 android:layout_height="@dimen/live_bottom_layout_height"
                 android:layout_marginEnd="@dimen/live_bottom_btn_margin"
                 android:background="@drawable/live_bottom_button_item_bg_light"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/live_bottom_btn_fun4"
@@ -75,7 +77,8 @@
                 android:layout_width="@dimen/live_bottom_layout_height"
                 android:layout_height="@dimen/live_bottom_layout_height"
                 android:background="@drawable/live_bottom_button_item_bg_light"
-                android:src="@drawable/live_bottom_btn_close_black" />
+                android:src="@drawable/live_bottom_btn_close_black"
+                tools:visibility="visible"/>
 
         </LinearLayout>
     </HorizontalScrollView>
