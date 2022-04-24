@@ -76,11 +76,11 @@ public class BBFaceDetection implements IFaceDetectBase {
             i420Buffer.release();
 
             long t1 = System.currentTimeMillis();
-//            Log.d(TAG, "frame convert time: " + (t1 - t0));
-            String bbData = BBFaceHelper.getInstance().setImageData(nv21Buffer.getData(), nv21Buffer.getWidth(), nv21Buffer.getHeight(), false, 0);
+//            Log.d(TAG, "frame rotation: " + frame.getRotation());
+            String bbData = BBFaceHelper.getInstance().setImageData(nv21Buffer.getData(), nv21Buffer.getWidth(), nv21Buffer.getHeight(), (frame.getRotation()==90), 2);
             long t2 = System.currentTimeMillis();
 //            Log.d(TAG, "face detect time: " + (System.currentTimeMillis() - t1));
-            Log.d(TAG, "face result: " + bbData);
+//            Log.d(TAG, "face result: " + bbData);
             ret = parseFaceInfo(bbData, detectInfo);
             long t3 = System.currentTimeMillis();
 //            Log.d(TAG, "parse time: " + (t3 - t2));
