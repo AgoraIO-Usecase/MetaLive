@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.FrameLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import io.agora.metalive.databinding.PreviewActivityBinding
 import io.agora.metalive.manager.RoomManager
@@ -16,16 +16,20 @@ import io.agora.uiwidget.function.VideoSettingDialog.OnValuesChangeListener
 import io.agora.uiwidget.utils.StatusBarUtil
 
 class PreviewActivity : AppCompatActivity() {
-    private val rtcManager = RtcManager.getInstance()
+    private val rtcManager = RtcManager()
     private val mBinding by lazy {
         PreviewActivityBinding.inflate(LayoutInflater.from(this))
     }
+    private lateinit var faceEditLauncher: ActivityResultLauncher<String>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
         StatusBarUtil.hideStatusBar(window, false)
+        faceEditLauncher = FaceEditActivity.launcher(this){
+            rtcManager.renderLocalAvatarVideo(mBinding.surfaceViewContainer)
+        }
         initView()
         initPreview()
     }
@@ -34,7 +38,9 @@ class PreviewActivity : AppCompatActivity() {
         mBinding.previewControlView.apply {
             setBackIcon(true) { v: View? -> onBackPressed() }
             setCameraIcon(true) { v: View? -> }
-            setBeautyIcon(false, null)
+            setBeautyIcon(false){
+                faceEditLauncher.launch(FaceEditActivity.FROM_ROOM_PREVIEW)
+            }
             setSettingIcon(true) { v: View? ->
                 // 视频参数设置弹窗
                 showSettingDialog()
@@ -94,12 +100,11 @@ class PreviewActivity : AppCompatActivity() {
 
     private fun initPreview() {
         rtcManager.init(this, getString(R.string.rtc_app_id), null)
-        val surfaceViewContainer = findViewById<FrameLayout>(R.id.surface_view_container)
-        rtcManager.renderLocalCameraVideo(surfaceViewContainer)
+        rtcManager.renderLocalAvatarVideo(mBinding.surfaceViewContainer)
     }
 
     override fun onBackPressed() {
-        rtcManager.reset(true)
+        rtcManager.destroy()
         super.onBackPressed()
     }
 }

@@ -44,9 +44,10 @@
             android:id="@+id/iv_create"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="25dp"
             android:src="@drawable/room_list_btn_create"
-            android:layout_margin="?attr/iconPadding"
-            android:layout_gravity="bottom|center_horizontal"/>
+            />
 
 
     </FrameLayout>

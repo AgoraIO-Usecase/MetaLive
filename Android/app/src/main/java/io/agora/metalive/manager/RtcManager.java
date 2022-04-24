@@ -1,6 +1,7 @@
 package io.agora.metalive.manager;
 
 
+import static io.agora.rtc2.video.VideoCanvas.RENDER_MODE_ADAPTIVE;
 import static io.agora.rtc2.video.VideoCanvas.RENDER_MODE_HIDDEN;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_1;
@@ -29,6 +30,7 @@ import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_840x480;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_960x720;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -47,6 +49,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import io.agora.base.VideoFrame;
+import io.agora.meta.wrapper.AvatarConstant;
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.DataStreamConfig;
@@ -180,20 +183,6 @@ public class RtcManager {
     };
 
 
-    public static RtcManager getInstance() {
-        if (INSTANCE == null) {
-            synchronized (RtcManager.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new RtcManager();
-                }
-            }
-        }
-        return INSTANCE;
-    }
-
-    private RtcManager() {
-    }
-
     public void init(Context context, String appId, @Nullable OnInitializeListener listener) {
         if (isInitialized) {
             return;
@@ -277,7 +266,10 @@ public class RtcManager {
             engine.registerVideoFrameObserver(mVideoFrameObserver);
             engine.setLogLevel(Constants.LogLevel.getValue(Constants.LogLevel.LOG_LEVEL_ERROR));
             avatarEngine = engine.queryAvatarEngine();
-            avatarEngine.initialize(authpack.A(), authpack.A().length);
+
+            byte[] licence = AvatarConstant.SDKKEY.getBytes();
+            avatarEngine.initialize(licence, licence.length);
+
 
             AvatarConfigs avatarConfigs = new AvatarConfigs(
                     Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE,
@@ -287,6 +279,14 @@ public class RtcManager {
             );
 
             avatarEngine.enableOrUpdateLocalAvatarVideo(true, avatarConfigs);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    avatarEngine.setActivity(context);
+                }
+            }, 1000);
+
 
 
             engine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
@@ -355,7 +355,7 @@ public class RtcManager {
         avatarSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         container.addView(avatarSurfaceView);
         engine.startPreview();
-        VideoCanvas videoCanvas = new VideoCanvas(avatarSurfaceView, RENDER_MODE_HIDDEN);
+        VideoCanvas videoCanvas = new VideoCanvas(avatarSurfaceView, RENDER_MODE_ADAPTIVE);
         videoCanvas.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED.getValue();
         avatarEngine.setupLocalVideoCanvas(videoCanvas);
         Log.d(TAG, "RTCManager renderLocalAvatarVideo cost time ms=" + (System.currentTimeMillis() - startTime));
@@ -586,7 +586,7 @@ public class RtcManager {
             setBundlePath = avatarItemEnableMap.get(type);
         }
         avatarItemEnableMap.put(type, bundlePath);
-        avatarEngine.enableAvatarGeneratorItems(enable, type, setBundlePath);
+        avatarEngine.enableLocalUserAvatarItems(enable, type, setBundlePath);
     }
 
     public void setGeneratorOptions(String option, AvatarOptionValue value) {
@@ -595,14 +595,14 @@ public class RtcManager {
         }
 
         Log.d(TAG, "Avatar >> setGeneratorOptions option=" + option + ", value=" + toString(value));
-        avatarEngine.setGeneratorOptions(option, value);
+        //avatarEngine.setLocalUserAvatarOptions(option, value);
     }
 
     public void GetGeneratorOptions(String option, Constants.AvatarValueType type, AvatarOptionValue outValue) {
         if (avatarEngine == null) {
             return;
         }
-        avatarEngine.GetGeneratorOptions(option, type, outValue);
+        //avatarEngine.GetGeneratorOptions(option, type, outValue);
         Log.d(TAG, "Avatar >> GetGeneratorOptions option=" + option + ", type=" + type + ", outValue=" + toString(outValue));
     }
 

@@ -4,12 +4,11 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import io.agora.metalive.databinding.RoomListActivityBinding
 import io.agora.metalive.databinding.RoomListItemBinding
-import io.agora.metalive.manager.EditFaceManager
 import io.agora.metalive.manager.RoomManager
-import io.agora.metalive.manager.RtcManager
 import io.agora.uiwidget.basic.BindingViewHolder
 import io.agora.uiwidget.function.RoomListView
 import io.agora.uiwidget.utils.RandomUtil
@@ -31,13 +30,17 @@ class RoomListActivity : AppCompatActivity() {
 
     private var permissionGrandRun: (() -> Unit)? = null
 
+    private lateinit var faceEditLauncher: ActivityResultLauncher<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
 
-        doOnInitialized()
-        initView()
+        faceEditLauncher = FaceEditActivity.launcher(this)
+        doOnInitialized{
+            initView()
+        }
     }
 
     private fun initView() {
@@ -102,18 +105,20 @@ class RoomListActivity : AppCompatActivity() {
 
         mBinding.ivEditFace.setOnClickListener {
             doOnInitialized {
-                startActivity(Intent(this, FaceEditActivity::class.java))
+                faceEditLauncher.launch(FaceEditActivity.FROM_ROOM_LIST)
             }
         }
     }
 
-    private fun doOnInitialized(run: (() -> Unit)? = null) {
-        RoomManager.getInstance()
-            .init(this, getString(R.string.rtm_app_id), getString(R.string.rtm_app_token))
+    private fun doOnInitialized(run: () -> Unit) {
         runOnPermissionGrand {
-            EditFaceManager.getInstance().initialize(this)
-            RtcManager.getInstance().init(this, getString(R.string.rtc_app_id), null)
-            run?.invoke()
+            if (!RoomManager.getInstance()
+                    .init(this, getString(R.string.rtm_app_id), getString(R.string.rtm_app_token)){
+                        runOnUiThread(run)
+                    }
+            ) {
+                run.invoke()
+            }
         }
     }
 

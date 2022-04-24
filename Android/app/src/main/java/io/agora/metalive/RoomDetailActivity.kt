@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import io.agora.metalive.databinding.RoomDetailActivityBinding
 import io.agora.metalive.databinding.RoomDetailMessageListItemBinding
 import io.agora.metalive.databinding.RoomDetailRaisehandItemBinding
-import io.agora.metalive.manager.EditFaceManager
 import io.agora.metalive.manager.RoomManager
 import io.agora.metalive.manager.RtcManager
 import io.agora.uiwidget.basic.BindingViewHolder
@@ -26,7 +26,6 @@ import kotlin.random.Random
 class RoomDetailActivity : AppCompatActivity() {
 
     companion object {
-        private const val ACTIVITY_RESULT_CODE_FACE_EDIT = 1001
         private const val EXTRA_ROOM_INFO = "roomInfo"
 
         fun newIntent(context: Context, roomInfo: RoomManager.RoomInfo): Intent {
@@ -35,6 +34,8 @@ class RoomDetailActivity : AppCompatActivity() {
             }
         }
     }
+
+    private val rtcManager by lazy { RtcManager() }
 
     private val mBinding by lazy {
         RoomDetailActivityBinding.inflate(LayoutInflater.from(this))
@@ -107,17 +108,26 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
+    private lateinit var faceEditLauncher: ActivityResultLauncher<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
-
+        faceEditLauncher = FaceEditActivity.launcher(this) {
+            seatLayouts.find {
+                (it.root.tag as? RoomManager.UserInfo)?.userId?.equals(RoomManager.getCacheUserId())
+                    ?: false
+            }?.let {
+                rtcManager.renderLocalAvatarVideo(it.videoContainer)
+            }
+        }
         initManager();
         initView()
     }
 
     private fun initManager() {
-        EditFaceManager.getInstance().start()
+        rtcManager.init(this, getString(R.string.rtc_app_id), null)
 
         RoomManager.getInstance().joinRoom(mRoomInfo.roomId,
             if (isRoomOwner()) RoomManager.Status.ACCEPT else RoomManager.Status.END,
@@ -146,7 +156,7 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     private fun joinRtcChannel() {
-        RtcManager.getInstance().joinChannel(
+        rtcManager.joinChannel(
             mRoomInfo.roomId,
             RoomManager.getCacheUserId(),
             getString(R.string.rtc_app_token),
@@ -219,11 +229,11 @@ class RoomDetailActivity : AppCompatActivity() {
                         seatLayouts.firstOrNull { viewBinidng -> viewBinidng.root.tag == null }
                             ?: return
                     if (userInfo.userId == RoomManager.getCacheUserId()) {
-                        RtcManager.getInstance()
+                        rtcManager
                             .renderLocalAvatarVideo(targetViewBinding.videoContainer)
-                        RtcManager.getInstance().setPublishTracks(mRoomInfo.roomId, true)
+                        rtcManager.setPublishTracks(mRoomInfo.roomId, true)
                     } else {
-                        RtcManager.getInstance().renderRemoteVideo(
+                        rtcManager.renderRemoteVideo(
                             targetViewBinding.videoContainer,
                             mRoomInfo.roomId,
                             userInfo.userId.toInt()
@@ -245,7 +255,7 @@ class RoomDetailActivity : AppCompatActivity() {
                             viewBinding.tvName.text = ""
                             viewBinding.ivMicOff.isVisible = false
                             if (userInfo.userId == RoomManager.getCacheUserId()) {
-                                RtcManager.getInstance().setPublishTracks(mRoomInfo.roomId, false)
+                                rtcManager.setPublishTracks(mRoomInfo.roomId, false)
                             }
                             return@forEach
                         }
@@ -294,7 +304,7 @@ class RoomDetailActivity : AppCompatActivity() {
             setFun1Background(null)
             isFun1Activated = true
             setFun1ClickListener {
-                RtcManager.getInstance().muteLocalAudio(isFun1Activated)
+                rtcManager.muteLocalAudio(isFun1Activated)
                 isFun1Activated = !isFun1Activated
             }
             // 特效
@@ -302,29 +312,11 @@ class RoomDetailActivity : AppCompatActivity() {
             setFun2ImageResource(R.drawable.room_detail_icon_magic)
             setFun2Background(null)
             setFun2ClickListener {
-                startActivityForResult(
-                    Intent(
-                        this@RoomDetailActivity,
-                        FaceEditActivity::class.java
-                    ), ACTIVITY_RESULT_CODE_FACE_EDIT
-                )
+                faceEditLauncher.launch(FaceEditActivity.FROM_ROOM_DETAIL)
             }
             // 更多
             setupMoreBtn(true) {
-                LiveToolsDialog(this@RoomDetailActivity, true)
-                    .addToolItem(
-                        LiveToolsDialog.TOOL_ITEM_ROTATE,
-                        false
-                    ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
-                    .addToolItem(
-                        LiveToolsDialog.TOOL_ITEM_VIDEO,
-                        true
-                    ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
-                    .addToolItem(
-                        LiveToolsDialog.TOOL_ITEM_SETTING,
-                        true
-                    ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
-                    .show()
+                showToolsDialog()
             }
             // 礼物
             setFun3Visible(!isRoomOwner())
@@ -376,6 +368,23 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun showToolsDialog() {
+        LiveToolsDialog(this@RoomDetailActivity, true)
+            .addToolItem(
+                LiveToolsDialog.TOOL_ITEM_ROTATE,
+                false
+            ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
+            .addToolItem(
+                LiveToolsDialog.TOOL_ITEM_VIDEO,
+                true
+            ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
+            .addToolItem(
+                LiveToolsDialog.TOOL_ITEM_SETTING,
+                true
+            ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
+            .show()
+    }
+
     private fun showRoomOwnerExitDialog() {
         if (isDestroyed) {
             return
@@ -389,15 +398,6 @@ class RoomDetailActivity : AppCompatActivity() {
             }
             .setCancelable(false)
             .show()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == ACTIVITY_RESULT_CODE_FACE_EDIT) {
-            seatLayouts.find { (it.root.tag as? RoomManager.UserInfo)?.userId?.equals(RoomManager.getCacheUserId()) ?: false }?.let {
-                RtcManager.getInstance().renderLocalAvatarVideo(it.videoContainer)
-            }
-        }
     }
 
     private fun showGiftDialog() {
@@ -467,8 +467,7 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        EditFaceManager.getInstance().stop()
-        RtcManager.getInstance().reset(true)
+        rtcManager.destroy()
         if (isRoomOwner()) {
             RoomManager.getInstance().destroyRoom(mRoomInfo.roomId)
         } else {

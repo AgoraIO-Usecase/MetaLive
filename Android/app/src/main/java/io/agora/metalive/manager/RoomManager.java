@@ -55,9 +55,9 @@ public class RoomManager {
     private RoomManager() {
     }
 
-    public void init(Context context, String appId, String token) {
+    public boolean init(Context context, String appId, String token, Runnable success) {
         if (isInitialized) {
-            return;
+            return false;
         }
         PreferenceUtil.init(context);
         localUserInfo = new UserInfo();
@@ -69,7 +69,9 @@ public class RoomManager {
         Sync.Instance().init(context, params, new Sync.Callback() {
             @Override
             public void onSuccess() {
-
+                if(success != null){
+                    success.run();
+                }
             }
 
             @Override
@@ -77,6 +79,7 @@ public class RoomManager {
                 isInitialized = false;
             }
         });
+        return true;
     }
 
     public void createRoom(RoomInfo roomInfo, DataCallback<RoomInfo> callback) {
