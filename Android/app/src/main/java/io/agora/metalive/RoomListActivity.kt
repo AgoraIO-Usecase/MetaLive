@@ -8,7 +8,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import io.agora.metalive.databinding.RoomListActivityBinding
 import io.agora.metalive.databinding.RoomListItemBinding
+import io.agora.metalive.manager.AvatarConfigManager
 import io.agora.metalive.manager.RoomManager
+import io.agora.metalive.manager.RtcManager
 import io.agora.uiwidget.basic.BindingViewHolder
 import io.agora.uiwidget.function.RoomListView
 import io.agora.uiwidget.utils.RandomUtil
@@ -112,12 +114,31 @@ class RoomListActivity : AppCompatActivity() {
 
     private fun doOnInitialized(run: () -> Unit) {
         runOnPermissionGrand {
-            if (!RoomManager.getInstance()
-                    .init(this, getString(R.string.rtm_app_id), getString(R.string.rtm_app_token)){
+            var valid = true
+            val rtmAppId: String = getString(R.string.rtm_app_id)
+            if (rtmAppId.isBlank()) {
+                valid = false
+            }
+
+            val rtcAppId: String = getString(R.string.rtc_app_id)
+            if (rtcAppId.isBlank()) {
+                valid = false
+            }
+
+            var rtmToken: String? = getString(R.string.rtm_app_token)
+            if (rtmToken?.isBlank() == true) {
+                rtmToken = null
+            }
+
+            if (valid) {
+                RtcManager.getInstance().registerAvatarEventHandler(AvatarConfigManager.getInstance())
+                RtcManager.getInstance().init(this, rtcAppId, null)
+
+                if (!RoomManager.getInstance().init(this, rtmAppId, rtmToken) {
                         runOnUiThread(run)
+                    }) {
+                        run.invoke()
                     }
-            ) {
-                run.invoke()
             }
         }
     }

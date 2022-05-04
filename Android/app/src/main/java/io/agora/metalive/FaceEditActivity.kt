@@ -41,7 +41,7 @@ class FaceEditActivity : AppCompatActivity() {
     private val mBinding by lazy {
         FaceEditActivityBinding.inflate(LayoutInflater.from(this))
     }
-    private val rtcManager by lazy { RtcManager() }
+    private val rtcManager by lazy { RtcManager.getInstance() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

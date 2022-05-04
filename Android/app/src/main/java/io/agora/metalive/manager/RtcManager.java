@@ -1,7 +1,5 @@
 package io.agora.metalive.manager;
 
-
-import static io.agora.rtc2.video.VideoCanvas.RENDER_MODE_ADAPTIVE;
 import static io.agora.rtc2.video.VideoCanvas.RENDER_MODE_HIDDEN;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_1;
@@ -30,7 +28,6 @@ import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_840x480;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_960x720;
 
 import android.content.Context;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -43,32 +40,37 @@ import androidx.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import io.agora.base.VideoFrame;
-import io.agora.meta.wrapper.AvatarConstant;
+import io.agora.metalive.R;
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.DataStreamConfig;
 import io.agora.rtc2.IAvatarEngine;
+import io.agora.rtc2.IAvatarEngineEventHandler;
 import io.agora.rtc2.IRtcEngineEventHandler;
 import io.agora.rtc2.RtcConnection;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineEx;
 import io.agora.rtc2.video.AvatarConfigs;
+import io.agora.rtc2.video.AvatarContext;
 import io.agora.rtc2.video.AvatarOptionValue;
 import io.agora.rtc2.video.CameraCapturerConfiguration;
 import io.agora.rtc2.video.IVideoFrameObserver;
 import io.agora.rtc2.video.VideoCanvas;
 import io.agora.rtc2.video.VideoEncoderConfiguration;
 
-
-public class RtcManager {
+public class RtcManager implements IAvatarEngineEventHandler {
     private static final String TAG = "RtcManager";
+
     private static final int LOCAL_RTC_UID = 0;
+    private static final int DEFAULT_BITRATE = 700;
+
     public static final List<VideoEncoderConfiguration.VideoDimensions> sVideoDimensions = Arrays.asList(
             VD_120x120,
             VD_160x120,
@@ -109,14 +111,15 @@ public class RtcManager {
     public static final int AVATAR_ITEM_TYPE_HAIR_MASK = 1011;
     public static final int AVATAR_ITEM_TYPE_LIGHT = 1012;
 
+    private static final CameraCapturerConfiguration.CAMERA_DIRECTION cameraDirection =
+            CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT;
 
-    private static CameraCapturerConfiguration.CAMERA_DIRECTION cameraDirection = CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT;
-    public static final VideoEncoderConfiguration encoderConfiguration = new VideoEncoderConfiguration(
-            VD_1280x720,
-            FRAME_RATE_FPS_15,
-            700,
-            ORIENTATION_MODE_FIXED_PORTRAIT
-    );
+    public static final VideoEncoderConfiguration encoderConfiguration =
+            new VideoEncoderConfiguration(
+                    VD_1280x720,
+                    FRAME_RATE_FPS_15,
+                    DEFAULT_BITRATE,
+                    ORIENTATION_MODE_FIXED_PORTRAIT);
 
     private volatile boolean isInitialized = false;
     private RtcEngineEx engine;
@@ -182,11 +185,42 @@ public class RtcManager {
         }
     };
 
+    private final List<BaseAvatarEventHandler> avatarEventHandlers = new LinkedList<>();
+
+    public synchronized void registerAvatarEventHandler(BaseAvatarEventHandler handler) {
+        if (!avatarEventHandlers.contains(handler)) {
+            avatarEventHandlers.add(handler);
+        }
+    }
+
+    public synchronized void removeAvatarEventHandler(BaseAvatarEventHandler handler) {
+        avatarEventHandlers.remove(handler);
+    }
+
+    private interface OnAvatarHandlerIterateListener {
+        void onHandlerIterate(BaseAvatarEventHandler handler);
+    }
+
+    private RtcManager() {
+
+    }
+
+    public static RtcManager getInstance() {
+        if (INSTANCE == null) {
+            synchronized (RtcManager.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new RtcManager();
+                }
+            }
+        }
+        return INSTANCE;
+    }
 
     public void init(Context context, String appId, @Nullable OnInitializeListener listener) {
         if (isInitialized) {
             return;
         }
+
         try {
             // 0. create engine
             long startTime = System.currentTimeMillis();
@@ -267,16 +301,16 @@ public class RtcManager {
             engine.setLogLevel(Constants.LogLevel.getValue(Constants.LogLevel.LOG_LEVEL_ERROR));
             avatarEngine = engine.queryAvatarEngine();
 
-            byte[] licence = AvatarConstant.SDKKEY.getBytes();
-            avatarEngine.initialize(licence, licence.length);
-
+            AvatarContext avatarContext = new AvatarContext(
+                    context.getString(R.string.ai_app_id),
+                    context.getString(R.string.ai_token_id));
+            avatarEngine.initialize(avatarContext);
+            avatarEngine.registerEventHandler(this);
 
             AvatarConfigs avatarConfigs = new AvatarConfigs(
                     Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE,
-                    true,
-                    true,
-                    Constants.AvatarProcessingMode.AVATAR_PROCESSING_MODE_AVATAR
-            );
+                    context, true, true,
+                    Constants.AvatarProcessingMode.AVATAR_PROCESSING_MODE_AVATAR);
 
             avatarEngine.enableOrUpdateLocalAvatarVideo(true, avatarConfigs);
 
@@ -355,7 +389,7 @@ public class RtcManager {
         avatarSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         container.addView(avatarSurfaceView);
         engine.startPreview();
-        VideoCanvas videoCanvas = new VideoCanvas(avatarSurfaceView, RENDER_MODE_ADAPTIVE);
+        VideoCanvas videoCanvas = new VideoCanvas(avatarSurfaceView, RENDER_MODE_HIDDEN);
         videoCanvas.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED.getValue();
         avatarEngine.setupLocalVideoCanvas(videoCanvas);
         Log.d(TAG, "RTCManager renderLocalAvatarVideo cost time ms=" + (System.currentTimeMillis() - startTime));
@@ -445,6 +479,17 @@ public class RtcManager {
         Log.i(TAG, String.format("joinChannel channel %s ret %d", channelId, ret));
     }
 
+    public void leaveChannel(String channelId) {
+        if (engine == null) {
+            return;
+        }
+
+        RtcConnection conn = connectionMap.get(channelId);
+        if (conn != null) {
+            engine.leaveChannelEx(conn);
+        }
+    }
+
     public void setPublishTracks(String channelId, boolean publish) {
         if (engine == null) {
             return;
@@ -521,7 +566,11 @@ public class RtcManager {
             engine.leaveChannel();
             if (isStopPreview) {
                 engine.stopPreview();
-                engine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(cameraDirection, new CameraCapturerConfiguration.CaptureFormat(encoderConfiguration.dimensions.width, encoderConfiguration.dimensions.height, encoderConfiguration.frameRate)));
+                engine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(cameraDirection,
+                        new CameraCapturerConfiguration.CaptureFormat(
+                                encoderConfiguration.dimensions.width,
+                                encoderConfiguration.dimensions.height,
+                                encoderConfiguration.frameRate)));
             }
         }
 
@@ -637,6 +686,7 @@ public class RtcManager {
                 }
             }
             avatarItemEnableMap.clear();
+            avatarEngine.unregisterEventHandler(this);
             avatarEngine = null;
         }
         if (engine != null) {
@@ -648,6 +698,105 @@ public class RtcManager {
         isInitialized = false;
     }
 
+    private void iterateAvatarHandlers(OnAvatarHandlerIterateListener handler) {
+        int size = avatarEventHandlers.size();
+        for (int i = 0; i < size; i++) {
+            handler.onHandlerIterate(avatarEventHandlers.get(i));
+        }
+    }
+
+    /**
+     * The result will be returned in local user avatar event callback
+     */
+    public void requestDressOptionList() {
+        // For current sdk version, we use setXXX method instead of
+        // getXX method, will be replaced in future version.
+        avatarEngine.setLocalUserAvatarOptions(AvatarConfigManager.AvatarConfig.DRESS_KEY_REQUEST_FULL_LIST, null);
+    }
+
+    public int startDressing() {
+        return avatarEngine.setLocalUserAvatarOptions(AvatarConfigManager.AvatarConfig.DRESS_KEY_START, null);
+    }
+
+    public int stopDressing() {
+        return avatarEngine.setLocalUserAvatarOptions(AvatarConfigManager.AvatarConfig.DRESS_KEY_STOP, null);
+    }
+
+    /**
+     * The result will be returned in local user avatar event callback
+     */
+    public void requestFaceEditOptionList() {
+        // For current sdk version, we use setXXX method instead of
+        // getXX method, will be replaced in future version.
+        avatarEngine.setLocalUserAvatarOptions(AvatarConfigManager.AvatarConfig.FACE_EDIT_KEY_REQUEST_FULL_LIST, null);
+    }
+
+    public int startFaceEdit() {
+        return avatarEngine.setLocalUserAvatarOptions(AvatarConfigManager.AvatarConfig.FACE_EDIT_KEY_START, null);
+    }
+
+    public int stopFaceEdit() {
+        return avatarEngine.setLocalUserAvatarOptions(AvatarConfigManager.AvatarConfig.FACE_EDIT_KEY_STOP, null);
+    }
+
+    public int setLocalAvatarOption(String key, String value) {
+        Log.d(TAG, "setLocalAvatarOption, key:" + key + ", value:" + value);
+        return avatarEngine.setLocalUserAvatarOptions(key, value.getBytes());
+    }
+
+    /**
+     * Implementation of IAvatarEngineEventHandler
+     */
+    @Override
+    public void onLocalUserAvatarStarted(boolean b, int i, String s) {
+        Log.e(TAG, "onLocalUserAvatarStarted " + b + " " + i + " " + s);
+        iterateAvatarHandlers(handler -> handler.onLocalUserAvatarStarted(b, i, s));
+    }
+
+    /**
+     * Implementation of IAvatarEngineEventHandler
+     */
+    @Override
+    public void onLocalUserAvatarError(int i, String s) {
+        Log.e(TAG, "onLocalUserAvatarError " + i + " " + s);
+        iterateAvatarHandlers(handler -> handler.onLocalUserAvatarError(i, s));
+    }
+
+    /**
+     * Implementation of IAvatarEngineEventHandler
+     */
+    @Override
+    public void onLocalUserAvatarEvent(String s, String s1) {
+        Log.e(TAG, s1 + "," + s1);
+        iterateAvatarHandlers(handler -> handler.onLocalUserAvatarEvent(s, s1));
+    }
+
+    /**
+     * Implementation of IAvatarEngineEventHandler
+     */
+    @Override
+    public void onRemoteUserAvatarStarted(int i, boolean b, int i1, String s) {
+        Log.e(TAG, "onRemoteUserAvatarStarted " + b + " " + i + " " + s);
+        iterateAvatarHandlers(handler -> handler.onRemoteUserAvatarStarted(i, b, i1, s));
+    }
+
+    /**
+     * Implementation of IAvatarEngineEventHandler
+     */
+    @Override
+    public void onRemoteUserAvatarError(int i, int i1, String s) {
+        Log.e(TAG, "onRemoteUserAvatarError " + i + " " + s);
+        iterateAvatarHandlers(handler -> handler.onRemoteUserAvatarError(i, i1, s));
+    }
+
+    /**
+     * Implementation of IAvatarEngineEventHandler
+     */
+    @Override
+    public void onRemoteUserAvatarEvent(int i, String s, String s1) {
+        Log.e(TAG, "onRemoteUserAvatarEvent " + i + " " + s + " " + s1);
+        iterateAvatarHandlers(handler -> handler.onRemoteUserAvatarEvent(i, s, s1));
+    }
 
     public interface OnInitializeListener {
         void onError(int code, String message);
@@ -677,4 +826,35 @@ public class RtcManager {
         void onMediaOptionUpdated();
     }
 
+    public static class BaseAvatarEventHandler implements IAvatarEngineEventHandler {
+        @Override
+        public void onLocalUserAvatarStarted(boolean b, int i, String s) {
+
+        }
+
+        @Override
+        public void onLocalUserAvatarError(int i, String s) {
+
+        }
+
+        @Override
+        public void onLocalUserAvatarEvent(String s, String s1) {
+
+        }
+
+        @Override
+        public void onRemoteUserAvatarStarted(int i, boolean b, int i1, String s) {
+
+        }
+
+        @Override
+        public void onRemoteUserAvatarError(int i, int i1, String s) {
+
+        }
+
+        @Override
+        public void onRemoteUserAvatarEvent(int i, String s, String s1) {
+
+        }
+    }
 }

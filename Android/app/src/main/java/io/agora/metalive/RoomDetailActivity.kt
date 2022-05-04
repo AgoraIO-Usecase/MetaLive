@@ -17,6 +17,7 @@ import io.agora.metalive.manager.RoomManager
 import io.agora.metalive.manager.RtcManager
 import io.agora.uiwidget.basic.BindingViewHolder
 import io.agora.uiwidget.function.*
+import io.agora.metalive.component.AvatarOptionDialogUtil
 import io.agora.uiwidget.utils.RandomUtil
 import io.agora.uiwidget.utils.StatusBarUtil
 import io.agora.uiwidget.utils.UIUtil
@@ -35,7 +36,7 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    private val rtcManager by lazy { RtcManager() }
+    private val rtcManager by lazy { RtcManager.getInstance() }
 
     private val mBinding by lazy {
         RoomDetailActivityBinding.inflate(LayoutInflater.from(this))
@@ -127,7 +128,8 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     private fun initManager() {
-        rtcManager.init(this, getString(R.string.rtc_app_id), null)
+        // rtcManager.init(this, getString(R.string.rtc_app_id), null)
+        // rtcManager.setAvatarActivity(this)
 
         RoomManager.getInstance().joinRoom(mRoomInfo.roomId,
             if (isRoomOwner()) RoomManager.Status.ACCEPT else RoomManager.Status.END,
@@ -312,7 +314,7 @@ class RoomDetailActivity : AppCompatActivity() {
             setFun2ImageResource(R.drawable.room_detail_icon_magic)
             setFun2Background(null)
             setFun2ClickListener {
-                faceEditLauncher.launch(FaceEditActivity.FROM_ROOM_DETAIL)
+                showAvatarOptionDialog()
             }
             // 更多
             setupMoreBtn(true) {
@@ -383,6 +385,10 @@ class RoomDetailActivity : AppCompatActivity() {
                 true
             ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
             .show()
+    }
+
+    private fun showAvatarOptionDialog() {
+        AvatarOptionDialogUtil().show(this)
     }
 
     private fun showRoomOwnerExitDialog() {
@@ -467,7 +473,8 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        rtcManager.destroy()
+        rtcManager.leaveChannel(mRoomInfo.roomId)
+
         if (isRoomOwner()) {
             RoomManager.getInstance().destroyRoom(mRoomInfo.roomId)
         } else {
