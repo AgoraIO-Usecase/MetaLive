@@ -32,15 +32,15 @@ class RoomListActivity : AppCompatActivity() {
 
     private var permissionGrandRun: (() -> Unit)? = null
 
-    private lateinit var faceEditLauncher: ActivityResultLauncher<String>
+    //private lateinit var faceEditLauncher: ActivityResultLauncher<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
 
-        faceEditLauncher = FaceEditActivity.launcher(this)
-        doOnInitialized{
+//        faceEditLauncher = FaceEditActivity.launcher(this)
+        doOnInitialized {
             initView()
         }
     }
@@ -107,7 +107,7 @@ class RoomListActivity : AppCompatActivity() {
 
         mBinding.ivEditFace.setOnClickListener {
             doOnInitialized {
-                faceEditLauncher.launch(FaceEditActivity.FROM_ROOM_LIST)
+//                faceEditLauncher.launch(FaceEditActivity.FROM_ROOM_LIST)
             }
         }
     }

@@ -32,6 +32,12 @@ public class EditFaceSelectView extends FrameLayout {
     private RecyclerView.Adapter<RecyclerView.ViewHolder> mVPAdapter;
     private final List<Tab> vpTabs = new ArrayList<>();
 
+    public void setOnTabSelectListener(OnSelectTabChangedListener mListener) {
+        this.mListener = mListener;
+    }
+
+    private OnSelectTabChangedListener mListener;
+
     public EditFaceSelectView(@NonNull Context context) {
         this(context, null);
     }
@@ -96,6 +102,10 @@ public class EditFaceSelectView extends FrameLayout {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewBinding.viewPager2.setCurrentItem(tab.getPosition());
+
+                if (mListener != null) {
+                    mListener.onTabChanged(tab.getPosition());
+                }
             }
 
             @Override
@@ -142,4 +152,7 @@ public class EditFaceSelectView extends FrameLayout {
         mVPAdapter.notifyItemInserted(insertIndex);
     }
 
+    public interface OnSelectTabChangedListener {
+        void onTabChanged(int position);
+    }
 }

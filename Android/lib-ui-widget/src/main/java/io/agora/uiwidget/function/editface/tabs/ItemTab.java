@@ -17,23 +17,26 @@ public class ItemTab extends Tab<ItemTab.ItemTabViewHolder>{
     private final List<ItemInfo> itemList;
     private final int selectItem;
     private final ItemAdapter.ItemSelectListener itemSelectListener;
+    private final ItemSelectView.ItemImageInterceptListener itemImageInterceptor;
 
     public ItemTab(
             String title,
             List<ItemInfo> itemList,
             int selectItem,
-            ItemAdapter.ItemSelectListener itemSelectListener
+            ItemAdapter.ItemSelectListener itemSelectListener,
+            ItemSelectView.ItemImageInterceptListener interceptor
     ) {
         super(title, VIEW_TYPE_ITEM);
         this.itemList = itemList;
         this.selectItem = selectItem;
         this.itemSelectListener = itemSelectListener;
+        this.itemImageInterceptor = interceptor;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ItemTabViewHolder holder, int position) {
         holder.itemSelectView.setItemControllerListener(itemSelectListener);
-        holder.itemSelectView.init(itemList, selectItem);
+        holder.itemSelectView.init(itemList, selectItem, itemImageInterceptor);
     }
 
     public static class ItemTabViewHolder extends RecyclerView.ViewHolder{

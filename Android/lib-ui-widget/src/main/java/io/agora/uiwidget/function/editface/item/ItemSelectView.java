@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,7 +42,8 @@ public class ItemSelectView extends RecyclerView {
         super(context, attrs, defStyleAttr);
     }
 
-    public <T extends ItemInfo> void init(final List<T> itemList, int defaultSelectItem) {
+    public <T extends ItemInfo> void init(final List<T> itemList, int defaultSelectItem,
+                                          ItemImageInterceptListener interceptor) {
         size = itemList.size();
         mItemAdapter = new ItemAdapter(getContext()) {
             @Override
@@ -54,9 +56,23 @@ public class ItemSelectView extends RecyclerView {
                 return size;
             }
         };
+
         mItemAdapter.setSelectPosition(this.mDefaultSelectItem = defaultSelectItem);
 
+        // If the interceptor exists, the default image setting
+        // of this item is replaced by this interceptor.
+        if (interceptor != null) {
+            mItemAdapter.setItemImageListener((imageView, position) -> {
+                interceptor.onItemImageIntercept(imageView, position);
+                return true;
+            });
+        }
+
         init();
+    }
+
+    public <T extends ItemInfo> void init(final List<T> itemList, int defaultSelectItem) {
+        this.init(itemList, defaultSelectItem, null);
     }
 
     private void init() {
@@ -121,5 +137,9 @@ public class ItemSelectView extends RecyclerView {
 
     public int getSelectItem() {
         return mItemAdapter.mSelectPosition;
+    }
+
+    public interface ItemImageInterceptListener {
+        void onItemImageIntercept(ImageView imageView, int position);
     }
 }

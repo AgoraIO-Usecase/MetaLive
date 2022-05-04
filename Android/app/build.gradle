@@ -63,11 +63,11 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation 'pub.devrel:easypermissions:3.0.0'
-    implementation rootProject.findProject(':rtmSyncManager') != null ? project(':rtmSyncManager') : 'com.github.AgoraIO-Community:SyncManager-Android:1.0.5.2'
+    implementation rootProject.findProject(':rtmSyncManager') != null ? project(':rtmSyncManager') : 'com.github.AgoraIO-Community:SyncManager-Android:1.0.5.3'
 
     implementation project(":lib-ui-widget")
 
-    //implementation 'com.android.databinding:library:4.0.1'
+    implementation 'com.android.databinding:library:4.0.1'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.yanzhenjie:album:2.1.1'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'

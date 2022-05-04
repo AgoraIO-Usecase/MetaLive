@@ -314,15 +314,6 @@ public class RtcManager implements IAvatarEngineEventHandler {
 
             avatarEngine.enableOrUpdateLocalAvatarVideo(true, avatarConfigs);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    avatarEngine.setActivity(context);
-                }
-            }, 1000);
-
-
-
             engine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
             engine.setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
             engine.setLogLevel(Constants.LogLevel.getValue(Constants.LogLevel.LOG_LEVEL_ERROR));
@@ -334,7 +325,13 @@ public class RtcManager implements IAvatarEngineEventHandler {
             engine.enableVideo();
             engine.enableAudio();
 
-            engine.setCameraCapturerConfiguration(new CameraCapturerConfiguration(cameraDirection, new CameraCapturerConfiguration.CaptureFormat(encoderConfiguration.dimensions.width, encoderConfiguration.dimensions.height, encoderConfiguration.frameRate)));
+            engine.setCameraCapturerConfiguration(
+                    new CameraCapturerConfiguration(cameraDirection,
+                            new CameraCapturerConfiguration.CaptureFormat(
+                                    encoderConfiguration.dimensions.width,
+                                    encoderConfiguration.dimensions.height,
+                                    encoderConfiguration.frameRate)));
+
             if (cameraDirection == CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT) {
                 encoderConfiguration.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_ENABLED;
             } else {
@@ -393,6 +390,16 @@ public class RtcManager implements IAvatarEngineEventHandler {
         videoCanvas.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED.getValue();
         avatarEngine.setupLocalVideoCanvas(videoCanvas);
         Log.d(TAG, "RTCManager renderLocalAvatarVideo cost time ms=" + (System.currentTimeMillis() - startTime));
+    }
+
+    public void stopRenderLocalAvatarVideo(FrameLayout container) {
+        if (engine == null) {
+            return;
+        }
+
+        container.removeAllViews();
+        VideoCanvas canvas = new VideoCanvas(null, RENDER_MODE_HIDDEN);
+        avatarEngine.setupLocalVideoCanvas(canvas);
     }
 
     public void renderLocalCameraVideo(FrameLayout container) {

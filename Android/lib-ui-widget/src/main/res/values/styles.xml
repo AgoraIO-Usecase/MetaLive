@@ -29,15 +29,19 @@
         <item name="android:indeterminateDrawable">@drawable/common_ratingbar_indicator</item>
     </style>
 
-
     <!-- Bottom Dialog-->
-    <style name="BottomSheetDialog" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@android:color/transparent</item>
+    <style name="BottomSheetDialog" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:backgroundDimAmount">0</item>
-        <item name="colorPrimary">#6F57EB</item>
-        <item name="colorPrimaryDark">#6F33EE</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="bottomSheetStyle">@style/bottom_action_dialog_background</item>
     </style>
+
+    <style name="bottom_action_dialog_background" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
 
     <style name="GiftAnimPlayDialog">
         <item name="windowNoTitle">true</item>
