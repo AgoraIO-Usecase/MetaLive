@@ -162,7 +162,6 @@ class PreviewActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        rtcManager.stopRenderLocalAvatarVideo(mBinding.surfaceViewContainer);
         handler.removeCallbacks(showAvatarButtonRunnable)
     }
 }
