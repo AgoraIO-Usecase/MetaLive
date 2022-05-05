@@ -7,12 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import io.agora.metalive.component.AvatarOptionDialogUtil
 import io.agora.metalive.databinding.PreviewActivityBinding
 import io.agora.metalive.manager.RoomManager
 import io.agora.metalive.manager.RoomManager.RoomInfo
 import io.agora.metalive.manager.RtcManager
 import io.agora.rtc2.video.VideoEncoderConfiguration.VideoDimensions
-import io.agora.metalive.component.AvatarOptionDialogUtil
 import io.agora.uiwidget.function.VideoSettingDialog
 import io.agora.uiwidget.function.VideoSettingDialog.OnValuesChangeListener
 import io.agora.uiwidget.utils.StatusBarUtil
@@ -151,6 +151,7 @@ class PreviewActivity : AppCompatActivity() {
 
     private fun initPreview() {
         rtcManager.renderLocalAvatarVideo(mBinding.surfaceViewContainer)
+        rtcManager.renderLocalCameraVideo(mBinding.cameraViewContainer)
 
         // Wait until the avatar loading is possibly completed,
         // then we should acquire the information of current

@@ -142,6 +142,7 @@
         android:layout_marginStart="@dimen/preview_control_content_padding"
         android:layout_marginEnd="@dimen/preview_control_content_padding"
         android:layout_marginBottom="@dimen/preview_control_bottom_padding"
+        android:visibility="gone"
         android:background="@drawable/preview_control_policy_bg">
 
         <ImageView
