@@ -196,6 +196,8 @@ public class AvatarConfigManager extends RtcManager.BaseAvatarEventHandler {
         public static final String FACE_EDIT_KEY_STOP = "stop_faceedit";
         public static final String FACE_EDIT_KEY_REQUEST_FULL_LIST = "request_felist";
         public static final String FACE_EDIT_KEY_SEND = "send_felist";
+
+        public static final String KEY_AVATAR_QUALITY = "set_quality";
     }
 
     public static class DressConfigItemSet {

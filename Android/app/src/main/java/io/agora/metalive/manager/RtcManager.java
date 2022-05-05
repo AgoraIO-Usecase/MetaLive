@@ -121,6 +121,29 @@ public class RtcManager implements IAvatarEngineEventHandler {
                     DEFAULT_BITRATE,
                     ORIENTATION_MODE_FIXED_PORTRAIT);
 
+    public enum AvatarRenderQuality {
+        Low, Medium, High, Ultra;
+
+        public String getStringId() {
+            String id = "";
+            switch (this) {
+                case Low:
+                    id = "0";
+                    break;
+                case Medium:
+                    id = "1";
+                    break;
+                case High:
+                    id = "2";
+                    break;
+                case Ultra:
+                    id = "3";
+                    break;
+            }
+            return id;
+        }
+    }
+
     private volatile boolean isInitialized = false;
     private RtcEngineEx engine;
     private final Map<Integer, Runnable> firstVideoFramePendingRuns = new HashMap<>();
@@ -749,6 +772,11 @@ public class RtcManager implements IAvatarEngineEventHandler {
     public int setLocalAvatarOption(String key, String value) {
         Log.d(TAG, "setLocalAvatarOption, key:" + key + ", value:" + value);
         return avatarEngine.setLocalUserAvatarOptions(key, value.getBytes());
+    }
+
+    public int setLocalAvatarQuality(AvatarRenderQuality quality) {
+        String id = quality.getStringId();
+        return setLocalAvatarOption(AvatarConfigManager.AvatarConfig.KEY_AVATAR_QUALITY, id);
     }
 
     /**
