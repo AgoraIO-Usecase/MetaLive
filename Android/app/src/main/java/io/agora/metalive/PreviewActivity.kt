@@ -1,10 +1,11 @@
 package io.agora.metalive
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Handler
-import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import io.agora.metalive.component.AvatarOptionDialogUtil
@@ -12,10 +13,11 @@ import io.agora.metalive.databinding.PreviewActivityBinding
 import io.agora.metalive.manager.RoomManager
 import io.agora.metalive.manager.RoomManager.RoomInfo
 import io.agora.metalive.manager.RtcManager
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration.VideoDimensions
 import io.agora.uiwidget.function.VideoSettingDialog
-import io.agora.uiwidget.function.VideoSettingDialog.OnValuesChangeListener
 import io.agora.uiwidget.utils.StatusBarUtil
+import java.util.*
 
 class PreviewActivity : AppCompatActivity() {
     private val avatarButtonDelay = 10000L
@@ -91,11 +93,10 @@ class PreviewActivity : AppCompatActivity() {
 
             setGoLiveBtn { _: View?, randomName: String? ->
                 RoomManager.getInstance().createRoom(RoomInfo(randomName).apply {
-                    roomType = mBinding.tabLayout.selectedTabPosition + 1
+                    roomType = RoomManager.RoomType.SINGLE_HOST
                 }) { data: RoomInfo ->
                     // Only multi-host room is supported now,
                     // remove if other room types are supported in future versions.
-                    data.roomType = RoomManager.RoomType.MULTI_HOST
                     runOnUiThread { goToRoomDetail(data) }
                 }
             }
@@ -112,40 +113,79 @@ class PreviewActivity : AppCompatActivity() {
     }
 
     private fun showSettingDialog() {
-        val resolutions: MutableList<Size> = ArrayList()
-        for (sVideoDimension in RtcManager.sVideoDimensions) {
-            resolutions.add(Size(sVideoDimension.width, sVideoDimension.height))
+        val dimensionsOptions = arrayListOf<String>()
+        var dimensionDefault = 0
+        RtcManager.sVideoDimensions.forEachIndexed { index: Int, item: VideoDimensions ->
+            if (item.width == RtcManager.encoderConfiguration.dimensions.width && item.height == RtcManager.encoderConfiguration.dimensions.height) {
+                dimensionDefault = index
+            }
+            dimensionsOptions.add(String.format(Locale.US, "%dx%d", item.width, item.height))
         }
-        val frameRates: MutableList<Int> = ArrayList()
-        for (sFrameRate in RtcManager.sFrameRates) {
-            frameRates.add(sFrameRate.value)
+
+        val frameRateOptions = arrayListOf<String>()
+        var frameRateDefault = 0
+        RtcManager.sFrameRates.forEachIndexed { index: Int, item: VideoEncoderConfiguration.FRAME_RATE ->
+            if (item.value == RtcManager.encoderConfiguration.frameRate) {
+                frameRateDefault = index
+            }
+            frameRateOptions.add(String.format(Locale.US, "%d", item.value))
         }
-        VideoSettingDialog(this@PreviewActivity)
-            .setResolutions(resolutions)
-            .setFrameRates(frameRates)
-            .setBitRateRange(0, 2000)
-            .setDefaultValues(
-                Size(
-                    RtcManager.encoderConfiguration.dimensions.width,
-                    RtcManager.encoderConfiguration.dimensions.height
-                ),
-                RtcManager.encoderConfiguration.frameRate,
-                RtcManager.encoderConfiguration.bitrate
-            )
-            .setOnValuesChangeListener(object : OnValuesChangeListener {
-                override fun onResolutionChanged(resolution: Size) {
-                    RtcManager.encoderConfiguration.dimensions =
-                        VideoDimensions(resolution.width, resolution.height)
-                }
 
-                override fun onFrameRateChanged(framerate: Int) {
-                    RtcManager.encoderConfiguration.frameRate = framerate
-                }
+        val renderQualityOptions = arrayListOf<String>()
+        var renderQualityDefault = 0
+        RtcManager.sRenderQuality.forEachIndexed { index: Int, item: RtcManager.AvatarRenderQuality ->
+            renderQualityOptions.add(item.name)
+            if(RtcManager.currRenderQuality.stringId.equals(item.stringId)){
+                renderQualityDefault = index
+            }
+        }
 
-                override fun onBitrateChanged(bitrate: Int) {
-                    RtcManager.encoderConfiguration.bitrate = bitrate
-                }
-            })
+        VideoSettingDialog(this)
+            .addTextItem(
+                getString(R.string.video_setting_dialog_title_resolution),
+                dimensionsOptions,
+                dimensionDefault
+            ) { _: DialogInterface, position: Int ->
+                RtcManager.getInstance().setCameraCaptureResolution(RtcManager.sVideoDimensions[position])
+            }
+            .addTextItem(
+                getString(R.string.video_setting_dialog_title_framerate),
+                frameRateOptions,
+                frameRateDefault
+            ) { _: DialogInterface, position: Int ->
+                RtcManager.getInstance().setEncoderVideoFrameRate(RtcManager.sFrameRates[position])
+            }
+            .addTextItem(
+                "RenderQuality",
+                renderQualityOptions,
+                renderQualityDefault
+            ) { _: DialogInterface, position: Int ->
+                RtcManager.getInstance().setLocalAvatarQuality(RtcManager.sRenderQuality[position])
+            }
+            .addProgressItem(
+                getString(R.string.video_setting_dialog_title_bitrate),
+                0,
+                2000,
+                RtcManager.encoderConfiguration.bitrate,
+                "%s kps",
+                object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(
+                        seekBar: SeekBar?,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
+                        RtcManager.encoderConfiguration.bitrate = progress
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+                    }
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+                    }
+
+                })
             .show()
     }
 

@@ -2,12 +2,9 @@ package io.agora.metalive.manager;
 
 import static io.agora.rtc2.video.VideoCanvas.RENDER_MODE_HIDDEN;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE;
-import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_1;
-import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_10;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_15;
-import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_24;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_30;
-import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_7;
+import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_60;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.MIRROR_MODE_TYPE;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_120x120;
@@ -90,26 +87,18 @@ public class RtcManager implements IAvatarEngineEventHandler {
             VD_1280x720
     );
     public static final List<FRAME_RATE> sFrameRates = Arrays.asList(
-            FRAME_RATE_FPS_1,
-            FRAME_RATE_FPS_7,
-            FRAME_RATE_FPS_10,
             FRAME_RATE_FPS_15,
-            FRAME_RATE_FPS_24,
-            FRAME_RATE_FPS_30
+            FRAME_RATE_FPS_30,
+            FRAME_RATE_FPS_60
     );
 
-    public static final int AVATAR_ITEM_TYPE_OTHER_01 = 1001;
-    public static final int AVATAR_ITEM_TYPE_OTHER_02 = 1002;
-    public static final int AVATAR_ITEM_TYPE_OTHER_03 = 1003;
-    public static final int AVATAR_ITEM_TYPE_OTHER_04 = 1004;
-    public static final int AVATAR_ITEM_TYPE_OTHER_05 = 1005;
-    public static final int AVATAR_ITEM_TYPE_BODY = 1006;
-    public static final int AVATAR_ITEM_TYPE_ER_SHI = 1007;
-    public static final int AVATAR_ITEM_TYPE_JIAO_SHI = 1008;
-    public static final int AVATAR_ITEM_TYPE_SHOU_SHI = 1009;
-    public static final int AVATAR_ITEM_TYPE_BO_SHI = 1010;
-    public static final int AVATAR_ITEM_TYPE_HAIR_MASK = 1011;
-    public static final int AVATAR_ITEM_TYPE_LIGHT = 1012;
+    public static final List<AvatarRenderQuality> sRenderQuality = Arrays.asList(
+            AvatarRenderQuality.Low,
+            AvatarRenderQuality.Medium,
+            AvatarRenderQuality.High,
+            AvatarRenderQuality.Ultra
+    );
+
 
     private static final CameraCapturerConfiguration.CAMERA_DIRECTION cameraDirection =
             CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT;
@@ -117,9 +106,10 @@ public class RtcManager implements IAvatarEngineEventHandler {
     public static final VideoEncoderConfiguration encoderConfiguration =
             new VideoEncoderConfiguration(
                     VD_1280x720,
-                    FRAME_RATE_FPS_15,
+                    FRAME_RATE_FPS_60,
                     DEFAULT_BITRATE,
                     ORIENTATION_MODE_FIXED_PORTRAIT);
+    public static AvatarRenderQuality currRenderQuality = AvatarRenderQuality.High;
 
     public enum AvatarRenderQuality {
         Low, Medium, High, Ultra;
@@ -329,6 +319,7 @@ public class RtcManager implements IAvatarEngineEventHandler {
                     context.getString(R.string.ai_token_id));
             avatarEngine.initialize(avatarContext);
             avatarEngine.registerEventHandler(this);
+            setLocalAvatarQuality(currRenderQuality);
 
             AvatarConfigs avatarConfigs = new AvatarConfigs(
                     Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE,
@@ -368,6 +359,21 @@ public class RtcManager implements IAvatarEngineEventHandler {
                 listener.onError(-1, "RtcEngine create exception : " + e.toString());
             }
         }
+    }
+
+    public void setCameraCaptureResolution(VideoEncoderConfiguration.VideoDimensions dimension){
+        encoderConfiguration.dimensions = dimension;
+        engine.setCameraCapturerConfiguration(
+                new CameraCapturerConfiguration(cameraDirection,
+                        new CameraCapturerConfiguration.CaptureFormat(
+                                encoderConfiguration.dimensions.width,
+                                encoderConfiguration.dimensions.height,
+                                encoderConfiguration.frameRate)));
+    }
+
+    public void setEncoderVideoFrameRate(FRAME_RATE frameRate){
+        encoderConfiguration.frameRate = frameRate.getValue();
+        engine.setVideoEncoderConfiguration(encoderConfiguration);
     }
 
     public void setOnVideoFrameRenderListener(OnVideoFrameRenderListener onVideoFrameRenderListener) {
@@ -775,6 +781,7 @@ public class RtcManager implements IAvatarEngineEventHandler {
     }
 
     public int setLocalAvatarQuality(AvatarRenderQuality quality) {
+        currRenderQuality = quality;
         String id = quality.getStringId();
         return setLocalAvatarOption(AvatarConfigManager.AvatarConfig.KEY_AVATAR_QUALITY, id);
     }

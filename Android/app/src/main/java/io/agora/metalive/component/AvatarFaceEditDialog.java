@@ -136,7 +136,7 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
         mViewBindings.faceEditSubItemRecycler.setAdapter(adapter);
 
         AvatarConfigManager.FaceEditConfigGroup group = configList.get(position);
-        if (group != null) {
+        if (group != null && group.items.size() > 0) {
             AvatarConfigManager.FaceEditConfigItem item = group.items.get(0);
             refreshCurFaceEditItemInfo(group.name, item);
         }
