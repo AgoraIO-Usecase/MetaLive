@@ -11,9 +11,4 @@ struct KeyCenter {
 
     // assign token to nil if you have not enabled app certificate
     static var token: String? = nil
-    
-    /// 游戏
-    static let gameAppSecrets = ""
-    static let gameToken = "aa"
-    static let gameAppId = "10020"
 }
