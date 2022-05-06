@@ -117,10 +117,11 @@ public class RtcManager {
          */
         @Override
         public void onLocalUserAvatarEvent(String key, String value) {
-            Log.e(TAG, key + "," + value);
+            Log.e(TAG, "onLocalUserAvatarEvent " + key + "," + value);
             DataCallback<String> callback = localAvatarEventCallbackMap.get(key);
             if(callback != null){
                 runOnUiThread(() -> callback.onSuccess(value));
+                localAvatarEventCallbackMap.remove(key);
             }
         }
 
