@@ -135,7 +135,8 @@ class RoomDetailActivity : AppCompatActivity() {
                 )
                 RoomManager.getInstance()
                     .subscribeGiftReceiveEvent(mRoomInfo.roomId, WeakReference(giftReceiveObserver))
-                joinRtcChannel(it.find { it.userId.equals(RoomManager.getCacheUserId()) }?.status == RoomManager.Status.ACCEPT)
+                joinRtcChannel()
+                updateBottomView()
                 it.forEach { userInfo -> runOnUiThread { updateUserView(userInfo) } }
             },
             {
@@ -147,12 +148,12 @@ class RoomDetailActivity : AppCompatActivity() {
         )
     }
 
-    private fun joinRtcChannel(publish: Boolean) {
+    private fun joinRtcChannel() {
         rtcManager.joinChannel(
             mRoomInfo.roomId,
             RoomManager.getCacheUserId(),
             getString(R.string.rtc_app_token),
-            true, publish && !isShowAvatar, publish && isShowAvatar,
+            true, isLocalOnLinePublish() && !isShowAvatar, isLocalOnLinePublish() && isShowAvatar,
             object : RtcManager.OnChannelListener {
                 override fun onError(code: Int, message: String?) {
                     runOnUiThread {
@@ -233,6 +234,11 @@ class RoomDetailActivity : AppCompatActivity() {
                 }
                 // 调整声音
                 targetViewBinding.ivMicOff.isVisible = !userInfo.hasAudio
+                if (userInfo.userId.equals(RoomManager.getCacheUserId())) {
+                    rtcManager.enableLocalAudio(userInfo.hasAudio)
+                    mBinding.liveBottomView.isFun1Activated = userInfo.hasAudio
+                    updateBottomView()
+                }
                 targetViewBinding.tvName.text = userInfo.userName
             }
             RoomManager.Status.REFUSE,
@@ -241,12 +247,13 @@ class RoomDetailActivity : AppCompatActivity() {
                     (viewBinding.root.tag as? RoomManager.UserInfo)?.let {
                         if (it.userId.equals(userInfo.userId)) {
                             viewBinding.videoContainer.removeAllViews()
+                            viewBinding.root.tag = null
                             viewBinding.tvName.text = ""
-                            viewBinding.ivMicOff.isVisible = false
+                            viewBinding.ivMicOff.isVisible = true
                             if (userInfo.userId == RoomManager.getCacheUserId()) {
                                 rtcManager.setPublishVideo(mRoomInfo.roomId, false, false)
                                 rtcManager.enableLocalAudio(false)
-                                viewBinding.ivMicOff.isVisible = true
+                                updateBottomView()
                             }
                             return@forEach
                         }
@@ -258,6 +265,16 @@ class RoomDetailActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun updateBottomView() {
+        val localOnLinePublish = isLocalOnLinePublish()
+        mBinding.liveBottomView
+            .setFun1Visible(localOnLinePublish)
+            .setFun2Visible(localOnLinePublish)
+            .setupMoreBtn(localOnLinePublish) {
+                showToolsDialog()
+            }
     }
 
     private fun updateLocalVideo(targetViewBinding: RoomDetailViewportBinding) {
@@ -301,23 +318,31 @@ class RoomDetailActivity : AppCompatActivity() {
                     .show()
             }
             // 麦克风
-            setFun1Visible(true)
+            setFun1Visible(isRoomOwner())
             setFun1ImageResource(R.drawable.room_detail_icon_mic)
             setFun1Background(null)
-            isFun1Activated = true
+            isFun1Activated = false
             setFun1ClickListener {
-                rtcManager.enableLocalAudio(isFun1Activated)
                 isFun1Activated = !isFun1Activated
+                RoomManager.getInstance().openUserAudio(
+                    mRoomInfo.roomId,
+                    RoomManager.getInstance().localUserInfo,
+                    isFun1Activated
+                )
             }
             // 特效
-            setFun2Visible(true)
+            setFun2Visible(isRoomOwner())
             setFun2ImageResource(R.drawable.room_detail_icon_magic)
             setFun2Background(null)
             setFun2ClickListener {
-                showAvatarOptionDialog()
+                if (isShowAvatar) {
+                    showAvatarOptionDialog()
+                } else {
+                    Toast.makeText(this@RoomDetailActivity, getString(R.string.room_detail_avatar_effect_click_tip), Toast.LENGTH_SHORT).show()
+                }
             }
             // 更多
-            setupMoreBtn(true) {
+            setupMoreBtn(isRoomOwner()) {
                 showToolsDialog()
             }
             // 礼物
@@ -409,7 +434,7 @@ class RoomDetailActivity : AppCompatActivity() {
         }
         AlertDialog.Builder(this@RoomDetailActivity)
             .setTitle(R.string.common_tip)
-            .setMessage("Homeowner has left")
+            .setMessage(getString(R.string.room_detail_exit_tip))
             .setPositiveButton(R.string.common_sure) { dialog, _ ->
                 dialog.dismiss()
                 finish()
@@ -496,4 +521,7 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     private fun isRoomOwner() = mRoomInfo.userId == RoomManager.getCacheUserId()
+
+    private fun isLocalOnLinePublish() =
+        RoomManager.getInstance().localUserInfo.status == RoomManager.Status.ACCEPT
 }

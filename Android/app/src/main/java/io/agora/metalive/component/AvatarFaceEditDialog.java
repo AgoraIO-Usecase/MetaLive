@@ -33,7 +33,7 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
     private List<AvatarManager.FaceEditConfigGroup> configList;
 
     public AvatarFaceEditDialog(@NonNull Context context) {
-        this(context, R.style.BottomSheetDialog, false);
+        this(context, R.style.BottomSheetDialog, true);
     }
 
     public AvatarFaceEditDialog(@NonNull Context context, boolean dartText) {

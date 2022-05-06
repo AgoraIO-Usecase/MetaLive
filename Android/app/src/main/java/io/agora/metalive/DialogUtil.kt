@@ -15,7 +15,7 @@ import java.util.*
 object DialogUtil {
 
     fun showAvatarOptionDialog(context: Context): LiveToolsDialog {
-        return LiveToolsDialog(context).apply {
+        return LiveToolsDialog(context, true).apply {
             addToolItem(
                 LiveToolsDialog.ToolItem(
                     R.string.avatar_option_name_dress,

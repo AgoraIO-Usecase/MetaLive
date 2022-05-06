@@ -164,6 +164,9 @@ public class RtcManager {
 
     public void init(Context context, String appId, @Nullable OnInitializeListener listener) {
         if (isInitialized) {
+            if (listener != null) {
+                listener.onSuccess();
+            }
             return;
         }
 

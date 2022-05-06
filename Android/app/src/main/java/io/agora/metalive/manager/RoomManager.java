@@ -232,6 +232,8 @@ public class RoomManager {
         _userInfo.userId = userInfo.userId;
         _userInfo.userName = userInfo.userName;
         _userInfo.avatar = userInfo.avatar;
+        _userInfo.hasAudio = userInfo.hasAudio;
+        _userInfo.hasVideo = userInfo.hasVideo;
         _userInfo.status = status;
         sceneReference.collection(SYNC_MANAGER_USER_INFO_LIST)
                 .update(userInfo.objectId, _userInfo, new Sync.Callback() {
@@ -369,6 +371,9 @@ public class RoomManager {
                     public void onCreated(IObject item) {
                         UserInfo userInfo = item.toObject(UserInfo.class);
                         userInfo.objectId = item.getId();
+                        if(userInfo.userId.equals(localUserInfo.userId)){
+                            localUserInfo = userInfo;
+                        }
                         if (addOrUpdateCallback != null && addOrUpdateCallback.get() != null) {
                             addOrUpdateCallback.get().onSuccess(userInfo);
                         }
@@ -378,6 +383,9 @@ public class RoomManager {
                     public void onUpdated(IObject item) {
                         UserInfo userInfo = item.toObject(UserInfo.class);
                         userInfo.objectId = item.getId();
+                        if(userInfo.userId.equals(localUserInfo.userId)){
+                            localUserInfo = userInfo;
+                        }
                         if (addOrUpdateCallback != null && addOrUpdateCallback.get() != null) {
                             addOrUpdateCallback.get().onSuccess(userInfo);
                         }
