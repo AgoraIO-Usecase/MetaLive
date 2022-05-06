@@ -45,12 +45,6 @@
             android:launchMode="singleTop"
             android:exported="true"/>
 
-        <activity
-            android:name=".FaceEditActivity"
-            android:screenOrientation="behind"
-            android:launchMode="singleTop"
-            android:exported="true"/>
-
     </application>
 
 </manifest>

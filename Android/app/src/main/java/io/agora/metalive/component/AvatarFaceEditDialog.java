@@ -20,17 +20,17 @@ import java.util.List;
 
 import io.agora.metalive.databinding.FaceEditDialogLayoutBinding;
 import io.agora.metalive.databinding.FaceEditListItemBinding;
-import io.agora.metalive.manager.AvatarConfigManager;
+import io.agora.metalive.manager.AvatarManager;
+import io.agora.metalive.manager.DataListCallback;
 import io.agora.uiwidget.R;
 import io.agora.uiwidget.utils.StatusBarUtil;
 
 public class AvatarFaceEditDialog extends BottomSheetDialog {
-    private AvatarOptionDialogListener mListener;
     private FaceEditDialogLayoutBinding mViewBindings;
 
-    private AvatarConfigManager.FaceEditConfigItem curFeItem;
+    private AvatarManager.FaceEditConfigItem curFeItem;
 
-    private List<AvatarConfigManager.FaceEditConfigGroup> configList;
+    private List<AvatarManager.FaceEditConfigGroup> configList;
 
     public AvatarFaceEditDialog(@NonNull Context context) {
         this(context, R.style.BottomSheetDialog, false);
@@ -50,7 +50,24 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
         mViewBindings = FaceEditDialogLayoutBinding.inflate(LayoutInflater.from(getContext()));
         setContentView(mViewBindings.getRoot());
         StatusBarUtil.hideStatusBar(getWindow(), dartText);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AvatarManager.getInstance().startFaceEdit();
+    }
+
+    @Override
+    public void show() {
+        super.show();
         initTabs();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        AvatarManager.getInstance().stopFaceEdit();
     }
 
     private void initTabs() {
@@ -87,22 +104,32 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (curFeItem != null && mListener != null) {
+                if (curFeItem != null) {
                     float value = seekBar.getProgress() / 100f;
                     mViewBindings.faceEditItemValue.setText(value + "");
-                    mListener.onFaceEditChanged(curFeItem.id, value);
+                    AvatarManager.getInstance().changeFaceEdit(curFeItem.id, value);
                 }
             }
         });
 
-        configList = AvatarConfigManager.getInstance().getCurFaceEditConfigs();
-        if (configList.size() > 0) {
-            for (AvatarConfigManager.FaceEditConfigGroup group : configList) {
-                addTab(group.name);
-            }
+        AvatarManager.getInstance().getCurFaceEditConfigsSafely(new DataListCallback<AvatarManager.FaceEditConfigGroup>() {
+            @Override
+            public void onSuccess(@NonNull List<AvatarManager.FaceEditConfigGroup> dataList) {
+                if(!isShowing()){
+                    return;
+                }
+                mViewBindings.progressBar.setVisibility(View.GONE);
+                mViewBindings.contentLayout.setVisibility(View.VISIBLE);
+                configList = dataList;
+                if (configList.size() > 0) {
+                    for (AvatarManager.FaceEditConfigGroup group : configList) {
+                        addTab(group.name);
+                    }
 
-            showTab(0);
-        }
+                    showTab(0);
+                }
+            }
+        });
     }
 
     private void addTab(String title) {
@@ -118,9 +145,9 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
         TabLayout.Tab tab = tabLayout.getTabAt(position);
         tabLayout.selectTab(tab);
 
-        AvatarConfigManager.FaceEditConfigGroup group = configList.get(position);
-        if (group != null) {
-            AvatarConfigManager.FaceEditConfigItem item = group.items.get(0);
+        AvatarManager.FaceEditConfigGroup group = configList.get(position);
+        if (group != null && group.items.size() > 0) {
+            AvatarManager.FaceEditConfigItem item = group.items.get(0);
             refreshCurFaceEditItemInfo(group.name, item);
         }
     }
@@ -135,22 +162,18 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         mViewBindings.faceEditSubItemRecycler.setAdapter(adapter);
 
-        AvatarConfigManager.FaceEditConfigGroup group = configList.get(position);
+        AvatarManager.FaceEditConfigGroup group = configList.get(position);
         if (group != null && group.items.size() > 0) {
-            AvatarConfigManager.FaceEditConfigItem item = group.items.get(0);
+            AvatarManager.FaceEditConfigItem item = group.items.get(0);
             refreshCurFaceEditItemInfo(group.name, item);
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private void refreshCurFaceEditItemInfo(String groupName, AvatarConfigManager.FaceEditConfigItem item) {
+    private void refreshCurFaceEditItemInfo(String groupName, AvatarManager.FaceEditConfigItem item) {
         mViewBindings.faceEditItemValue.setText(item.value + "");
         mViewBindings.faceEditItemName.setText(groupName + item.name);
         mViewBindings.faceEditItemSeekBar.setProgress((int) (item.value * 100));
-    }
-
-    public void setAvatarOptionDialogListener(AvatarOptionDialogListener listener) {
-        this.mListener = listener;
     }
 
     private class FaceEditItemAdapter extends RecyclerView.Adapter<FaceEditItemHolder> {
@@ -191,10 +214,10 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
         @SuppressLint({"SetTextI18n", "NotifyDataSetChanged"})
         @Override
         public void onBindViewHolder(@NonNull FaceEditItemHolder holder, int position) {
-            AvatarConfigManager.FaceEditConfigGroup group = configList.get(groupNo);
+            AvatarManager.FaceEditConfigGroup group = configList.get(groupNo);
             if (group != null) {
                 int pos = holder.getAdapterPosition();
-                AvatarConfigManager.FaceEditConfigItem config = group.items.get(pos);
+                AvatarManager.FaceEditConfigItem config = group.items.get(pos);
                 holder.title.setText(config.name);
                 if (pos == selected) {
                     holder.itemView.setBackgroundColor(bgColorSelected);
@@ -215,7 +238,7 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
 
         @Override
         public int getItemCount() {
-            AvatarConfigManager.FaceEditConfigGroup group = configList.get(groupNo);
+            AvatarManager.FaceEditConfigGroup group = configList.get(groupNo);
             return group != null ? configList.get(groupNo).items.size() : 0;
         }
     }
@@ -229,4 +252,5 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
             title = binding.faceEditListItemText;
         }
     }
+
 }

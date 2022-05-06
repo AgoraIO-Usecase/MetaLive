@@ -42,10 +42,7 @@
     <string name="live_tool_name_rotate">翻转</string>
     <string name="live_tool_name_camera">摄像头</string>
 
-    <!-- AvatarToolDialog -->
-    <string name="avatar_option_title">虚拟形象设置</string>
-    <string name="avatar_option_name_dress">换装</string>
-    <string name="avatar_option_name_face">捏脸</string>
+
 
     <!-- GiftGridDialog -->
     <string name="gift_grid_title">礼物</string>

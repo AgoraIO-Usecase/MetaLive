@@ -653,12 +653,4 @@ public class RoomManager {
         int RAISING = 5;
     }
 
-
-    public interface DataListCallback<T> {
-        void onSuccess(@NonNull List<T> dataList);
-    }
-
-    public interface DataCallback<T> {
-        void onSuccess(@NonNull T data);
-    }
 }

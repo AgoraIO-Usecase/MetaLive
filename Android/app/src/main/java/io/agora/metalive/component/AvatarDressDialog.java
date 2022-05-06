@@ -2,6 +2,7 @@ package io.agora.metalive.component;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.metalive.databinding.AvatarDressToolLayoutBinding;
-import io.agora.metalive.manager.AvatarConfigManager;
+import io.agora.metalive.manager.AvatarManager;
 import io.agora.uiwidget.R;
 import io.agora.uiwidget.function.editface.bean.ItemInfo;
 import io.agora.uiwidget.function.editface.bean.UrlItemInfo;
@@ -22,7 +23,6 @@ import io.agora.uiwidget.utils.StatusBarUtil;
 public class AvatarDressDialog extends BottomSheetDialog {
     private AvatarDressToolLayoutBinding mBinding;
 
-    private AvatarOptionDialogListener mListener;
 
     public AvatarDressDialog(@NonNull Context context) {
         this(context, R.style.BottomSheetDialog, false);
@@ -42,62 +42,75 @@ public class AvatarDressDialog extends BottomSheetDialog {
         mBinding = AvatarDressToolLayoutBinding.inflate(LayoutInflater.from(getContext()));
         setContentView(mBinding.getRoot());
         StatusBarUtil.hideStatusBar(getWindow(), dartText);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AvatarManager.getInstance().startDressing();
+    }
+
+    @Override
+    public void show() {
+        super.show();
         initTabs(getContext());
     }
 
-    private void initTabs(Context context) {
-        List<AvatarConfigManager.DressConfigItemSet> list =
-                AvatarConfigManager.getInstance().getCurDressConfigSets();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        AvatarManager.getInstance().stopDressing();
+    }
 
-        mBinding.avatarDressToolSelectView.setOnTabSelectListener(
-                position -> {
-                    if (mListener != null) {
-                        AvatarConfigManager.DressConfigItemSet set = list.get(position);
+    private void initTabs(Context context) {
+        AvatarManager.getInstance().getCurDressConfigSetsSafely(list -> {
+            if (!isShowing()) {
+                return;
+            }
+            mBinding.progressBar.setVisibility(View.GONE);
+            mBinding.avatarDressToolSelectView.setOnTabSelectListener(
+                    position -> {
+                        AvatarManager.DressConfigItemSet set = list.get(position);
                         if (set != null) {
-                            mListener.onDressTypeChanged(set.id);
+                            AvatarManager.getInstance().setDressType(set.id);
                         }
                     }
-                }
-        );
-
-        for (AvatarConfigManager.DressConfigItemSet set : list) {
-            int index = -1;
-            int active = -1;
-
-            List<ItemInfo> infoList = new ArrayList<>();
-            for (AvatarConfigManager.DressConfigItem item : set.items) {
-                index++;
-                UrlItemInfo info = new UrlItemInfo(item.icon);
-                infoList.add(info);
-
-                if (item.isUsing == 1) {
-                    active = index;
-                }
-            }
-            mBinding.avatarDressToolSelectView.addTab(
-                    new ItemTab(
-                            set.name,
-                            infoList,
-                            active,
-                            (lastPos, position) -> {
-                                if (mListener != null) {
-                                    AvatarConfigManager.DressConfigItem config = set.items.get(position);
-                                    if (config != null) {
-                                        mListener.onDressItemSelected(config.id);
-                                    }
-                                }
-                                return true;
-                            },
-                            (imageView, position) -> {
-                                String url = set.items.get(position).icon;
-                                ImageUtil.setImageUrl(context, imageView, url);
-                            }
-                    )
             );
-        }
+
+            for (AvatarManager.DressConfigItemSet set : list) {
+                int index = -1;
+                int active = -1;
+
+                List<ItemInfo> infoList = new ArrayList<>();
+                for (AvatarManager.DressConfigItem item : set.items) {
+                    index++;
+                    UrlItemInfo info = new UrlItemInfo(item.icon);
+                    infoList.add(info);
+
+                    if (item.isUsing == 1) {
+                        active = index;
+                    }
+                }
+                mBinding.avatarDressToolSelectView.addTab(
+                        new ItemTab(
+                                set.name,
+                                infoList,
+                                active,
+                                (lastPos, position) -> {
+                                    AvatarManager.DressConfigItem config = set.items.get(position);
+                                    if (config != null) {
+                                        AvatarManager.getInstance().setDressValue(config.id);
+                                    }
+                                    return true;
+                                },
+                                (imageView, position) -> {
+                                    String url = set.items.get(position).icon;
+                                    ImageUtil.setImageUrl(context, imageView, url);
+                                }
+                        )
+                );
+            }
+        });
     }
 
-    public void setAvatarOptionDialogListener(AvatarOptionDialogListener listener) {
-        this.mListener = listener;
-    }
 }

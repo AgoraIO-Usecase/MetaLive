@@ -18,8 +18,20 @@
         android:layout_height="@dimen/live_tool_divider_height"
         android:layout_marginHorizontal="@dimen/live_tool_divider_margin_h"
         android:background="@color/live_tool_divider_color"/>
-    <io.agora.uiwidget.function.EditFaceSelectView
-        android:id="@+id/avatar_dress_tool_select_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+        <io.agora.uiwidget.function.EditFaceSelectView
+            android:id="@+id/avatar_dress_tool_select_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </FrameLayout>
 </LinearLayout>

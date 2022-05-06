@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import io.agora.metalive.manager.AvatarConfigManager
+import io.agora.metalive.manager.AvatarManager
 import io.agora.metalive.manager.RoomManager
 import io.agora.metalive.manager.RtcManager
 import pub.devrel.easypermissions.EasyPermissions
@@ -49,15 +49,29 @@ class SplashActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks 
             }
 
             if (valid) {
-                RtcManager.getInstance()
-                    .registerAvatarEventHandler(AvatarConfigManager.getInstance())
-                RtcManager.getInstance().init(this, rtcAppId, null)
+                RtcManager.getInstance().init(this, rtcAppId, object: RtcManager.OnInitializeListener{
+                    override fun onError(code: Int, message: String?) {
+                        AlertDialog.Builder(this@SplashActivity)
+                            .setTitle(R.string.common_tip)
+                            .setMessage("RtcManager initialize failed.\nreason: $message")
+                            .setPositiveButton(R.string.common_sure) { dialog: DialogInterface, _: Int ->
+                                dialog.dismiss()
+                                finish()
+                            }
+                            .show()
+                    }
 
-                if (!RoomManager.getInstance()
-                        .init(this, rtmAppId, rtmToken) { runOnUiThread(run) }
-                ) {
-                    run.invoke()
-                }
+                    override fun onSuccess() {
+                        AvatarManager.getInstance().setAvatarHandler { key, value, callback ->
+                            RtcManager.getInstance().setLocalAvatarOption(key, value, callback)
+                        }
+                        if (!RoomManager.getInstance()
+                                .init(this@SplashActivity, rtmAppId, rtmToken) { runOnUiThread(run) }
+                        ) {
+                            run.invoke()
+                        }
+                    }
+                })
             } else {
                 AlertDialog.Builder(this)
                     .setTitle(R.string.common_tip)
