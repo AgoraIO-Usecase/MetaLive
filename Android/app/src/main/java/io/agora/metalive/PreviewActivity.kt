@@ -23,7 +23,7 @@ class PreviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
-        StatusBarUtil.hideStatusBar(window, true)
+        StatusBarUtil.hideStatusBar(window, false)
 
         handler = Handler(mainLooper)
         initView()
@@ -72,7 +72,7 @@ class PreviewActivity : AppCompatActivity() {
     }
 
     private fun showAvatarOptionDialog() {
-        DialogUtil.showAvatarOptionDialog(this)
+        DialogUtil.showAvatarOptionDialog(this, false)
     }
 
     private fun initPreview() {

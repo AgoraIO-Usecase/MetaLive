@@ -47,8 +47,8 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            //outputFileName = "MetaLive-${versionName}-${variant.buildType.name}-${new SimpleDateFormat("yyyyMMdd").format(new Date())}.apk"
-            outputFileName = "MetaLive-${versionName}-${variant.buildType.name}.apk"
+            outputFileName = "MetaLive-${versionName}-${variant.buildType.name}-${new SimpleDateFormat("yyyyMMdd").format(new Date())}.apk"
+            //outputFileName = "MetaLive-${versionName}-${variant.buildType.name}.apk"
         }
     }
 }

@@ -129,7 +129,8 @@ public class AvatarManager {
         checkAvatarHandlerNoNull();
         checkAvatarStatus(AvatarStatus.FACE_EDITING);
         avatarStatus = AvatarStatus.IDLE;
-        avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.FACE_EDIT_KEY_STOP, null, null);
+        // TODO: 关闭捏脸会导致面部移动失效，先不调用等sdk修复
+        //avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.FACE_EDIT_KEY_STOP, null, null);
     }
 
     public void changeFaceEdit(String id, float value){
@@ -191,6 +192,7 @@ public class AvatarManager {
         }.getType();
 
         Map<String, Float> map = gson.fromJson(configString, type);
+        feDataSynced = map.size() > 0;
         for (Map.Entry<String, Float> entry : map.entrySet()) {
             String id = entry.getKey();
             if (!feIdToNameMap.containsKey(id)) {
@@ -219,7 +221,7 @@ public class AvatarManager {
                 }
             }
         }
-        feDataSynced = true;
+
     }
 
     private void checkAvatarHandlerNoNull() {

@@ -14,8 +14,8 @@ import java.util.*
 
 object DialogUtil {
 
-    fun showAvatarOptionDialog(context: Context): LiveToolsDialog {
-        return LiveToolsDialog(context, true).apply {
+    fun showAvatarOptionDialog(context: Context, statusTextDart: Boolean = true): LiveToolsDialog {
+        return LiveToolsDialog(context, statusTextDart).apply {
             addToolItem(
                 LiveToolsDialog.ToolItem(
                     R.string.avatar_option_name_dress,
@@ -23,7 +23,7 @@ object DialogUtil {
                 ), false
             ) { _: View, _: LiveToolsDialog.ToolItem ->
                 dismiss()
-                AvatarDressDialog(context).let {
+                AvatarDressDialog(context, statusTextDart).let {
                     it.setOnDismissListener { show() }
                     it.show()
                 }
@@ -35,7 +35,7 @@ object DialogUtil {
                 ), false
             ) { _: View, _: LiveToolsDialog.ToolItem ->
                 dismiss()
-                AvatarFaceEditDialog(context).let {
+                AvatarFaceEditDialog(context, statusTextDart).let {
                     it.setOnDismissListener { show() }
                     it.show()
                 }

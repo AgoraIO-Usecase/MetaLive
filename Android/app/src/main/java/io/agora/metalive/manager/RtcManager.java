@@ -19,9 +19,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.TextureView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.agora.metalive.R;
+import io.agora.metalive.databinding.AvatarLoadingLayoutBinding;
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.IAvatarEngine;
@@ -118,8 +122,14 @@ public class RtcManager {
         @Override
         public void onLocalUserAvatarEvent(String key, String value) {
             Log.e(TAG, "onLocalUserAvatarEvent " + key + "," + value);
+            if ("set_avatar_success".equalsIgnoreCase(key)) {
+                // module loaded successfully
+                // TODO 回调里头发还没加载完，即渲染还没结束就回调，这里需要的时渲染完成的回调，先延迟处理，等SDK处理
+                mainHandler.postDelayed(() -> onAvatarLoaded(), 2000L);
+                return;
+            }
             DataCallback<String> callback = localAvatarEventCallbackMap.get(key);
-            if(callback != null){
+            if (callback != null) {
                 runOnUiThread(() -> callback.onSuccess(value));
                 localAvatarEventCallbackMap.remove(key);
             }
@@ -151,7 +161,10 @@ public class RtcManager {
     };
 
     private static volatile RtcManager INSTANCE;
-    private RtcManager() {}
+
+    private RtcManager() {
+    }
+
     public static RtcManager getInstance() {
         if (INSTANCE == null) {
             synchronized (RtcManager.class) {
@@ -268,10 +281,21 @@ public class RtcManager {
         container.addView(avatarSurfaceView);
         engine.startPreview();
         VideoCanvas videoCanvas = new VideoCanvas(avatarSurfaceView, RENDER_MODE_HIDDEN);
-        videoCanvas.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED.getValue();
+        //videoCanvas.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED.getValue();
         avatarEngine.setupLocalVideoCanvas(videoCanvas);
         Log.d(TAG, "RTCManager renderLocalAvatarVideo cost time ms=" + (System.currentTimeMillis() - startTime));
-        container.postDelayed(this::onAvatarLoaded, 10000L);
+        //container.postDelayed(this::onAvatarLoaded, 10000L);
+
+        // add Loading View
+        if (!avatarIsLoaded) {
+            AvatarLoadingLayoutBinding inflate = AvatarLoadingLayoutBinding.inflate(LayoutInflater.from(container.getContext()), container, true);
+            doOnAvatarLoaded(new WeakRunnable<LinearLayout>(inflate.getRoot()) {
+                @Override
+                protected void runSafe(@NonNull LinearLayout data) {
+                    data.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
     public void stopRenderLocalAvatarVideo(FrameLayout container) {
@@ -386,7 +410,7 @@ public class RtcManager {
             return;
         }
         ChannelMediaOptions options = mediaOptionsHashMap.get(channelId);
-        if( options == null || options.publishAudioTrack == publishAudio){
+        if (options == null || options.publishAudioTrack == publishAudio) {
             return;
         }
         options.publishAudioTrack = publishAudio;
@@ -403,7 +427,7 @@ public class RtcManager {
             return;
         }
         ChannelMediaOptions options = mediaOptionsHashMap.get(channelId);
-        if( options == null || (options.publishAvatarTrack == publishAvatar && options.publishCameraTrack == publishCamera)){
+        if (options == null || (options.publishAvatarTrack == publishAvatar && options.publishCameraTrack == publishCamera)) {
             return;
         }
         options.publishAvatarTrack = publishAvatar;
@@ -489,17 +513,20 @@ public class RtcManager {
 
     public void setLocalAvatarOption(String key, String value, DataCallback<String> callback) {
         Log.d(TAG, "setLocalAvatarOption, key:" + key + ", value:" + value);
-        doOnAvatarLoaded(() -> {
-            int ret = avatarEngine.setLocalUserAvatarOptions(key, value == null ? null : value.getBytes());
-            if(ret != 0){
-                try {
-                    throw new RuntimeException("setLocalUserAvatarOptions error >> ret=" + ret + ", key=" + key + ", value=" + value);
-                }catch (Exception e){
-                    Log.e(TAG, "", e);
+        doOnAvatarLoaded(new Runnable() {
+            @Override
+            public void run() {
+                int ret = avatarEngine.setLocalUserAvatarOptions(key, value == null ? null : value.getBytes());
+                if (ret != 0) {
+                    try {
+                        throw new RuntimeException("setLocalUserAvatarOptions error >> ret=" + ret + ", key=" + key + ", value=" + value);
+                    } catch (Exception e) {
+                        Log.e(TAG, "", e);
+                    }
                 }
-            }
-            if(callback != null){
-                localAvatarEventCallbackMap.put(key, callback);
+                if(callback != null){
+                    localAvatarEventCallbackMap.put(key, callback);
+                }
             }
         });
     }
@@ -510,30 +537,30 @@ public class RtcManager {
         setLocalAvatarOption(AvatarManager.AvatarConfig.KEY_AVATAR_QUALITY, id);
     }
 
-    private void onAvatarLoaded(){
+    private void onAvatarLoaded() {
         avatarIsLoaded = true;
         Iterator<Runnable> iterator = avatarLoadedPendingRun.iterator();
         while (iterator.hasNext()) {
             Runnable next = iterator.next();
-            if(next != null){
+            if (next != null) {
                 runOnUiThread(next);
             }
             iterator.remove();
         }
     }
 
-    private void doOnAvatarLoaded(@NonNull Runnable runnable){
-        if(avatarIsLoaded){
+    private void doOnAvatarLoaded(@NonNull Runnable runnable) {
+        if (avatarIsLoaded) {
             runOnUiThread(runnable);
             return;
         }
         avatarLoadedPendingRun.add(runnable);
     }
 
-    private void runOnUiThread(@NonNull Runnable runnable){
-        if(Thread.currentThread() == mainHandler.getLooper().getThread()){
+    private void runOnUiThread(@NonNull Runnable runnable) {
+        if (Thread.currentThread() == mainHandler.getLooper().getThread()) {
             runnable.run();
-        }else{
+        } else {
             mainHandler.post(runnable);
         }
     }
