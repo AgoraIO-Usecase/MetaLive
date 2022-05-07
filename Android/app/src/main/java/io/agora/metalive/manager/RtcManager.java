@@ -267,6 +267,12 @@ public class RtcManager {
     public void setEncoderVideoFrameRate(FRAME_RATE frameRate) {
         encoderConfiguration.frameRate = frameRate.getValue();
         engine.setVideoEncoderConfiguration(encoderConfiguration);
+        for (String key : connectionMap.keySet()) {
+            RtcConnection rtcConnection = connectionMap.get(key);
+            if(rtcConnection != null){
+                engine.setVideoEncoderConfigurationEx(encoderConfiguration, rtcConnection);
+            }
+        }
     }
 
     public void renderLocalAvatarVideo(FrameLayout container) {
@@ -515,16 +521,19 @@ public class RtcManager {
         doOnAvatarLoaded(new Runnable() {
             @Override
             public void run() {
-                int ret = avatarEngine.setLocalUserAvatarOptions(key, value == null ? null : value.getBytes());
-                if (ret != 0) {
-                    try {
-                        throw new RuntimeException("setLocalUserAvatarOptions error >> ret=" + ret + ", key=" + key + ", value=" + value);
-                    } catch (Exception e) {
-                        Log.e(TAG, "", e);
-                    }
-                }
-                if(callback != null){
+                if (callback != null) {
+                    String ret = avatarEngine.getLocalUserAvatarOptions(key, value == null ? "": value);
+                    Log.d(TAG, "getLocalUserAvatarOptions >> key=" + key + ",value=" + value + ",ret=" + ret);
                     localAvatarEventCallbackMap.put(key, callback);
+                } else {
+                    int ret = avatarEngine.setLocalUserAvatarOptions(key, value == null ? null : value.getBytes());
+                    if (ret != 0) {
+                        try {
+                            throw new RuntimeException("setLocalUserAvatarOptions error >> ret=" + ret + ", key=" + key + ", value=" + value);
+                        } catch (Exception e) {
+                            Log.e(TAG, "", e);
+                        }
+                    }
                 }
             }
         });
