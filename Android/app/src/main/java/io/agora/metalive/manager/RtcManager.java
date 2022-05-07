@@ -124,8 +124,7 @@ public class RtcManager {
             Log.e(TAG, "onLocalUserAvatarEvent " + key + "," + value);
             if ("set_avatar_success".equalsIgnoreCase(key)) {
                 // module loaded successfully
-                // TODO 回调里头发还没加载完，即渲染还没结束就回调，这里需要的时渲染完成的回调，先延迟处理，等SDK处理
-                mainHandler.postDelayed(() -> onAvatarLoaded(), 2000L);
+                onAvatarLoaded();
                 return;
             }
             DataCallback<String> callback = localAvatarEventCallbackMap.get(key);
