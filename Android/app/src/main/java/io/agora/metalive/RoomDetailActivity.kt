@@ -250,14 +250,15 @@ class RoomDetailActivity : AppCompatActivity() {
                             viewBinding.root.tag = null
                             viewBinding.tvName.text = ""
                             viewBinding.ivMicOff.isVisible = true
-                            if (userInfo.userId == RoomManager.getCacheUserId()) {
-                                rtcManager.setPublishVideo(mRoomInfo.roomId, false, false)
-                                rtcManager.enableLocalAudio(false)
-                                updateBottomView()
-                            }
+
                             return@forEach
                         }
                     }
+                }
+                if (userInfo.userId == RoomManager.getCacheUserId()) {
+                    rtcManager.setPublishVideo(mRoomInfo.roomId, false, false)
+                    rtcManager.enableLocalAudio(false)
+                    updateBottomView()
                 }
                 if (!isRoomOwner()) {
                     // 观众逻辑
@@ -510,6 +511,7 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        rtcManager.enableLocalAudio(false)
         rtcManager.leaveChannel(mRoomInfo.roomId)
 
         if (isRoomOwner()) {

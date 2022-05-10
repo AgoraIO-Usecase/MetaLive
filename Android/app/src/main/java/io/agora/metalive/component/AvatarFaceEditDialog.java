@@ -165,12 +165,14 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
         AvatarManager.FaceEditConfigGroup group = configList.get(position);
         if (group != null && group.items.size() > 0) {
             AvatarManager.FaceEditConfigItem item = group.items.get(0);
+
             refreshCurFaceEditItemInfo(group.name, item);
         }
     }
 
     @SuppressLint("SetTextI18n")
     private void refreshCurFaceEditItemInfo(String groupName, AvatarManager.FaceEditConfigItem item) {
+        curFeItem = item;
         mViewBindings.faceEditItemValue.setText(item.value + "");
         mViewBindings.faceEditItemName.setText(groupName + item.name);
         mViewBindings.faceEditItemSeekBar.setProgress((int) (item.value * 100));
@@ -228,9 +230,8 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
                 }
 
                 holder.itemView.setOnClickListener(view -> {
-                    curFeItem = config;
                     selected = holder.getAdapterPosition();
-                    refreshCurFaceEditItemInfo(group.name, curFeItem);
+                    refreshCurFaceEditItemInfo(group.name, config);
                     notifyDataSetChanged();
                 });
             }

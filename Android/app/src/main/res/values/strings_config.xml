@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="rtm_app_id" translatable="false"><==AGORA RTM APP ID==></string>
+    <string name="rtm_app_id" translatable="false">aab8b8f5a8cd4469a63042fcfafe7063</string>
     <string name="rtm_app_token" translatable="false"/>
 
-    <string name="rtc_app_id" translatable="false"><==AGORA RTC APP ID==></string>
+    <string name="rtc_app_id" translatable="false">aab8b8f5a8cd4469a63042fcfafe7063</string>
     <string name="rtc_app_token" translatable="false"/>
 
-    <string name="ai_app_id" translatable="false"><==AVATAR APP ID==></string>
-    <string name="ai_token_id" translatable="false"><==AVATAR TOKEN ID==></string>
+    <string name="ai_app_id" translatable="false">51706f659d5dbc930733168cb5fa5e8b</string>
+    <string name="ai_token_id" translatable="false">db69784004408528e26f781616cf83dc</string>
 </resources>

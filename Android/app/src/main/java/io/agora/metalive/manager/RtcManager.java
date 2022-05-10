@@ -3,6 +3,7 @@ package io.agora.metalive.manager;
 import static io.agora.rtc2.video.VideoCanvas.RENDER_MODE_HIDDEN;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_15;
+import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_24;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_30;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_60;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.MIRROR_MODE_TYPE;
@@ -61,12 +62,14 @@ public class RtcManager {
             VD_240x180,
             VD_320x240,
             VD_480x360,
+            new VideoEncoderConfiguration.VideoDimensions(540, 960),
             VD_640x480,
             VD_960x720,
             VD_1280x720
     );
     public static final List<FRAME_RATE> sFrameRates = Arrays.asList(
             FRAME_RATE_FPS_15,
+            FRAME_RATE_FPS_24,
             FRAME_RATE_FPS_30,
             FRAME_RATE_FPS_60
     );
@@ -80,7 +83,7 @@ public class RtcManager {
     public static final VideoEncoderConfiguration encoderConfiguration =
             new VideoEncoderConfiguration(
                     VD_1280x720,
-                    FRAME_RATE_FPS_60,
+                    FRAME_RATE_FPS_30,
                     DEFAULT_BITRATE,
                     ORIENTATION_MODE_FIXED_PORTRAIT);
     public static AvatarRenderQuality currRenderQuality = AvatarRenderQuality.High;
@@ -199,6 +202,11 @@ public class RtcManager {
                     Log.e(TAG, String.format("onError code %d", err));
                 }
 
+                @Override
+                public void onRemoteVideoStats(RemoteVideoStats stats) {
+                    super.onRemoteVideoStats(stats);
+                    Log.d(TAG, String.format("onRemoteVideoStats stats decoderOutputFrameRate=%d, resolution=%dx%d", stats.decoderOutputFrameRate, stats.width, stats.height));
+                }
             });
 
             engine.setLogLevel(Constants.LogLevel.getValue(Constants.LogLevel.LOG_LEVEL_ERROR));
@@ -254,7 +262,7 @@ public class RtcManager {
         }
     }
 
-    public void setCameraCaptureResolution(VideoEncoderConfiguration.VideoDimensions dimension) {
+    public void setCameraAndEncoderResolution(VideoEncoderConfiguration.VideoDimensions dimension) {
         encoderConfiguration.dimensions = dimension;
         engine.setCameraCapturerConfiguration(
                 new CameraCapturerConfiguration(cameraDirection,
@@ -262,17 +270,27 @@ public class RtcManager {
                                 encoderConfiguration.dimensions.width,
                                 encoderConfiguration.dimensions.height,
                                 encoderConfiguration.frameRate)));
+        updateVideoEncoderConfigration();
     }
 
     public void setEncoderVideoFrameRate(FRAME_RATE frameRate) {
         encoderConfiguration.frameRate = frameRate.getValue();
-        engine.setVideoEncoderConfiguration(encoderConfiguration);
+        updateVideoEncoderConfigration();
+    }
+
+    public void setEncoderVideoBitrate(int bitrate) {
+        encoderConfiguration.bitrate = bitrate;
+        updateVideoEncoderConfigration();
+    }
+
+    private void updateVideoEncoderConfigration() {
         for (String key : connectionMap.keySet()) {
             RtcConnection rtcConnection = connectionMap.get(key);
             if(rtcConnection != null){
                 engine.setVideoEncoderConfigurationEx(encoderConfiguration, rtcConnection);
             }
         }
+        engine.setVideoEncoderConfiguration(encoderConfiguration);
     }
 
     public void renderLocalAvatarVideo(FrameLayout container) {
@@ -286,7 +304,7 @@ public class RtcManager {
         container.addView(avatarSurfaceView);
         engine.startPreview();
         VideoCanvas videoCanvas = new VideoCanvas(avatarSurfaceView, RENDER_MODE_HIDDEN);
-        //videoCanvas.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED.getValue();
+        videoCanvas.mirrorMode = MIRROR_MODE_TYPE.MIRROR_MODE_AUTO.getValue();
         avatarEngine.setupLocalVideoCanvas(videoCanvas);
         Log.d(TAG, "RTCManager renderLocalAvatarVideo cost time ms=" + (System.currentTimeMillis() - startTime));
         //container.postDelayed(this::onAvatarLoaded, 10000L);
@@ -360,7 +378,6 @@ public class RtcManager {
 
         RtcConnection connection = new RtcConnection(channelId, _uid);
         connectionMap.put(channelId, connection);
-        engine.setVideoEncoderConfigurationEx(encoderConfiguration, connection);
 
         int ret = engine.joinChannelEx(token, connection, options, new IRtcEngineEventHandler() {
             @Override
@@ -396,6 +413,8 @@ public class RtcManager {
             }
 
         });
+        engine.setVideoEncoderConfigurationEx(encoderConfiguration, connection);
+
         Log.i(TAG, String.format("joinChannel channel %s ret %d", channelId, ret));
     }
 
@@ -527,6 +546,7 @@ public class RtcManager {
                     localAvatarEventCallbackMap.put(key, callback);
                 } else {
                     int ret = avatarEngine.setLocalUserAvatarOptions(key, value == null ? null : value.getBytes());
+                    Log.d(TAG, "setLocalUserAvatarOptions >> key=" + key + ",value=" + value + ",ret=" + ret);
                     if (ret != 0) {
                         try {
                             throw new RuntimeException("setLocalUserAvatarOptions error >> ret=" + ret + ", key=" + key + ", value=" + value);

@@ -80,7 +80,7 @@ object DialogUtil {
                 dimensionDefault
             ) { _: DialogInterface, position: Int ->
                 RtcManager.getInstance()
-                    .setCameraCaptureResolution(RtcManager.sVideoDimensions[position])
+                    .setCameraAndEncoderResolution(RtcManager.sVideoDimensions[position])
             }
             addTextItem(
                 context.getString(R.string.video_setting_dialog_title_framerate),
@@ -108,7 +108,7 @@ object DialogUtil {
                         progress: Int,
                         fromUser: Boolean
                     ) {
-                        RtcManager.encoderConfiguration.bitrate = progress
+                        RtcManager.getInstance().setEncoderVideoBitrate(progress)
                     }
 
                     override fun onStartTrackingTouch(seekBar: SeekBar?) {

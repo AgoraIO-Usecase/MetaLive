@@ -23,7 +23,9 @@ public class AvatarManager {
     private static AvatarManager instance;
 
     private final Map<String, String> dressIdToNameMap = new HashMap<>();
+    private final Map<String, Boolean> dressIdOfficableMap = new HashMap<>();
     private final Map<String, DressConfigItemSet> dressConfigs = new HashMap<>();
+    private DressConfigItemSet currDressConfig;
 
     private final Map<String, String> feIdToNameMap = new HashMap<>();
     private final Set<String> feSupportIdSet = new HashSet<>();
@@ -84,11 +86,18 @@ public class AvatarManager {
         checkAvatarStatus(AvatarStatus.DRESSING);
         avatarStatus = AvatarStatus.IDLE;
         avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.DRESS_KEY_STOP, null, null);
+        currDressConfig = null;
     }
 
     public void setDressType(String type){
         checkAvatarHandlerNoNull();
         checkAvatarStatus(AvatarStatus.DRESSING);
+        DressConfigItemSet configItemSet = dressConfigs.get(type);
+        if(configItemSet == null){
+            Log.e(TAG, "The dress type " + type + " is not exist");
+            return;
+        }
+        currDressConfig = configItemSet;
         String format = "{\"type\":\"%s\"}";
         String value = String.format(format, type);
         avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.DRESS_KEY_SHOW_VIEW, value, null);
@@ -97,6 +106,25 @@ public class AvatarManager {
     public void setDressValue(String id){
         checkAvatarHandlerNoNull();
         checkAvatarStatus(AvatarStatus.DRESSING);
+        if(currDressConfig == null){
+            Log.e(TAG, "The dress type must be set firstly");
+            return;
+        }
+        boolean idExist = false;
+        for (DressConfigItem item : currDressConfig.items) {
+            if (item.id.equals(id)) {
+                idExist = true;
+                break;
+            }
+        }
+        if(!idExist){
+            Log.e(TAG, "The dress id " + id + " is not exist");
+            return;
+        }
+        for (DressConfigItem item : currDressConfig.items) {
+            item.isUsing = item.id.equals(id) ? 1 : 0;
+        }
+
         String format = "{\"id\":\"%s\"}";
         String value = String.format(format, id);
         avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.DRESS_KEY_PUT_ON, value, null);
@@ -130,7 +158,7 @@ public class AvatarManager {
         checkAvatarStatus(AvatarStatus.FACE_EDITING);
         avatarStatus = AvatarStatus.IDLE;
         // TODO: 关闭捏脸会导致面部移动失效，先不调用等sdk修复
-        //avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.FACE_EDIT_KEY_STOP, null, null);
+        avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.FACE_EDIT_KEY_STOP, null, null);
     }
 
     public void changeFaceEdit(String id, float value){
@@ -163,7 +191,27 @@ public class AvatarManager {
                     set.no = 0;
                 }
 
-                set.items = entry.getValue();
+                set.items = new ArrayList<>(entry.getValue());
+                Boolean officable = dressIdOfficableMap.get(id);
+                if(officable != null && officable){
+                    int isUsing = 1;
+                    for (DressConfigItem dressConfigItem : entry.getValue()) {
+                        if (dressConfigItem.isUsing > 0) {
+                            isUsing = 0;
+                            break;
+                        }
+                    }
+
+                    DressConfigItem element = new DressConfigItem();
+                    element.id = "";
+                    element.mame = "无";
+                    element.isUsing = isUsing;
+                    element.icon = "file:///android_asset/edit_face_item_none.png";
+                    set.items.add(0, element);
+                }
+
+
+
                 dressConfigs.put(id, set);
             }
         }
@@ -360,29 +408,51 @@ public class AvatarManager {
 
     private void initDressSetIdMap() {
         dressIdToNameMap.put("50", "脸型");
+        dressIdOfficableMap.put("50", false);
         dressIdToNameMap.put("51", "眼型");
+        dressIdOfficableMap.put("51", false);
         dressIdToNameMap.put("52", "嘴型");
+        dressIdOfficableMap.put("52", false);
         dressIdToNameMap.put("53", "瞳孔");
+        dressIdOfficableMap.put("53", false);
         dressIdToNameMap.put("54", "睫毛");
+        dressIdOfficableMap.put("54", false);
         dressIdToNameMap.put("55", "眉毛");
+        dressIdOfficableMap.put("55", false);
         dressIdToNameMap.put("60", "腮红");
+        dressIdOfficableMap.put("60", true);
         dressIdToNameMap.put("61", "口红");
+        dressIdOfficableMap.put("61", true);
         dressIdToNameMap.put("62", "眼影");
+        dressIdOfficableMap.put("62", true);
         dressIdToNameMap.put("63", "眼线");
+        dressIdOfficableMap.put("63", true);
         dressIdToNameMap.put("64", "胡须");
+        dressIdOfficableMap.put("64", true);
         dressIdToNameMap.put("65", "面部彩绘");
+        dressIdOfficableMap.put("65", true);
         dressIdToNameMap.put("66", "肤色");
+        dressIdOfficableMap.put("66", false);
         dressIdToNameMap.put("70", "发型");
-        dressIdToNameMap.put("71", "上装");
-        dressIdToNameMap.put("72", "下装");
-        dressIdToNameMap.put("73", "连衣裙");
-        dressIdToNameMap.put("74", "鞋子");
+        dressIdOfficableMap.put("70", true);
+        //dressIdToNameMap.put("71", "上装");
+        //dressIdOfficableMap.put("71", true);
+        //dressIdToNameMap.put("72", "下装");
+        //dressIdOfficableMap.put("72", true);
+        //dressIdToNameMap.put("73", "连衣裙");
+        //dressIdOfficableMap.put("73", true);
+        //dressIdToNameMap.put("74", "鞋子");
+        //dressIdOfficableMap.put("74", true);
         dressIdToNameMap.put("75", "帽子");
+        dressIdOfficableMap.put("75", true);
         dressIdToNameMap.put("76", "眼镜");
-        dressIdToNameMap.put("77", "配饰");
+        dressIdOfficableMap.put("76", true);
+        //dressIdToNameMap.put("77", "配饰");
+        //dressIdOfficableMap.put("77", true);
     }
 
     private void initFaceEditMaps() {
+        feGroupNames.put("10010", "额头");
         feGroupNames.put("10020", "颧骨");
         feGroupNames.put("10030", "苹果肌");
         feGroupNames.put("10040", "下颚角");
@@ -409,6 +479,13 @@ public class AvatarManager {
         feGroupNames.put("14020", "嘴角");
         feGroupNames.put("14030", "上唇");
         feGroupNames.put("14040", "唇珠");
+
+        feIdToNameMap.put("100101", "额头上下");
+        feIdToNameMap.put("100102", "额头前后");
+        feIdToNameMap.put("100103", "额头⻆度");
+        feIdToNameMap.put("100104", "额头宽度");
+        feIdToNameMap.put("100105", "额头⻓度");
+        feIdToNameMap.put("100106", "额头饱满");
 
         feIdToNameMap.put("100201", "颧骨上下");
         feIdToNameMap.put("100202", "颧骨前后");
@@ -468,16 +545,38 @@ public class AvatarManager {
         feIdToNameMap.put("110701", "瞳孔大小");
 
         feIdToNameMap.put("120101", "眉心上下");
+        feIdToNameMap.put("120102", "眉心前后");
         feIdToNameMap.put("120103", "眉心角度");
+        feIdToNameMap.put("120104", "眉心⻓度");
+        feIdToNameMap.put("120105", "眉心厚度");
+        feIdToNameMap.put("120106", "眉心饱满");
 
+        feIdToNameMap.put("120201", "眉头左右");
         feIdToNameMap.put("120202", "眉头上下");
+        feIdToNameMap.put("120203", "眉头前后");
         feIdToNameMap.put("120204", "眉头角度");
+        feIdToNameMap.put("120205", "眉头高低");
+        feIdToNameMap.put("120206", "眉头长度");
+        feIdToNameMap.put("120207", "眉头宽度");
+        feIdToNameMap.put("120208", "眉头饱满");
 
+        feIdToNameMap.put("120301", "眉中左右");
         feIdToNameMap.put("120302", "眉中上下");
+        feIdToNameMap.put("120303", "眉中前后");
         feIdToNameMap.put("120304", "眉中角度");
+        feIdToNameMap.put("120305", "眉中高低");
+        feIdToNameMap.put("120306", "眉中长度");
+        feIdToNameMap.put("120307", "眉中宽度");
+        feIdToNameMap.put("120308", "眉中饱满");
 
+        feIdToNameMap.put("120401", "眉尾左右");
         feIdToNameMap.put("120402", "眉尾上下");
+        feIdToNameMap.put("120403", "眉尾前后");
         feIdToNameMap.put("120404", "眉尾角度");
+        feIdToNameMap.put("120405", "眉尾高低");
+        feIdToNameMap.put("120406", "眉尾长度");
+        feIdToNameMap.put("120407", "眉尾宽度");
+        feIdToNameMap.put("120408", "眉尾饱满");
 
         feIdToNameMap.put("130202", "鼻梁前后");
 
@@ -497,15 +596,15 @@ public class AvatarManager {
         feIdToNameMap.put("140208", "嘴角厚度");
         feIdToNameMap.put("140209", "嘴角饱满");
 
-        feIdToNameMap.put("140301", "上嘴唇两侧左右");
-        feIdToNameMap.put("140302", "上嘴唇两侧上下");
-        feIdToNameMap.put("140303", "上嘴唇两侧前后");
-        feIdToNameMap.put("140304", "上嘴唇两侧角度");
-        feIdToNameMap.put("140305", "上嘴唇两侧倾斜");
-        feIdToNameMap.put("140306", "上嘴唇两侧外翻");
-        feIdToNameMap.put("140307", "上嘴唇两侧宽度");
-        feIdToNameMap.put("140308", "上嘴唇两侧厚度");
-        feIdToNameMap.put("140309", "上嘴唇两侧饱满");
+        feIdToNameMap.put("140301", "上唇两侧左右");
+        feIdToNameMap.put("140302", "上唇两侧上下");
+        feIdToNameMap.put("140303", "上唇两侧前后");
+        feIdToNameMap.put("140304", "上唇两侧角度");
+        feIdToNameMap.put("140305", "上唇两侧倾斜");
+        feIdToNameMap.put("140306", "上唇两侧外翻");
+        feIdToNameMap.put("140307", "上唇两侧宽度");
+        feIdToNameMap.put("140308", "上唇两侧厚度");
+        feIdToNameMap.put("140309", "上唇两侧饱满");
 
         feIdToNameMap.put("140401", "唇珠上下");
         feIdToNameMap.put("140402", "唇珠前后");
