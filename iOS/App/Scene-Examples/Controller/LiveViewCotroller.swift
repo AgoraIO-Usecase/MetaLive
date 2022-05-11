@@ -16,6 +16,7 @@ class LiveViewCotroller: UIViewController {
     var openMic = false
     var members = [Member]()
     var infos = [Info]()
+    var videoSetInfo: VideoSetInfo = .default
     
     /// init
     /// - Parameters:
@@ -92,6 +93,8 @@ class LiveViewCotroller: UIViewController {
     }
 }
 
+// MARK: - show view
+
 extension LiveViewCotroller { /** show view **/
     func showBeCloseAlert() { /** 房间被关闭 **/
         showAlert(title: "room_is_closed".localized, message: "", showCancle: false, confirm: { [weak self] in
@@ -135,9 +138,23 @@ extension LiveViewCotroller { /** show view **/
             self?.showHUDError(error: error.description)
         })
     }
+    
+    fileprivate func showVideoSetView() {
+        let vc = VideoSettingSheetVC(videoInfo: videoSetInfo)
+        vc.delegate = self
+        vc.show(in: self)
+    }
+    
+    fileprivate func showMoreView() {
+        let vc = MoreSheetVC()
+        vc.delegate = self
+        vc.show(in: self)
+    }
 }
 
-extension LiveViewCotroller: LiveViewDelegate, VideoViewDelegate, HandsUpSheetVCDelegate {
+// MARK: - view event
+
+extension LiveViewCotroller: LiveViewDelegate, VideoViewDelegate, HandsUpSheetVCDelegate, MoreSheetVCDelegate, VideoSettingSheetVCDelegate {
     func liveViewDidTapButtomAction(action: BottomView.ActionType) {
         switch action {
         case .mic:
@@ -146,67 +163,57 @@ extension LiveViewCotroller: LiveViewDelegate, VideoViewDelegate, HandsUpSheetVC
         case .handsup:
             entryType! == .fromCrateRoom ? showMembersView() : sendHandsupSync()
             break
+        case .more:
+            showMoreView()
+            break
         default:
             break
         }
     }
     
     func videoViewShouldRender(info: VideoCell.Info, renderView: UIView) {
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.view = renderView
-        canvas.renderMode = .hidden
-        if info.userId == UserInfo.uid {
-            canvas.uid = 0
-            agoraKit?.setupLocalVideo(canvas)
-            agoraKit?.startPreview()
-        }
-        else {
-            canvas.uid = UInt(info.userId)!
-            agoraKit?.setupRemoteVideo(canvas)
-        }
+        setRenderView(info: info,
+                      renderView: renderView)
     }
     
     func handsUpSheetVC(vc: HandsUpSheetVC, didTap action: HandsUpCell.Action, at index: Int) {
         let member = members[index]
         updateMember(member: member, action: action)
     }
-}
-
-extension LiveViewCotroller { /** info **/
-    enum EntryType {
-        /// 房主进入
-        case fromCrateRoom
-        /// 成员进入
-        case fromJoinRoom
+    
+    func moreSheetVCDidTap(action: MoreSheetVC.Action) {
+        switch action {
+        case .chang:
+            break
+        case .videoSet:
+            showVideoSetView()
+            break
+        }
     }
     
-    struct Info: Equatable {
-        let uid: UInt
-        let title: String
-        let userId: String
-        let hasAudio: Bool
-        let hasVideo: Bool
-        let member: Member
-        
-        init(member: Member) {
-            self.uid = UInt(member.userId)!
-            self.title = member.userName
-            self.userId = member.userId
-            self.hasAudio = member.hasAudio
-            self.hasVideo = member.status == .accept
-            self.member = member
+    func videoSettingSheetVCDidTap(type: VideoSettingSheetVC.InfoType, value: Int) {
+        var temp = videoSetInfo
+        switch type {
+        case .resolution:
+            temp.resolution = .init(rawValue: value)!
+            break
+        case .fremeRate:
+            temp.fremeRate = .init(rawValue: value)!
+            break
+        case .renderQuality:
+            temp.renderQuality = .init(rawValue: value)!
+            break
         }
-        
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.uid == rhs.uid &&
-            lhs.title == rhs.title &&
-            lhs.userId == rhs.userId &&
-            lhs.hasAudio == rhs.hasAudio &&
-            lhs.hasVideo == rhs.hasVideo
-        }
-        
-        var isMe: Bool {
-            return userId == UserInfo.uid
-        }
+        videoSetInfo = temp
+        updateVideoConfig(videoInfo: videoSetInfo)
+    }
+    
+    func videoSettingSheetVCDidValueChange(value: Int) {
+        var temp = videoSetInfo
+        temp.bitRate = value
+        videoSetInfo = temp
+        updateVideoConfig(videoInfo: videoSetInfo)
     }
 }
+
+

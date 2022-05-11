@@ -16,6 +16,8 @@
 		2642C2FC27CF6AE9002B626B /* HandsUpSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */; };
 		2642C2FE27CF6D9B002B626B /* HandsUpCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2FD27CF6D9B002B626B /* HandsUpCell.swift */; };
 		2693C36A282A7F00007F177D /* LiveViewCotroller+RTC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2693C369282A7F00007F177D /* LiveViewCotroller+RTC.swift */; };
+		2693C36C282BAE81007F177D /* MoreSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2693C36B282BAE81007F177D /* MoreSheetVC.swift */; };
+		2693C36E282BB5CE007F177D /* VideoSettingSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2693C36D282BB5CE007F177D /* VideoSettingSheetVC.swift */; };
 		2699846827C8BC830053DBB8 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2699846727C8BC830053DBB8 /* MainViewController.swift */; };
 		2699847927C8E5610053DBB8 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2699847827C8E5610053DBB8 /* NavigationController.swift */; };
 		2699847C27CC74B20053DBB8 /* MainCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2699847B27CC74B20053DBB8 /* MainCell.swift */; };
@@ -26,6 +28,7 @@
 		26C880D827CE02FA0066307D /* NotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C880D727CE02FA0066307D /* NotiView.swift */; };
 		26C880DA27CE07D00066307D /* LiveViewCotroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C880D927CE07D00066307D /* LiveViewCotroller.swift */; };
 		26C880DC27CE1A9B0066307D /* BottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C880DB27CE1A9B0066307D /* BottomView.swift */; };
+		26E4F023282BDE35005F553F /* LiveViewCotroller+Info.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E4F022282BDE35005F553F /* LiveViewCotroller+Info.swift */; };
 		26FF328E2824F73B009A9590 /* CreateLiveController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF328D2824F73B009A9590 /* CreateLiveController.swift */; };
 		26FF32902824F77B009A9590 /* LiveRandomNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF328F2824F77B009A9590 /* LiveRandomNameView.swift */; };
 		26FF3292282525B4009A9590 /* CreateLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF3291282525B4009A9590 /* CreateLiveView.swift */; };
@@ -88,6 +91,8 @@
 		2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandsUpSheetVC.swift; sourceTree = "<group>"; };
 		2642C2FD27CF6D9B002B626B /* HandsUpCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandsUpCell.swift; sourceTree = "<group>"; };
 		2693C369282A7F00007F177D /* LiveViewCotroller+RTC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveViewCotroller+RTC.swift"; sourceTree = "<group>"; };
+		2693C36B282BAE81007F177D /* MoreSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreSheetVC.swift; sourceTree = "<group>"; };
+		2693C36D282BB5CE007F177D /* VideoSettingSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoSettingSheetVC.swift; sourceTree = "<group>"; };
 		2699846727C8BC830053DBB8 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		2699847827C8E5610053DBB8 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		2699847B27CC74B20053DBB8 /* MainCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCell.swift; sourceTree = "<group>"; };
@@ -98,6 +103,7 @@
 		26C880D727CE02FA0066307D /* NotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiView.swift; sourceTree = "<group>"; };
 		26C880D927CE07D00066307D /* LiveViewCotroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveViewCotroller.swift; sourceTree = "<group>"; };
 		26C880DB27CE1A9B0066307D /* BottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomView.swift; sourceTree = "<group>"; };
+		26E4F022282BDE35005F553F /* LiveViewCotroller+Info.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveViewCotroller+Info.swift"; sourceTree = "<group>"; };
 		26FF328D2824F73B009A9590 /* CreateLiveController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateLiveController.swift; sourceTree = "<group>"; };
 		26FF328F2824F77B009A9590 /* LiveRandomNameView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveRandomNameView.swift; sourceTree = "<group>"; };
 		26FF3291282525B4009A9590 /* CreateLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateLiveView.swift; sourceTree = "<group>"; };
@@ -174,6 +180,7 @@
 				26C880D927CE07D00066307D /* LiveViewCotroller.swift */,
 				2612DE21282A4D860049998A /* LiveViewCotroller+Sync.swift */,
 				2693C369282A7F00007F177D /* LiveViewCotroller+RTC.swift */,
+				26E4F022282BDE35005F553F /* LiveViewCotroller+Info.swift */,
 				26FF328D2824F73B009A9590 /* CreateLiveController.swift */,
 			);
 			path = Controller;
@@ -212,6 +219,8 @@
 				2699848027CCC01D0053DBB8 /* TextInputAlertVC.swift */,
 				2642C2F527CF419B002B626B /* AlertVC.swift */,
 				2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */,
+				2693C36B282BAE81007F177D /* MoreSheetVC.swift */,
+				2693C36D282BB5CE007F177D /* VideoSettingSheetVC.swift */,
 				2699848127CCC01D0053DBB8 /* SystemAlertPrensentAnimation.swift */,
 			);
 			path = Sheet;
@@ -447,10 +456,13 @@
 				26FF328E2824F73B009A9590 /* CreateLiveController.swift in Sources */,
 				26FF329428252957009A9590 /* LiveView.swift in Sources */,
 				26C880DC27CE1A9B0066307D /* BottomView.swift in Sources */,
+				2693C36C282BAE81007F177D /* MoreSheetVC.swift in Sources */,
 				E79C2610273B689B00909CD4 /* KeyCenter.swift in Sources */,
 				26C880DA27CE07D00066307D /* LiveViewCotroller.swift in Sources */,
 				E79C262D273BC0CA00909CD4 /* ToastView.swift in Sources */,
+				26E4F023282BDE35005F553F /* LiveViewCotroller+Info.swift in Sources */,
 				E79BEF752744FD8B009FA838 /* GCDTimer.swift in Sources */,
+				2693C36E282BB5CE007F177D /* VideoSettingSheetVC.swift in Sources */,
 				2612DE1E28292BD10049998A /* VideoCell.swift in Sources */,
 				E79C2613273B689B00909CD4 /* UIColor+Extension.swift in Sources */,
 				2642C2FE27CF6D9B002B626B /* HandsUpCell.swift in Sources */,

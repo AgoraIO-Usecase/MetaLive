@@ -47,6 +47,9 @@ extension LiveViewCotroller {
         guard let objId = RoomManager.currentMemberId, let member = infos.first(where: { $0.isMe })?.member else {
             return
         }
+        guard member.status != .accept , member.status != .inviting else {
+            return
+        }
         var temp = member
         temp.status = .inviting
         showWaitHUD(title: "举手中")
@@ -117,6 +120,8 @@ extension LiveViewCotroller {
     }
 }
 
+// MARK: - Handle member update
+
 extension LiveViewCotroller { /** Handle member update **/
     func update(members: [Member]) {
         let infos = members.map({ Info(member: $0) })
@@ -126,7 +131,7 @@ extension LiveViewCotroller { /** Handle member update **/
     
     func remove(_ member: Member) {
         infos.removeAll(where: { $0.userId == member.userId })
-        removeRenderView(member: member)
+        resetRenderView(member: member)
         updateView()
     }
     
@@ -148,7 +153,7 @@ extension LiveViewCotroller { /** Handle member update **/
             break
         case .fromJoinRoom:
             if info.userId == UserInfo.uid { /** 是本人更新 **/
-                if info.member.status == .accept{ /** 房客举手被接受 **/
+                if info.member.status == .accept, oldInfo?.member.status != .accept { /** 房客举手被接受 **/
                     showHUD(title: "房主接受您的举手", duration: 2)
                 }
                 
@@ -159,14 +164,14 @@ extension LiveViewCotroller { /** Handle member update **/
                 if info.member.status == .end,
                    let old = oldInfo,
                    old.hasVideo { /** 房客被移出麦位 **/
-                    showHUD(title: "房主移出您的麦位", duration: 4)
+                    showHUD(title: "房主移出您的麦位", duration: 2)
                 }
             }
             break
         }
         
         if info.member.status == .end { /** 移除渲染 **/
-            removeRenderView(member: info.member)
+            resetRenderView(member: info.member)
         }
     }
     

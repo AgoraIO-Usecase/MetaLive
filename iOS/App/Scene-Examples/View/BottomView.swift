@@ -108,6 +108,7 @@ class BottomView: UIView {
         giftButton.addTarget(self, action: #selector(buttonTap(button:)), for: .touchUpInside)
         handupsButton.addTarget(self, action: #selector(buttonTap(button:)), for: .touchUpInside)
         moreButton.addTarget(self, action: #selector(buttonTap(button:)), for: .touchUpInside)
+        textField.isUserInteractionEnabled = false
     }
     
     @objc func keyboardWillShow(noti: Notification) {

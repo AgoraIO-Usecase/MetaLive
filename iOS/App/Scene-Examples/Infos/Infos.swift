@@ -35,3 +35,16 @@ enum Status: Int, Codable {
     // 举手中
     case raising = 5
 }
+
+struct VideoSetInfo {
+    var resolution: VideoSettingSheetVC.Resolution
+    var fremeRate: VideoSettingSheetVC.FremeRate
+    var renderQuality: VideoSettingSheetVC.RenderQuality
+    var bitRate: Int
+    
+    static var `default`: VideoSetInfo {
+        return VideoSetInfo(resolution: .v640x480,
+                            fremeRate: .fps30,
+                            renderQuality: .high,bitRate: 700)
+    }
+}

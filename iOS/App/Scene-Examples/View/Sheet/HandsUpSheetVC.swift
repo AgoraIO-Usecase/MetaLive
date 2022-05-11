@@ -7,7 +7,6 @@
 import UIKit
 import Presentr
 
-
 protocol HandsUpSheetVCDelegate: NSObjectProtocol {
     func handsUpSheetVC(vc: HandsUpSheetVC, didTap action: HandsUpCell.Action, at index: Int)
 }

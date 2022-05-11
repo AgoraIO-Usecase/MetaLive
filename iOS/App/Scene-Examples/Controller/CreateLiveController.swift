@@ -58,14 +58,15 @@ class CreateLiveController: UIViewController {
         config.channelProfile = .liveBroadcasting
         config.areaCode = .global
         
-        let encoderConfiguration = AgoraVideoEncoderConfiguration(size: CGSize(width: 320, height: 240),
-                                                                  frameRate: .fps30,
-                                                                  bitrate: AgoraVideoBitrateStandard,
-                                                                  orientationMode: .fixedPortrait,
-                                                                  mirrorMode: .auto)
+        let videoConfig = AgoraVideoEncoderConfiguration(size: VideoSetInfo.default.resolution.size,
+                                                         frameRate: VideoSetInfo.default.fremeRate.rtcType,
+                                                         bitrate: VideoSetInfo.default.bitRate,
+                                                         orientationMode: .fixedPortrait,
+                                                         mirrorMode: .auto)
+        
         let agoraKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
         agoraKit.setClientRole(.broadcaster)
-        agoraKit.setVideoEncoderConfiguration(encoderConfiguration)
+        agoraKit.setVideoEncoderConfiguration(videoConfig)
         
         /// 开启扬声器
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
