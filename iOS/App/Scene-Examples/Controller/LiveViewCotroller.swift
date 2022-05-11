@@ -9,11 +9,14 @@ import UIKit
 import AgoraRtcKit
 
 class LiveViewCotroller: UIViewController {
-    private let liveView = LiveView()
-    private var agoraKit: AgoraRtcEngineKit?
-    fileprivate var info: LiveRoomInfo!
-    fileprivate var entryType: EntryType!
-    fileprivate var openMic = false
+    let liveView = LiveView()
+    var agoraKit: AgoraRtcEngineKit?
+    var info: LiveRoomInfo!
+    var entryType: EntryType!
+    var openMic = false
+    var currentMember: Member?
+    var members = [Member]()
+    var infos = [Info]()
     
     /// init
     /// - Parameters:
@@ -31,12 +34,7 @@ class LiveViewCotroller: UIViewController {
     }
     
     deinit {
-        agoraKit?.leaveChannel({ state in
-            LogUtils.log(message: "\(state)", level: .info)
-        })
-        AgoraRtcEngineKit.destroy()
-        let roomId = info.roomId
-        entryType == .fromCrateRoom ? RoomManager.deleteRoom(roomId: roomId) : RoomManager.leaveRoom(roomId: roomId)
+        LogUtils.log(message: "LiveViewCotroller deinit", level: .info)
     }
     
     override func viewDidLoad() {
@@ -57,130 +55,182 @@ class LiveViewCotroller: UIViewController {
         liveView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         liveView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         liveView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "关闭", style: .plain, target: self, action: #selector(closeTap))
     }
     
     private func commonInit() {
+        liveView.videoView.delegate = self
         liveView.delegate = self
     }
     
-    private func setupAgoraKit() {
-        if entryType == .fromJoinRoom {
-            let config = AgoraRtcEngineConfig()
-            config.appId = KeyCenter.appId
-            config.channelProfile = .liveBroadcasting
-            config.areaCode = .global
-            
-            agoraKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
-            agoraKit?.setClientRole(.broadcaster)
-            agoraKit?.enableVideo()
-            agoraKit?.disableAudio()
-            agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
-            joinChannel()
-            return
-        }
-        
-        /** from create vc **/
-        joinChannel()
+    func handleMembersUpdate(members: [Member]) {
+        currentMember = members.first(where: { $0.userId == UserInfo.uid })
+        let temp = members.filter({ $0.status == .accept })
+        update(members: temp)
     }
     
-    private func joinChannel() {
-        let option = AgoraRtcChannelMediaOptions()
-        option.publishAudioTrack = .of(true)
-        option.publishCameraTrack = .of(true)
-        option.clientRoleType = .of((Int32)(AgoraClientRole.broadcaster.rawValue))
-        option.autoSubscribeVideo = .of(true)
-        option.autoSubscribeAudio = .of(true)
-        
-        guard let engine = agoraKit else {
-            fatalError("agoraKit must not nil")
-        }
-        engine.delegate = self
-        let result = engine.joinChannel(byToken: KeyCenter.token,
-                                        channelId: info.roomId,
-                                        uid: UserInfo.userId,
-                                        mediaOptions: option,
-                                        joinSuccess: nil)
-        
-        
-        if result != 0 {
-            LogUtils.log(message: "joinChannel fail: \(result)", level: .error)
-        }
-        else {
-            LogUtils.log(message: "joinChannel success: \(info.roomId)", level: .info)
-        }
-    }
-    
-    private func joinSync() {
-        if entryType == .fromCrateRoom {
-            RoomManager.createAndJoin(info: info) { [weak self](members) in
-                self?.handleMembersUpdate(members: members)
-                self?.subscribeEvent()
-                LogUtils.log(message: "createAndJoin success", level: .info)
-            } fail: { [weak self](error) in
-                self?.showHUDError(error: error.description)
-            }
-        }
-        else {
-            RoomManager.join(roomId: info.roomId) { [weak self](members) in
-                self?.handleMembersUpdate(members: members)
-                self?.subscribeEvent()
-                LogUtils.log(message: "join success", level: .info)
-            } fail: { [weak self](error) in
-                self?.showHUDError(error: error.description)
-            }
-        }
-    }
-    
-    private func subscribeEvent() {
-        if entryType == .fromJoinRoom {
-            RoomManager.subscribeRoomDelete(roomId: info.roomId, onDeleted: handleRoomDelete)
-        }
-    }
-    
-    private func handleMembersUpdate(members: [Member]) {
-//        let acceptMembers = members.filter({ $0.status == .accept })
-        
-        if let hostMember = members.first(where: { $0.userId == info.userId }) { /// 房主
-            let canvas = AgoraRtcVideoCanvas()
-            
-            canvas.renderMode = .hidden
-            canvas.view = liveView.renderViews.first
-            if hostMember.userId == UserInfo.uid { /** 当前是房主本人 **/
-                canvas.uid = 0
-                agoraKit?.setupLocalVideo(canvas)
-                agoraKit?.enableVideo()
-                agoraKit?.startPreview()
-            }
-            else { /** 当前非房主本人 **/
-                canvas.uid = UInt(hostMember.userId)!
-                agoraKit?.setupRemoteVideo(canvas)
-            }
-        }
-    }
-    
-    private func handleRoomDelete() {
+    func handleRoomDelete() {
         showAlert(title: "room_is_closed".localized, message: "") { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let list = Array<HandsUpSheetVC.Info>(repeating: .init(style: .isUp, title: "hahahha", imageName: "portrait01"), count: 4)
-        let vc = HandsUpSheetVC()
-        vc.show(in: self, list: list)
+    private func setMic() {
+        guard let objId = RoomManager.currentMemberId, let member = currentMember else {
+            return
+        }
+        let state = !openMic
+        var temp = member
+        temp.hasAudio = state
+        showWaitHUD()
+        RoomManager.updateMember(roomId: info.roomId,
+                                 objectId: objId,
+                                 member: temp) { [weak self] in
+            self?.openMic = state
+            self?.agoraKit?.muteLocalAudioStream(state)
+            self?.hideHUD()
+        } fail: { [weak self](error) in
+            self?.showHUDError(error: error.description)
+        }
+    }
+    
+    private func showHandsupListView() {
+        showWaitHUD()
+        RoomManager.getMembers(roomId: info.roomId) { [weak self](members) in
+            guard let self = self else {
+                return
+            }
+            self.members = members.filter({ ($0.status == .inviting || $0.status == .accept) && $0.userId != UserInfo.uid })
+            let list = self.members.map({ HandsUpSheetVC.Info(id: $0.userId,
+                                                              style: $0.status == .inviting ? .normal : .isUp,
+                                                              title: $0.userName,
+                                                              imageName: "portrait01") })
+            let vc = HandsUpSheetVC()
+            vc.show(in: self, list: list)
+            vc.delegate = self
+            self.hideHUD()
+        } fail: { [weak self](error) in
+            self?.hideHUD()
+            self?.showHUDError(error: error.description)
+        }
+    }
+    
+    private func sendHandsup() {
+        guard let objId = RoomManager.currentMemberId, let member = currentMember else {
+            return
+        }
+        var temp = member
+        temp.status = .inviting
+        showWaitHUD(title: "举手中")
+        RoomManager.updateMember(roomId: info.roomId,
+                                 objectId: objId,
+                                 member: temp) { [weak self] in
+            self?.hideHUD()
+            self?.showHUD(title: "举手成功", duration: 3)
+        } fail: { [weak self](error) in
+            self?.hideHUD()
+            self?.showHUDError(error: error.description)
+        }
+    }
+    
+    func removeRenderView(member: Member) {
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.view = nil
+        canvas.uid = UInt(member.userId)!
+        if member.userId == UserInfo.uid {
+            agoraKit?.setupLocalVideo(canvas)
+        }
+        else {
+            agoraKit?.setupRemoteVideo(canvas)
+        }
+    }
+    
+    func updateView() {
+        let list = infos.map({ VideoCell.Info(title: $0.title,
+                                              havAudio: $0.hasAudio,
+                                              havVideo: $0.hasVideo,
+                                              userId: $0.userId) })
+            .filter({ $0.havVideo })
+        
+        if Thread.isMainThread {
+            liveView.videoView.update(infos: list)
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.liveView.videoView.update(infos: list)
+        }
+    }
+    
+    @objc func closeTap() {
+        let roomId = info.roomId
+        RoomManager.unsubscribeMember(roomId: roomId)
+        RoomManager.unsubscribeRoomDelete(roomId: roomId)
+        entryType == .fromCrateRoom ? RoomManager.deleteRoom(roomId: roomId) : RoomManager.leaveRoom(roomId: roomId)
+        agoraKit?.leaveChannel({ state in
+            LogUtils.log(message: "\(state)", level: .info)
+        })
+        AgoraRtcEngineKit.destroy()
+        navigationController?.popViewController(animated: true)
     }
 }
 
-extension LiveViewCotroller: LiveViewDelegate {
+extension LiveViewCotroller: LiveViewDelegate, VideoViewDelegate, HandsUpSheetVCDelegate {
     func liveViewDidTapButtomAction(action: BottomView.ActionType) {
         switch action {
         case .mic:
-            openMic = !openMic
-            agoraKit?.muteLocalAudioStream(openMic)
+            setMic()
+            break
+        case .handsup:
+            if entryType == .fromCrateRoom {
+                showHandsupListView()
+            }
+            else {
+                sendHandsup()
+            }
             break
         default:
             break
         }
+    }
+    
+    func videoViewShouldRender(info: VideoCell.Info, renderView: UIView) {
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.view = renderView
+        canvas.renderMode = .hidden
+        if info.userId == UserInfo.uid {
+            canvas.uid = 0
+            agoraKit?.setupLocalVideo(canvas)
+            agoraKit?.startPreview()
+        }
+        else {
+            canvas.uid = UInt(info.userId)!
+            agoraKit?.setupRemoteVideo(canvas)
+        }
+    }
+    
+    func handsUpSheetVC(vc: HandsUpSheetVC, didTap action: HandsUpCell.Action, at index: Int) {
+        var member = members[index]
+        switch action {
+        case .reject:
+            member.status = .refuse
+            break
+        case .dowm:
+            member.status = .end
+            break
+        case .up:
+            member.status = .accept
+            break
+        }
+        RoomManager.updateMember(roomId: info.roomId,
+                                 objectId: member.objectId,
+                                 member: member,
+                                 success: {
+            self.showHUD(title: "成功")
+        }, fail: { [weak self](error) in
+            self?.showHUDError(error: error.localizedDescription)
+        })
     }
 }
 
@@ -188,6 +238,7 @@ extension LiveViewCotroller: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
         LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
     }
+    
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         LogUtils.log(message: "error: \(errorCode)", level: .error)
         showAlert(title: "Error", message: "Error \(errorCode.description) occur", confirm: {})
@@ -221,5 +272,21 @@ extension LiveViewCotroller {
         case fromCrateRoom
         /// 成员进入
         case fromJoinRoom
+    }
+    
+    struct Info: Equatable {
+        let uid: UInt
+        let title: String
+        let userId: String
+        let hasAudio: Bool
+        let hasVideo: Bool
+        
+        init(member: Member) {
+            self.uid = UInt(member.userId)!
+            self.title = member.userName
+            self.userId = member.userId
+            self.hasAudio = member.hasAudio
+            self.hasVideo = member.status == .accept
+        }
     }
 }

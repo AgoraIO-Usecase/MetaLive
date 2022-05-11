@@ -129,6 +129,7 @@ extension HandsUpCell {
     }
     
     struct Info {
+        let id: String
         let style: Style
         let title: String
         let imageName: String

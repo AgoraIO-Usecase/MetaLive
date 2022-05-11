@@ -9,11 +9,13 @@
 /* Begin PBXBuildFile section */
 		26118ADA279A974C0026E27C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26118AD9279A974C0026E27C /* Foundation.framework */; };
 		26118AE1279E9DBE0026E27C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E79C25E7273B67DD00909CD4 /* Assets.xcassets */; };
+		2612DE1E28292BD10049998A /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2612DE1D28292BD10049998A /* VideoCell.swift */; };
+		2612DE22282A4D860049998A /* LiveViewCotroller+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2612DE21282A4D860049998A /* LiveViewCotroller+Sync.swift */; };
 		2642C2F627CF419B002B626B /* AlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2F527CF419B002B626B /* AlertVC.swift */; };
-		2642C2F827CF5566002B626B /* VideoViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2F727CF5566002B626B /* VideoViewItem.swift */; };
 		2642C2FA27CF5B4C002B626B /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2F927CF5B4C002B626B /* VideoView.swift */; };
 		2642C2FC27CF6AE9002B626B /* HandsUpSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */; };
 		2642C2FE27CF6D9B002B626B /* HandsUpCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2FD27CF6D9B002B626B /* HandsUpCell.swift */; };
+		2693C36A282A7F00007F177D /* LiveViewCotroller+RTC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2693C369282A7F00007F177D /* LiveViewCotroller+RTC.swift */; };
 		2699846827C8BC830053DBB8 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2699846727C8BC830053DBB8 /* MainViewController.swift */; };
 		2699847927C8E5610053DBB8 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2699847827C8E5610053DBB8 /* NavigationController.swift */; };
 		2699847C27CC74B20053DBB8 /* MainCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2699847B27CC74B20053DBB8 /* MainCell.swift */; };
@@ -79,11 +81,13 @@
 /* Begin PBXFileReference section */
 		20C581EEB5F90DA480F83A68 /* Pods-Agora-ScreenShare-Extension(Socket).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Agora-ScreenShare-Extension(Socket).release.xcconfig"; path = "Target Support Files/Pods-Agora-ScreenShare-Extension(Socket)/Pods-Agora-ScreenShare-Extension(Socket).release.xcconfig"; sourceTree = "<group>"; };
 		26118AD9279A974C0026E27C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		2612DE1D28292BD10049998A /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
+		2612DE21282A4D860049998A /* LiveViewCotroller+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveViewCotroller+Sync.swift"; sourceTree = "<group>"; };
 		2642C2F527CF419B002B626B /* AlertVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertVC.swift; sourceTree = "<group>"; };
-		2642C2F727CF5566002B626B /* VideoViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoViewItem.swift; sourceTree = "<group>"; };
 		2642C2F927CF5B4C002B626B /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandsUpSheetVC.swift; sourceTree = "<group>"; };
 		2642C2FD27CF6D9B002B626B /* HandsUpCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandsUpCell.swift; sourceTree = "<group>"; };
+		2693C369282A7F00007F177D /* LiveViewCotroller+RTC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveViewCotroller+RTC.swift"; sourceTree = "<group>"; };
 		2699846727C8BC830053DBB8 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		2699847827C8E5610053DBB8 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		2699847B27CC74B20053DBB8 /* MainCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCell.swift; sourceTree = "<group>"; };
@@ -168,6 +172,8 @@
 				2699846727C8BC830053DBB8 /* MainViewController.swift */,
 				2699847827C8E5610053DBB8 /* NavigationController.swift */,
 				26C880D927CE07D00066307D /* LiveViewCotroller.swift */,
+				2612DE21282A4D860049998A /* LiveViewCotroller+Sync.swift */,
+				2693C369282A7F00007F177D /* LiveViewCotroller+RTC.swift */,
 				26FF328D2824F73B009A9590 /* CreateLiveController.swift */,
 			);
 			path = Controller;
@@ -181,7 +187,6 @@
 				E79C262B273BC0B500909CD4 /* ToastView */,
 				26C880D727CE02FA0066307D /* NotiView.swift */,
 				26C880DB27CE1A9B0066307D /* BottomView.swift */,
-				2642C2F727CF5566002B626B /* VideoViewItem.swift */,
 				2642C2F927CF5B4C002B626B /* VideoView.swift */,
 				26FF328F2824F77B009A9590 /* LiveRandomNameView.swift */,
 				26FF3291282525B4009A9590 /* CreateLiveView.swift */,
@@ -196,6 +201,7 @@
 				2699847B27CC74B20053DBB8 /* MainCell.swift */,
 				26C880D527CDFF890066307D /* NotiCell.swift */,
 				2642C2FD27CF6D9B002B626B /* HandsUpCell.swift */,
+				2612DE1D28292BD10049998A /* VideoCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -445,17 +451,18 @@
 				26C880DA27CE07D00066307D /* LiveViewCotroller.swift in Sources */,
 				E79C262D273BC0CA00909CD4 /* ToastView.swift in Sources */,
 				E79BEF752744FD8B009FA838 /* GCDTimer.swift in Sources */,
+				2612DE1E28292BD10049998A /* VideoCell.swift in Sources */,
 				E79C2613273B689B00909CD4 /* UIColor+Extension.swift in Sources */,
 				2642C2FE27CF6D9B002B626B /* HandsUpCell.swift in Sources */,
 				E79C2642273BE5C500909CD4 /* AlertManager.swift in Sources */,
 				26FF3292282525B4009A9590 /* CreateLiveView.swift in Sources */,
 				2699846827C8BC830053DBB8 /* MainViewController.swift in Sources */,
 				26FF32902824F77B009A9590 /* LiveRandomNameView.swift in Sources */,
-				2642C2F827CF5566002B626B /* VideoViewItem.swift in Sources */,
 				2699847C27CC74B20053DBB8 /* MainCell.swift in Sources */,
 				26C880D827CE02FA0066307D /* NotiView.swift in Sources */,
 				26FF329D28267BE1009A9590 /* UIViewController+Extension.swift in Sources */,
 				2642C2FA27CF5B4C002B626B /* VideoView.swift in Sources */,
+				2693C36A282A7F00007F177D /* LiveViewCotroller+RTC.swift in Sources */,
 				E79C2632273BC17B00909CD4 /* String+Extension.swift in Sources */,
 				2699848227CCC01D0053DBB8 /* TextInputAlertVC.swift in Sources */,
 				E79C262A273B7D8900909CD4 /* DeviceAssistant.swift in Sources */,
@@ -469,6 +476,7 @@
 				E79C25E1273B67DB00909CD4 /* SceneDelegate.swift in Sources */,
 				E79C260C273B689B00909CD4 /* MBHUD.swift in Sources */,
 				2699848327CCC01D0053DBB8 /* SystemAlertPrensentAnimation.swift in Sources */,
+				2612DE22282A4D860049998A /* LiveViewCotroller+Sync.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -633,7 +641,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HFDBB878GT;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

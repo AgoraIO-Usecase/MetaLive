@@ -17,6 +17,7 @@ class RoomManager {
     typealias SuccessBlockVoid = () -> ()
     typealias SuccessBlockRoomInfo = ([LiveRoomInfo]) -> ()
     typealias SuccessBlockMembers = ([Member]) -> ()
+    typealias SuccessBlockMember = (Member) -> ()
     typealias FailBlockString = (String) -> ()
     
     static func initSyncManager(success: SuccessBlockVoid?,
@@ -94,7 +95,7 @@ class RoomManager {
             return .failure(e)
         }
         
-        let result = RoomManager.joinInternal(roomId: info.roomId)
+        let result = RoomManager.joinInternal(roomId: info.roomId, isHost: true)
         switch result {
         case .success(let members):
             return .success(members)
@@ -107,7 +108,7 @@ class RoomManager {
                      success: SuccessBlockMembers?,
                      fail: FailBlock?) {
         RoomManager.queue.async {
-            let result = RoomManager.joinInternal(roomId: roomId)
+            let result = RoomManager.joinInternal(roomId: roomId, isHost: false)
             switch result {
             case .success(let members):
                 success?(members)
@@ -117,7 +118,7 @@ class RoomManager {
         }
     }
     
-    fileprivate static func joinInternal(roomId: String) -> Result<[Member], SyncError> {
+    fileprivate static func joinInternal(roomId: String, isHost: Bool) -> Result<[Member], SyncError> {
         let semp = DispatchSemaphore(value: 0)
         var error: SyncError?
         var members: [Member]?
@@ -164,7 +165,7 @@ class RoomManager {
                                 avatar: "",
                                 userId: UserInfo.uid,
                                 userName: "User-\(UserInfo.uid)",
-                                status: .end,
+                                status: isHost ? .accept : .end,
                                 hasAudio: false)
             var params = JSONObject.toJson(member)
             params.removeValue(forKey: "objectId")
@@ -187,6 +188,16 @@ class RoomManager {
         return .success(members)
     }
     
+    static func subscribeRoomDelete(roomId: String, onDeleted: OnSubscribeBlockVoid?) {
+        SyncUtil.subscribeScene(id: roomId,
+                                onDeleted: onDeleted,
+                                fail: nil)
+    }
+    
+    static func unsubscribeRoomDelete(roomId: String) {
+        SyncUtil.unsubscribeScene(id: roomId, fail: nil)
+    }
+    
     static func deleteLocalUser() {
         guard let objectId = RoomManager.currentMemberId else {
             return
@@ -196,16 +207,6 @@ class RoomManager {
                                 objectId: objectId,
                                 success: nil,
                                 fail: nil)
-    }
-    
-    static func subscribeRoomDelete(roomId: String, onDeleted: OnSubscribeBlockVoid?) {
-        SyncUtil.subscribeScene(id: roomId,
-                                onDeleted: onDeleted,
-                                fail: nil)
-    }
-    
-    static func unsubscribeRoomDelete(roomId: String) {
-        SyncUtil.unsubscribeScene(id: roomId, fail: nil)
     }
     
     static func updateMember(roomId: String,
@@ -220,5 +221,42 @@ class RoomManager {
                                   params: params,
                                   success: success,
                                   fail: fail)
+    }
+    
+    static func getMembers(roomId: String, success: SuccessBlockMembers?, fail: FailBlock?) {
+        SyncUtil.fetchCollection(id: roomId, className: RoomManager.usersKey, success: { objs in
+            let infos = objs.compactMap({ $0.toJson() })
+                .compactMap({ JSONObject.toModel(Member.self, value: $0 )})
+            success?(infos)
+        }, fail: fail)
+    }
+    
+    static func subscribeMember(roomId: String,
+                                onUpdated: SuccessBlockMember?,
+                                onDeleted: SuccessBlockMember?,
+                                fail: FailBlock?) {
+        SyncUtil.subscribeCollection(id: roomId,
+                                     className: usersKey,
+                                     documentId: nil,
+                                     onCreated: { obj in
+            guard let member = JSONObject.toModel(Member.self, value: obj.toJson() ) else {
+                fatalError()
+            }
+            onUpdated?(member)
+        },onUpdated: { obj in
+            guard let member = JSONObject.toModel(Member.self, value: obj.toJson() ) else {
+                fatalError()
+            }
+            onUpdated?(member)
+        },onDeleted: { obj in
+            guard let member = JSONObject.toModel(Member.self, value: obj.toJson() ) else {
+                fatalError()
+            }
+            onDeleted?(member)
+        },onSubscribed: nil, fail: fail)
+    }
+    
+    static func unsubscribeMember(roomId: String) {
+        SyncUtil.unsubscribeCollection(id: roomId, className: usersKey)
     }
 }

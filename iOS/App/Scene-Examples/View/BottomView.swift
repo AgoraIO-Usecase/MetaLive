@@ -137,30 +137,33 @@ class BottomView: UIView {
         if button == micButton {
             micButton.isSelected = !micButton.isSelected
             actionType = .mic
+            delegate?.bottomView(view: self, didTap: actionType)
             return
         }
         
         if button == beautyButton {
             actionType = .beauty
+            delegate?.bottomView(view: self, didTap: actionType)
             return
         }
         
         if button == moreButton {
             actionType = .more
+            delegate?.bottomView(view: self, didTap: actionType)
             return
         }
         
         if button == giftButton {
             actionType = .mic
+            delegate?.bottomView(view: self, didTap: actionType)
             return
         }
         
         if button == handupsButton {
             actionType = .handsup
+            delegate?.bottomView(view: self, didTap: actionType)
             return
         }
-        
-        delegate?.bottomView(view: self, didTap: actionType)
     }
     
     func setMic(open: Bool) {

@@ -12,15 +12,11 @@ protocol LiveViewDelegate: NSObjectProtocol {
 }
 
 class LiveView: UIView {
-    private let videoView = VideoView()
+    let videoView = VideoView()
     private let notiView = NotiView()
     private let bottomView = BottomView()
     private var bottomConstraint: NSLayoutConstraint?
     weak var delegate: LiveViewDelegate?
-    
-    var renderViews: [UIView] {
-        videoView.viewItems.map({ $0.renderView })
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)

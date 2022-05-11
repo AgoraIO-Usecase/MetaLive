@@ -7,12 +7,31 @@
 
 import UIKit
 
+protocol VideoViewDelegate: NSObjectProtocol {
+    func videoViewShouldRender(info: VideoCell.Info, renderView: UIView)
+}
+
 class VideoView: UIView {
-    var viewItems = [VideoViewItem]()
+    var collectionView: UICollectionView!
+    var infos = [VideoCell.Info]()
+    weak var delegate: VideoViewDelegate?
+    private static let space: CGFloat = 10
+    private static let itemWidth: CGFloat = UIScreen.main.bounds.size.width/2 - 2*space
+    private static let itemHeight: CGFloat = itemWidth + 23
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: VideoView.itemWidth, height: VideoView.itemHeight)
+        layout.sectionInset = .init(top: VideoView.space,
+                                    left: VideoView.space,
+                                    bottom: VideoView.space,
+                                    right: VideoView.space)
+        layout.minimumLineSpacing = VideoView.space
+        layout.minimumInteritemSpacing = VideoView.space
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         setup()
+        commonInit()
     }
     
     required init?(coder: NSCoder) {
@@ -20,44 +39,46 @@ class VideoView: UIView {
     }
     
     private func setup() {
-        let viewItem1 = VideoViewItem()
-        let viewItem2 = VideoViewItem()
-        let viewItem3 = VideoViewItem()
-        let viewItem4 = VideoViewItem()
+        collectionView.backgroundColor = .white
+        addSubview(collectionView)
         
-        addSubview(viewItem1)
-        addSubview(viewItem2)
-        addSubview(viewItem3)
-        addSubview(viewItem4)
-        
-        viewItem1.translatesAutoresizingMaskIntoConstraints = false
-        viewItem2.translatesAutoresizingMaskIntoConstraints = false
-        viewItem3.translatesAutoresizingMaskIntoConstraints = false
-        viewItem4.translatesAutoresizingMaskIntoConstraints = false
-        
-        let w = (UIScreen.main.bounds.width - 30)/2
-        let h = w+25
-        
-        viewItem1.leftAnchor.constraint(equalTo: leftAnchor, constant: 10).isActive = true
-        viewItem1.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        viewItem1.widthAnchor.constraint(equalToConstant: w).isActive = true
-        viewItem1.heightAnchor.constraint(equalToConstant: h).isActive = true
-        
-        viewItem2.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
-        viewItem2.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        viewItem2.widthAnchor.constraint(equalToConstant: w).isActive = true
-        viewItem2.heightAnchor.constraint(equalToConstant: h).isActive = true
-        
-        viewItem3.leftAnchor.constraint(equalTo: leftAnchor, constant: 10).isActive = true
-        viewItem3.topAnchor.constraint(equalTo: viewItem1.bottomAnchor, constant: 10).isActive = true
-        viewItem3.widthAnchor.constraint(equalToConstant: w).isActive = true
-        viewItem3.heightAnchor.constraint(equalToConstant: h).isActive = true
-        
-        viewItem4.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
-        viewItem4.topAnchor.constraint(equalTo: viewItem2.bottomAnchor, constant: 10).isActive = true
-        viewItem4.widthAnchor.constraint(equalToConstant: w).isActive = true
-        viewItem4.heightAnchor.constraint(equalToConstant: h).isActive = true
-        
-        viewItems = [viewItem1, viewItem2, viewItem3, viewItem4]
+        let height = (VideoView.itemHeight * 2) + 3*VideoView.space
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
+        collectionView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
+        collectionView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        collectionView.heightAnchor.constraint(equalToConstant: height ).isActive = true
+    }
+    
+    private func commonInit() {
+        collectionView.register(VideoCell.self, forCellWithReuseIdentifier: "VideoCell")
+        collectionView.dataSource = self
+    }
+    
+    func update(infos: [VideoCell.Info]) {
+        if infos.count > 4 {
+            fatalError()
+        }
+        self.infos = infos + [VideoCell.Info].init(repeating: .empty, count: 4-infos.count)
+        collectionView.reloadData()
     }
 }
+
+extension VideoView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return infos.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VideoCell", for: indexPath) as! VideoCell
+        let info = infos[indexPath.row]
+        cell.update(info: info)
+        if info.havVideo {
+            LogUtils.log(message: "需要渲染 \(indexPath.row)", level: .info)
+            delegate?.videoViewShouldRender(info: info, renderView: cell.renderView)
+        }
+        return cell
+    }
+}
+
+
