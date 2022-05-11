@@ -15,7 +15,7 @@ public class AvatarConfigTest {
                 "{\"id\":\"70002\",\"name\":\"发型2\",\"icon\":\"https:\\/\\/store.gtx.fun\\/avatar\\/cjie\\/icon\\/70002.png\",\"version\":0,\"tag\":0,\"status\":0,\"isUsing\":0,\"zOrder\":0}" +
                 "]}";
 
-        AvatarConfigManager.getInstance().parseDressConfig(configString);
-        System.out.println(AvatarConfigManager.getInstance().dump());
+        //AvatarConfigManager.getInstance().parseDressConfig(configString);
+        System.out.println(AvatarManager.getInstance().dump());
     }
 }

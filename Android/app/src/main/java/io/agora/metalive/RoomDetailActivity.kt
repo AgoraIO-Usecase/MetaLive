@@ -6,18 +6,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import io.agora.metalive.databinding.RoomDetailActivityBinding
 import io.agora.metalive.databinding.RoomDetailMessageListItemBinding
 import io.agora.metalive.databinding.RoomDetailRaisehandItemBinding
+import io.agora.metalive.databinding.RoomDetailViewportBinding
+import io.agora.metalive.manager.DataCallback
 import io.agora.metalive.manager.RoomManager
 import io.agora.metalive.manager.RtcManager
 import io.agora.uiwidget.basic.BindingViewHolder
 import io.agora.uiwidget.function.*
-import io.agora.metalive.component.AvatarOptionDialogUtil
+import io.agora.uiwidget.function.LiveToolsDialog.ToolItem
 import io.agora.uiwidget.utils.RandomUtil
 import io.agora.uiwidget.utils.StatusBarUtil
 import io.agora.uiwidget.utils.UIUtil
@@ -76,10 +77,10 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
     private val userAddOrUpdateObserver by lazy {
-        RoomManager.DataCallback<RoomManager.UserInfo> { runOnUiThread { updateUserView(it) } }
+        DataCallback<RoomManager.UserInfo> { runOnUiThread { updateUserView(it) } }
     }
     private val userDeleteObserver by lazy {
-        RoomManager.DataCallback<RoomManager.UserInfo> {
+        DataCallback<RoomManager.UserInfo> {
             runOnUiThread {
                 updateUserView(it)
                 if (it.userId.equals(mRoomInfo.userId)) {
@@ -91,7 +92,7 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     private val giftReceiveObserver by lazy {
-        RoomManager.DataCallback<RoomManager.GiftInfo> {
+        DataCallback<RoomManager.GiftInfo> {
             runOnUiThread {
                 // 播放礼物特效
                 mMsgAdapter.addMessage(
@@ -109,28 +110,17 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var faceEditLauncher: ActivityResultLauncher<String>
+    private var isShowAvatar = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
-        faceEditLauncher = FaceEditActivity.launcher(this) {
-            seatLayouts.find {
-                (it.root.tag as? RoomManager.UserInfo)?.userId?.equals(RoomManager.getCacheUserId())
-                    ?: false
-            }?.let {
-                rtcManager.renderLocalAvatarVideo(it.videoContainer)
-            }
-        }
         initManager();
         initView()
     }
 
     private fun initManager() {
-        // rtcManager.init(this, getString(R.string.rtc_app_id), null)
-        // rtcManager.setAvatarActivity(this)
-
         RoomManager.getInstance().joinRoom(mRoomInfo.roomId,
             if (isRoomOwner()) RoomManager.Status.ACCEPT else RoomManager.Status.END,
             {
@@ -146,6 +136,7 @@ class RoomDetailActivity : AppCompatActivity() {
                 RoomManager.getInstance()
                     .subscribeGiftReceiveEvent(mRoomInfo.roomId, WeakReference(giftReceiveObserver))
                 joinRtcChannel()
+                updateBottomView()
                 it.forEach { userInfo -> runOnUiThread { updateUserView(userInfo) } }
             },
             {
@@ -162,7 +153,7 @@ class RoomDetailActivity : AppCompatActivity() {
             mRoomInfo.roomId,
             RoomManager.getCacheUserId(),
             getString(R.string.rtc_app_token),
-            false,
+            true, isLocalOnLinePublish() && !isShowAvatar, isLocalOnLinePublish() && isShowAvatar,
             object : RtcManager.OnChannelListener {
                 override fun onError(code: Int, message: String?) {
                     runOnUiThread {
@@ -231,9 +222,7 @@ class RoomDetailActivity : AppCompatActivity() {
                         seatLayouts.firstOrNull { viewBinidng -> viewBinidng.root.tag == null }
                             ?: return
                     if (userInfo.userId == RoomManager.getCacheUserId()) {
-                        rtcManager
-                            .renderLocalAvatarVideo(targetViewBinding.videoContainer)
-                        rtcManager.setPublishTracks(mRoomInfo.roomId, true)
+                        updateLocalVideo(targetViewBinding)
                     } else {
                         rtcManager.renderRemoteVideo(
                             targetViewBinding.videoContainer,
@@ -243,10 +232,14 @@ class RoomDetailActivity : AppCompatActivity() {
                     }
                     targetViewBinding.root.tag = userInfo
                 }
-
+                // 调整声音
                 targetViewBinding.ivMicOff.isVisible = !userInfo.hasAudio
+                if (userInfo.userId.equals(RoomManager.getCacheUserId())) {
+                    rtcManager.enableLocalAudio(userInfo.hasAudio)
+                    mBinding.liveBottomView.isFun1Activated = userInfo.hasAudio
+                    updateBottomView()
+                }
                 targetViewBinding.tvName.text = userInfo.userName
-
             }
             RoomManager.Status.REFUSE,
             RoomManager.Status.END -> {
@@ -254,20 +247,45 @@ class RoomDetailActivity : AppCompatActivity() {
                     (viewBinding.root.tag as? RoomManager.UserInfo)?.let {
                         if (it.userId.equals(userInfo.userId)) {
                             viewBinding.videoContainer.removeAllViews()
+                            viewBinding.root.tag = null
                             viewBinding.tvName.text = ""
-                            viewBinding.ivMicOff.isVisible = false
-                            if (userInfo.userId == RoomManager.getCacheUserId()) {
-                                rtcManager.setPublishTracks(mRoomInfo.roomId, false)
-                            }
+                            viewBinding.ivMicOff.isVisible = true
+
                             return@forEach
                         }
                     }
+                }
+                if (userInfo.userId == RoomManager.getCacheUserId()) {
+                    rtcManager.setPublishVideo(mRoomInfo.roomId, false, false)
+                    rtcManager.enableLocalAudio(false)
+                    updateBottomView()
                 }
                 if (!isRoomOwner()) {
                     // 观众逻辑
                     mBinding.liveBottomView.isFun4Activated = false
                 }
             }
+        }
+    }
+
+    private fun updateBottomView() {
+        val localOnLinePublish = isLocalOnLinePublish()
+        mBinding.liveBottomView
+            .setFun1Visible(localOnLinePublish)
+            .setFun2Visible(localOnLinePublish)
+            .setupMoreBtn(localOnLinePublish) {
+                showToolsDialog()
+            }
+    }
+
+    private fun updateLocalVideo(targetViewBinding: RoomDetailViewportBinding) {
+        rtcManager.setPublishVideo(mRoomInfo.roomId, isShowAvatar, !isShowAvatar)
+        if (isShowAvatar) {
+            rtcManager
+                .renderLocalAvatarVideo(targetViewBinding.videoContainer)
+        } else {
+            rtcManager
+                .renderLocalCameraVideo(targetViewBinding.videoContainer)
         }
     }
 
@@ -301,23 +319,31 @@ class RoomDetailActivity : AppCompatActivity() {
                     .show()
             }
             // 麦克风
-            setFun1Visible(true)
+            setFun1Visible(isRoomOwner())
             setFun1ImageResource(R.drawable.room_detail_icon_mic)
             setFun1Background(null)
-            isFun1Activated = true
+            isFun1Activated = false
             setFun1ClickListener {
-                rtcManager.muteLocalAudio(isFun1Activated)
                 isFun1Activated = !isFun1Activated
+                RoomManager.getInstance().openUserAudio(
+                    mRoomInfo.roomId,
+                    RoomManager.getInstance().localUserInfo,
+                    isFun1Activated
+                )
             }
             // 特效
-            setFun2Visible(true)
+            setFun2Visible(isRoomOwner())
             setFun2ImageResource(R.drawable.room_detail_icon_magic)
             setFun2Background(null)
             setFun2ClickListener {
-                showAvatarOptionDialog()
+                if (isShowAvatar) {
+                    showAvatarOptionDialog()
+                } else {
+                    Toast.makeText(this@RoomDetailActivity, getString(R.string.room_detail_avatar_effect_click_tip), Toast.LENGTH_SHORT).show()
+                }
             }
             // 更多
-            setupMoreBtn(true) {
+            setupMoreBtn(isRoomOwner()) {
                 showToolsDialog()
             }
             // 礼物
@@ -371,24 +397,36 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     private fun showToolsDialog() {
-        LiveToolsDialog(this@RoomDetailActivity, true)
-            .addToolItem(
-                LiveToolsDialog.TOOL_ITEM_ROTATE,
-                false
-            ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
-            .addToolItem(
-                LiveToolsDialog.TOOL_ITEM_VIDEO,
-                true
-            ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
-            .addToolItem(
+        LiveToolsDialog(this@RoomDetailActivity, true).apply {
+            addToolItem(
+                ToolItem(R.string.avatar_option_camera, R.drawable.live_tool_icon_video),
+                !isShowAvatar
+            ) { view: View, toolItem: LiveToolsDialog.ToolItem ->
+                isShowAvatar = !isShowAvatar
+
+                seatLayouts.firstOrNull { viewBinidng ->
+                    (viewBinidng.root.tag as? RoomManager.UserInfo)?.userId?.equals(RoomManager.getCacheUserId())
+                        ?: false
+                }?.let {
+                    updateLocalVideo(it)
+                }
+            }
+            addToolItem(
                 LiveToolsDialog.TOOL_ITEM_SETTING,
                 true
-            ) { view: View, toolItem: LiveToolsDialog.ToolItem -> }
-            .show()
+            ) { _: View, _: LiveToolsDialog.ToolItem ->
+                dismiss()
+                DialogUtil.showSettingDialog(this@RoomDetailActivity).let {
+                    it.setOnDismissListener { show() }
+                }
+            }
+            show()
+        }
+
     }
 
     private fun showAvatarOptionDialog() {
-        AvatarOptionDialogUtil().show(this)
+        DialogUtil.showAvatarOptionDialog(this)
     }
 
     private fun showRoomOwnerExitDialog() {
@@ -397,7 +435,7 @@ class RoomDetailActivity : AppCompatActivity() {
         }
         AlertDialog.Builder(this@RoomDetailActivity)
             .setTitle(R.string.common_tip)
-            .setMessage("Homeowner has left")
+            .setMessage(getString(R.string.room_detail_exit_tip))
             .setPositiveButton(R.string.common_sure) { dialog, _ ->
                 dialog.dismiss()
                 finish()
@@ -473,6 +511,7 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        rtcManager.enableLocalAudio(false)
         rtcManager.leaveChannel(mRoomInfo.roomId)
 
         if (isRoomOwner()) {
@@ -484,4 +523,7 @@ class RoomDetailActivity : AppCompatActivity() {
     }
 
     private fun isRoomOwner() = mRoomInfo.userId == RoomManager.getCacheUserId()
+
+    private fun isLocalOnLinePublish() =
+        RoomManager.getInstance().localUserInfo.status == RoomManager.Status.ACCEPT
 }

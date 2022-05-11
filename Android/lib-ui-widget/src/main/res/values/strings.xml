@@ -46,10 +46,6 @@
     <string name="live_tool_name_rotate">Rotate</string>
     <string name="live_tool_name_camera">Camera</string>
 
-    <!-- AvatarToolDialog -->
-    <string name="avatar_option_title">Avatar Setting</string>
-    <string name="avatar_option_name_dress">Dress</string>
-    <string name="avatar_option_name_face">Face Edit</string>
 
     <!-- GiftGridDialog -->
     <string name="gift_grid_title">Presents</string>
