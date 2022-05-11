@@ -9,9 +9,9 @@ import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RAT
 import static io.agora.rtc2.video.VideoEncoderConfiguration.MIRROR_MODE_TYPE;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_1280x720;
-import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_240x180;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_320x240;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_480x360;
+import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_640x360;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_640x480;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_960x720;
 
@@ -59,11 +59,11 @@ public class RtcManager {
     private static final int LOCAL_RTC_UID = 0;
     private static final int DEFAULT_BITRATE = 700;
     public static final List<VideoEncoderConfiguration.VideoDimensions> sVideoDimensions = Arrays.asList(
-            VD_240x180,
             VD_320x240,
             VD_480x360,
-            new VideoEncoderConfiguration.VideoDimensions(540, 960),
+            VD_640x360,
             VD_640x480,
+            new VideoEncoderConfiguration.VideoDimensions(960,540),
             VD_960x720,
             VD_1280x720
     );
@@ -82,7 +82,7 @@ public class RtcManager {
 
     public static final VideoEncoderConfiguration encoderConfiguration =
             new VideoEncoderConfiguration(
-                    VD_1280x720,
+                    VD_640x360,
                     FRAME_RATE_FPS_30,
                     DEFAULT_BITRATE,
                     ORIENTATION_MODE_FIXED_PORTRAIT);
@@ -275,6 +275,12 @@ public class RtcManager {
 
     public void setEncoderVideoFrameRate(FRAME_RATE frameRate) {
         encoderConfiguration.frameRate = frameRate.getValue();
+        engine.setCameraCapturerConfiguration(
+                new CameraCapturerConfiguration(cameraDirection,
+                        new CameraCapturerConfiguration.CaptureFormat(
+                                encoderConfiguration.dimensions.width,
+                                encoderConfiguration.dimensions.height,
+                                encoderConfiguration.frameRate)));
         updateVideoEncoderConfigration();
     }
 

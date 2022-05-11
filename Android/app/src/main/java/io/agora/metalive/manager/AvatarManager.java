@@ -169,6 +169,26 @@ public class AvatarManager {
         avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.FACE_EDIT_KEY_STOP, null, null);
     }
 
+    public void resetFaceEdit(){
+        checkAvatarHandlerNoNull();
+        checkAvatarStatus(AvatarStatus.FACE_EDITING);
+        float resetValue = 0.5f;
+        for (String setId : feConfigGroups.keySet()) {
+            FaceEditConfigGroup group = feConfigGroups.get(setId);
+            if(group == null){
+                continue;
+            }
+            for (FaceEditConfigItem item : group.items) {
+                if(item.value != resetValue){
+                    String format = "{\"%s\":%.2f}";
+                    String valueString = String.format(Locale.US, format, item.id, resetValue);
+                    avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.FACE_EDIT_KEY_SEND, valueString, null);
+                    item.value = resetValue;
+                }
+            }
+        }
+    }
+
     public void changeFaceEdit(String id, float value){
         checkAvatarHandlerNoNull();
         checkAvatarStatus(AvatarStatus.FACE_EDITING);

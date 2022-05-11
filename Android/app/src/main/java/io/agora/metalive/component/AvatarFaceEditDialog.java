@@ -118,14 +118,18 @@ public class AvatarFaceEditDialog extends BottomSheetDialog {
                 if(!isShowing()){
                     return;
                 }
+                mViewBindings.btnReset.setVisibility(View.VISIBLE);
                 mViewBindings.progressBar.setVisibility(View.GONE);
                 mViewBindings.contentLayout.setVisibility(View.VISIBLE);
                 configList = dataList;
+                mViewBindings.btnReset.setOnClickListener(v -> {
+                    AvatarManager.getInstance().resetFaceEdit();
+                    mViewBindings.faceEditItemSeekBar.setProgress(50);
+                });
                 if (configList.size() > 0) {
                     for (AvatarManager.FaceEditConfigGroup group : configList) {
                         addTab(group.name);
                     }
-
                     showTab(0);
                 }
             }
