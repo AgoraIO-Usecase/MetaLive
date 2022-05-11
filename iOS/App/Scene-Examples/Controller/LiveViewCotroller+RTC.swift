@@ -30,7 +30,7 @@ extension LiveViewCotroller {
     
     func joinChannel() {
         let option = AgoraRtcChannelMediaOptions()
-        option.publishAudioTrack = .of(false)
+        option.publishAudioTrack = .of(true)
         option.publishCameraTrack = .of(true)
         option.clientRoleType = .of((Int32)(AgoraClientRole.broadcaster.rawValue))
         option.autoSubscribeVideo = .of(true)
@@ -40,12 +40,12 @@ extension LiveViewCotroller {
             fatalError("agoraKit must not nil")
         }
         engine.delegate = self
+        engine.enableLocalAudio(false)
         let result = engine.joinChannel(byToken: KeyCenter.token,
                                         channelId: info.roomId,
                                         uid: UserInfo.userId,
                                         mediaOptions: option,
                                         joinSuccess: nil)
-        
         
         if result != 0 {
             LogUtils.log(message: "joinChannel fail: \(result)", level: .error)
@@ -68,16 +68,16 @@ extension LiveViewCotroller {
         canvas.uid = UInt(member.userId)!
         if member.userId == UserInfo.uid {
             agoraKit?.setupLocalVideo(canvas)
+            LogUtils.log(message: "removeRenderView local \(member.userId)", level: .info)
         }
         else {
             agoraKit?.setupRemoteVideo(canvas)
+            LogUtils.log(message: "removeRenderView remote \(member.userId)", level: .info)
         }
     }
     
     func openAudio(open: Bool) {
-        let option = AgoraRtcChannelMediaOptions()
-        option.publishAudioTrack = .of(open)
-        agoraKit?.updateChannel(with: option)
+        agoraKit?.enableLocalAudio(open)
     }
 }
 
