@@ -161,6 +161,11 @@ class RoomManager {
             RoomManager.currentMemberId = memberForMe.objectId
         }
         else { /** add member **/
+            if members.count >= 4 {
+                let e = SyncError(message: "房间已满人", code: -100001)
+                return .failure(e)
+            }
+            
             var member = Member(objectId: "",
                                 avatar: "",
                                 userId: UserInfo.uid,

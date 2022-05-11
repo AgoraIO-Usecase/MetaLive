@@ -32,6 +32,7 @@ class LogUtils {
     static func log(message: String, level: LogLevel) {
         LogUtils.logs.append(LogItem(message: message, level: level, dateTime: Date()))
         print("\(level.description): \(message)")
+        writeAppLogsToDisk()
     }
     
     static func logFolder() -> String {

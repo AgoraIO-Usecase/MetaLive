@@ -9,7 +9,7 @@ target 'Scene-Examples' do
   
   pod 'AgoraSyncManager', :path => '../SDK/AgoraSyncManager/AgoraSyncManagerLocal.podspec'
   pod 'AgoraEditAvatar', :path => '../SDK/AgoraEditAvatar/AgoraEditAvatarLocal.podspec'
-  pod 'AgoraRtcEngine_iOS_Beta', '4.0.0-beta.1'
   pod 'MBProgressHUD'
   pod 'Presentr'
+  pod 'AgoraRtcEngine_iOS', :path => '/Users/zyp/Agora/PodSpec/Avatar Cocos/AgoraRtcEngine_iOS.podspec'
 end
