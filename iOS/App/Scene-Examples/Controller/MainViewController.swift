@@ -31,6 +31,7 @@ class MainViewController: UIViewController {
         tableView.refreshControl = refreshCtrl
         tableView.separatorStyle = .none
         tableView.backgroundColor = UIColor(hex: "FAF9FF")
+        tableView.contentInset = .init(top: 15, left: 0, bottom: 0, right: 0)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         
