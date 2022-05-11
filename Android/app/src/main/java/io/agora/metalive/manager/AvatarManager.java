@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,6 +27,7 @@ public class AvatarManager {
     private final Map<String, Boolean> dressIdOfficableMap = new HashMap<>();
     private final Map<String, DressConfigItemSet> dressConfigs = new HashMap<>();
     private DressConfigItemSet currDressConfig;
+    private String currDressType;
 
     private final Map<String, String> feIdToNameMap = new HashMap<>();
     private final Set<String> feSupportIdSet = new HashSet<>();
@@ -87,6 +89,7 @@ public class AvatarManager {
         avatarStatus = AvatarStatus.IDLE;
         avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.DRESS_KEY_STOP, null, null);
         currDressConfig = null;
+        currDressType = null;
     }
 
     public void setDressType(String type){
@@ -97,6 +100,7 @@ public class AvatarManager {
             Log.e(TAG, "The dress type " + type + " is not exist");
             return;
         }
+        currDressType = type;
         currDressConfig = configItemSet;
         String format = "{\"type\":\"%s\"}";
         String value = String.format(format, type);
@@ -106,7 +110,7 @@ public class AvatarManager {
     public void setDressValue(String id){
         checkAvatarHandlerNoNull();
         checkAvatarStatus(AvatarStatus.DRESSING);
-        if(currDressConfig == null){
+        if(currDressType == null || currDressConfig == null){
             Log.e(TAG, "The dress type must be set firstly");
             return;
         }
@@ -123,6 +127,11 @@ public class AvatarManager {
         }
         for (DressConfigItem item : currDressConfig.items) {
             item.isUsing = item.id.equals(id) ? 1 : 0;
+        }
+
+        if("".equals(id)){
+            avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.DRESS_KEY_TAKE_OFF, String.format(Locale.US, "{\"type\":\"%s\"}", currDressType), null);
+            return;
         }
 
         String format = "{\"id\":\"%s\"}";
@@ -157,7 +166,6 @@ public class AvatarManager {
         checkAvatarHandlerNoNull();
         checkAvatarStatus(AvatarStatus.FACE_EDITING);
         avatarStatus = AvatarStatus.IDLE;
-        // TODO: 关闭捏脸会导致面部移动失效，先不调用等sdk修复
         avatarHandler.handleAvatarOption(AvatarManager.AvatarConfig.FACE_EDIT_KEY_STOP, null, null);
     }
 

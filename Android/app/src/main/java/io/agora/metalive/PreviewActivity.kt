@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import io.agora.metalive.databinding.PreviewActivityBinding
@@ -23,6 +24,7 @@ class PreviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         StatusBarUtil.hideStatusBar(window, false)
 
         handler = Handler(mainLooper)
@@ -51,7 +53,7 @@ class PreviewActivity : AppCompatActivity() {
             }
 
             setSettingIcon(true) {
-                DialogUtil.showSettingDialog(this@PreviewActivity)
+                DialogUtil.showSettingDialog(this@PreviewActivity, false)
             }
 
             setGoLiveBtn { _: View?, randomName: String? ->

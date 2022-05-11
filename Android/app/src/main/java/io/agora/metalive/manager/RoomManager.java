@@ -210,6 +210,7 @@ public class RoomManager {
     }
 
     public void acceptUser(String roomId, UserInfo userInfo){
+        userInfo.hasAudio = false;
         updateUserStatus(roomId, userInfo, Status.ACCEPT);
     }
 
