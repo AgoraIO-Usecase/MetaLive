@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/live_tool_layout_bg">
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <Button
+        android:id="@+id/btn_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@drawable/avatar_btn_bg"
+        android:minWidth="20dp"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone"
+        android:text="重置"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@drawable/live_tool_layout_bg">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/face_edit_dialog_title"
@@ -35,11 +48,13 @@
                 android:id="@+id/progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                tools:visibility="gone"
                 android:layout_gravity="center"/>
 
             <LinearLayout
                 android:id="@+id/content_layout"
                 android:visibility="invisible"
+                tools:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -105,4 +120,4 @@
 
 
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

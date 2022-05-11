@@ -30,19 +30,23 @@ public class VideoSettingDialog extends BottomSheetDialog {
     private VideoSettingDialogLayoutBinding mBinding;
 
     public VideoSettingDialog(@NonNull Context context) {
-        this(context, R.style.BottomSheetDialog);
+        this(context, true);
     }
 
-    public VideoSettingDialog(@NonNull Context context, int theme) {
+    public VideoSettingDialog(@NonNull Context context, boolean darkText) {
+        this(context, R.style.BottomSheetDialog, darkText);
+    }
+
+    public VideoSettingDialog(@NonNull Context context, int theme, boolean darkText) {
         super(context, theme);
-        init();
+        init(darkText);
     }
 
-    private void init() {
+    private void init(boolean darkText) {
         setCanceledOnTouchOutside(true);
         mBinding = VideoSettingDialogLayoutBinding.inflate(LayoutInflater.from(getContext()));
         setContentView(mBinding.getRoot());
-        StatusBarUtil.hideStatusBar(getWindow(), false);
+        StatusBarUtil.hideStatusBar(getWindow(), darkText);
     }
 
     public VideoSettingDialog addProgressItem(String title, int min, int max, int defaultValue, String valueFormat, SeekBar.OnSeekBarChangeListener listener) {

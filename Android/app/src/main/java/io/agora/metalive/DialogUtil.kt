@@ -45,7 +45,7 @@ object DialogUtil {
 
     }
 
-    fun showSettingDialog(context: Context): VideoSettingDialog {
+    fun showSettingDialog(context: Context, statusTextDart: Boolean = true): VideoSettingDialog {
         val dimensionsOptions = arrayListOf<String>()
         var dimensionDefault = 0
         RtcManager.sVideoDimensions.forEachIndexed { index: Int, item: VideoEncoderConfiguration.VideoDimensions ->
@@ -73,7 +73,7 @@ object DialogUtil {
             }
         }
 
-        return VideoSettingDialog(context).apply {
+        return VideoSettingDialog(context, statusTextDart).apply {
             addTextItem(
                 context.getString(R.string.video_setting_dialog_title_resolution),
                 dimensionsOptions,
