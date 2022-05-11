@@ -57,10 +57,15 @@ class LiveView: UIView {
     
     private func commonInit() {
         bottomView.delegate = self
+        bottomView.micButton.isEnabled = false
     }
     
     func append(noti: NotiView.Info) {
         notiView.append(info: noti)
+    }
+    
+    func enableMic(enable: Bool) {
+        bottomView.micButton.isEnabled = enable
     }
 }
 

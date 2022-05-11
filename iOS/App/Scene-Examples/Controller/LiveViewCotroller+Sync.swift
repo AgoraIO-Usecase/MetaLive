@@ -60,6 +60,11 @@ extension LiveViewCotroller {
             showHUD(title: "房主移出您的麦位", duration: 4)
         }
         
+        if entryType == .fromJoinRoom,
+           member.userId == UserInfo.uid {
+            updateMicView(enable: member.hasAudio)
+        }
+        
         if member.status == .end {
             removeRenderView(member: member)
         }
@@ -88,5 +93,9 @@ extension LiveViewCotroller {
         infos.removeAll(where: { $0.userId == member.userId })
         removeRenderView(member: member)
         updateView()
+    }
+    
+    func updateMicView(enable: Bool) {
+        liveView.enableMic(enable: enable)
     }
 }

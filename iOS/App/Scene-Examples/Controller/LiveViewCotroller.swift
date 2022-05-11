@@ -280,6 +280,7 @@ extension LiveViewCotroller {
         let userId: String
         let hasAudio: Bool
         let hasVideo: Bool
+        let member: Member
         
         init(member: Member) {
             self.uid = UInt(member.userId)!
@@ -287,6 +288,15 @@ extension LiveViewCotroller {
             self.userId = member.userId
             self.hasAudio = member.hasAudio
             self.hasVideo = member.status == .accept
+            self.member = member
+        }
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.uid == rhs.uid &&
+            lhs.title == rhs.title &&
+            lhs.userId == rhs.userId &&
+            lhs.hasAudio == rhs.hasAudio &&
+            lhs.hasVideo == rhs.hasVideo
         }
     }
 }
