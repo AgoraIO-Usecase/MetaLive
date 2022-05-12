@@ -33,6 +33,14 @@ class PreviewActivity : AppCompatActivity() {
     }
 
     private fun initView() {
+        mBinding.root.tag = true
+        mBinding.root.setOnClickListener {
+            val visible = !(mBinding.root.tag as Boolean)
+            mBinding.root.tag = visible
+
+            mBinding.previewControlView.isVisible = visible
+            mBinding.cameraViewContainer.isVisible = visible
+        }
         // Currently go to multi-host scene by default,
         // remove bottom tab layout.
         // Modify this if multi-scenes is supported.
@@ -74,7 +82,11 @@ class PreviewActivity : AppCompatActivity() {
     }
 
     private fun showAvatarOptionDialog() {
-        DialogUtil.showAvatarOptionDialog(this, false)
+        DialogUtil.showAvatarOptionDialog(this, false, {
+            mBinding.cameraViewContainer.isVisible = false
+        }, {
+            mBinding.cameraViewContainer.isVisible = true
+        })
     }
 
     private fun initPreview() {

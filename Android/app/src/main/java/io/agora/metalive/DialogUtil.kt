@@ -14,7 +14,7 @@ import java.util.*
 
 object DialogUtil {
 
-    fun showAvatarOptionDialog(context: Context, statusTextDart: Boolean = true): LiveToolsDialog {
+    fun showAvatarOptionDialog(context: Context, statusTextDart: Boolean = true, showRun: (()->Unit)? = null, dismissRun: (()->Unit)? = null): LiveToolsDialog {
         return LiveToolsDialog(context, statusTextDart).apply {
             addToolItem(
                 LiveToolsDialog.ToolItem(
@@ -24,8 +24,12 @@ object DialogUtil {
             ) { _: View, _: LiveToolsDialog.ToolItem ->
                 dismiss()
                 AvatarDressDialog(context, statusTextDart).let {
-                    it.setOnDismissListener { show() }
+                    it.setOnDismissListener {
+                        show()
+                        dismissRun?.invoke()
+                    }
                     it.show()
+                    showRun?.invoke()
                 }
             }
             addToolItem(
@@ -36,8 +40,12 @@ object DialogUtil {
             ) { _: View, _: LiveToolsDialog.ToolItem ->
                 dismiss()
                 AvatarFaceEditDialog(context, statusTextDart).let {
-                    it.setOnDismissListener { show() }
+                    it.setOnDismissListener {
+                        show()
+                        dismissRun?.invoke()
+                    }
                     it.show()
+                    showRun?.invoke()
                 }
             }
             show()
@@ -101,7 +109,7 @@ object DialogUtil {
                 0,
                 2000,
                 RtcManager.encoderConfiguration.bitrate,
-                "%s kps",
+                "%s kbps",
                 object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(
                         seekBar: SeekBar?,

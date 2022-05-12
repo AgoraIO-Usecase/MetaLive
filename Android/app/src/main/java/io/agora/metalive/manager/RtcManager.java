@@ -5,7 +5,6 @@ import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_15;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_24;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_30;
-import static io.agora.rtc2.video.VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_60;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.MIRROR_MODE_TYPE;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT;
 import static io.agora.rtc2.video.VideoEncoderConfiguration.VD_1280x720;
@@ -70,8 +69,7 @@ public class RtcManager {
     public static final List<FRAME_RATE> sFrameRates = Arrays.asList(
             FRAME_RATE_FPS_15,
             FRAME_RATE_FPS_24,
-            FRAME_RATE_FPS_30,
-            FRAME_RATE_FPS_60
+            FRAME_RATE_FPS_30
     );
     public static final List<AvatarRenderQuality> sRenderQuality = Arrays.asList(
             AvatarRenderQuality.Low,
