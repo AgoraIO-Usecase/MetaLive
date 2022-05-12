@@ -83,7 +83,7 @@ public class VideoSettingDialog extends BottomSheetDialog {
         return this;
     }
 
-    public VideoSettingDialog addTextItem(String title, List<String> options, int defaultOptionIndex, OnClickListener clickListener) {
+    public VideoSettingDialog addTextItem(String title, List<CharSequence> options, int defaultOptionIndex, OnClickListener clickListener) {
         VideoSettingDialogItemTextBinding textBinding = VideoSettingDialogItemTextBinding.inflate(LayoutInflater.from(getContext()), mBinding.itemContainer, true);
         textBinding.tvTitle.setText(title);
         textBinding.tvValue.setText(options.get(defaultOptionIndex));
@@ -104,7 +104,7 @@ public class VideoSettingDialog extends BottomSheetDialog {
         return this;
     }
 
-    private View showNextRecycleView(List<String> options, OnClickListener clickListener) {
+    private View showNextRecycleView(List<CharSequence> options, OnClickListener clickListener) {
         RecyclerView recyclerView = new RecyclerView(getContext());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(new RecyclerView.Adapter<BindingViewHolder<VideoSettingListItemTextOnlyBinding>>() {
@@ -116,7 +116,7 @@ public class VideoSettingDialog extends BottomSheetDialog {
 
             @Override
             public void onBindViewHolder(@NonNull BindingViewHolder<VideoSettingListItemTextOnlyBinding> holder, int position) {
-                String option = options.get(position);
+                CharSequence option = options.get(position);
                 holder.binding.videoSettingItemText.setText(option);
                 holder.binding.videoSettingItemText.setOnClickListener(v -> {
                     mBinding.nextContainer.removeView(recyclerView);

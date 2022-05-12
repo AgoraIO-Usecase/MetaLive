@@ -84,7 +84,7 @@ public class RtcManager {
                     FRAME_RATE_FPS_30,
                     DEFAULT_BITRATE,
                     ORIENTATION_MODE_FIXED_PORTRAIT);
-    public static AvatarRenderQuality currRenderQuality = AvatarRenderQuality.High;
+    public static AvatarRenderQuality currRenderQuality = AvatarRenderQuality.Ultra;
 
     private static final CameraCapturerConfiguration.CAMERA_DIRECTION cameraDirection =
             CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT;

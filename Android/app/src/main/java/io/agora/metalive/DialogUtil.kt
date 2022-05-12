@@ -2,11 +2,15 @@ package io.agora.metalive
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Color
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.SeekBar
 import io.agora.metalive.component.AvatarDressDialog
 import io.agora.metalive.component.AvatarFaceEditDialog
 import io.agora.metalive.manager.RtcManager
+import io.agora.metalive.manager.RtcManager.AvatarRenderQuality
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.uiwidget.function.LiveToolsDialog
 import io.agora.uiwidget.function.VideoSettingDialog
@@ -14,7 +18,12 @@ import java.util.*
 
 object DialogUtil {
 
-    fun showAvatarOptionDialog(context: Context, statusTextDart: Boolean = true, showRun: (()->Unit)? = null, dismissRun: (()->Unit)? = null): LiveToolsDialog {
+    fun showAvatarOptionDialog(
+        context: Context,
+        statusTextDart: Boolean = true,
+        showRun: (() -> Unit)? = null,
+        dismissRun: (() -> Unit)? = null
+    ): LiveToolsDialog {
         return LiveToolsDialog(context, statusTextDart).apply {
             addToolItem(
                 LiveToolsDialog.ToolItem(
@@ -54,30 +63,68 @@ object DialogUtil {
     }
 
     fun showSettingDialog(context: Context, statusTextDart: Boolean = true): VideoSettingDialog {
-        val dimensionsOptions = arrayListOf<String>()
+        val dimensionsOptions = arrayListOf<CharSequence>()
         var dimensionDefault = 0
         RtcManager.sVideoDimensions.forEachIndexed { index: Int, item: VideoEncoderConfiguration.VideoDimensions ->
             if (item.width == RtcManager.encoderConfiguration.dimensions.width && item.height == RtcManager.encoderConfiguration.dimensions.height) {
                 dimensionDefault = index
             }
-            dimensionsOptions.add(String.format(Locale.US, "%dx%d", item.width, item.height))
+            val dimension = String.format(Locale.US, "%dx%d", item.width, item.height)
+            if (item.width == 640 && item.height == 360) {
+                val showText = "${dimension}(推荐)"
+                val ssb = SpannableStringBuilder(showText)
+                ssb.setSpan(
+                    ForegroundColorSpan(Color.RED),
+                    dimension.length,
+                    showText.length,
+                    SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE
+                )
+                dimensionsOptions.add(ssb)
+            } else {
+                dimensionsOptions.add(dimension)
+            }
         }
 
-        val frameRateOptions = arrayListOf<String>()
+        val frameRateOptions = arrayListOf<CharSequence>()
         var frameRateDefault = 0
         RtcManager.sFrameRates.forEachIndexed { index: Int, item: VideoEncoderConfiguration.FRAME_RATE ->
             if (item.value == RtcManager.encoderConfiguration.frameRate) {
                 frameRateDefault = index
             }
-            frameRateOptions.add(String.format(Locale.US, "%d", item.value))
+            val fps = String.format(Locale.US, "%d", item.value)
+            if (item.value == 30) {
+                val showText = "${fps}(推荐)"
+                val ssb = SpannableStringBuilder(showText)
+                ssb.setSpan(
+                    ForegroundColorSpan(Color.RED),
+                    fps.length,
+                    showText.length,
+                    SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE
+                )
+                frameRateOptions.add(ssb)
+            } else {
+                frameRateOptions.add(fps)
+            }
         }
 
-        val renderQualityOptions = arrayListOf<String>()
+        val renderQualityOptions = arrayListOf<CharSequence>()
         var renderQualityDefault = 0
-        RtcManager.sRenderQuality.forEachIndexed { index: Int, item: RtcManager.AvatarRenderQuality ->
-            renderQualityOptions.add(item.name)
+        RtcManager.sRenderQuality.forEachIndexed { index: Int, item: AvatarRenderQuality ->
             if (RtcManager.currRenderQuality.stringId.equals(item.stringId)) {
                 renderQualityDefault = index
+            }
+            if (item == AvatarRenderQuality.Ultra) {
+                val showText = "${item.name}(推荐)"
+                val ssb = SpannableStringBuilder(showText)
+                ssb.setSpan(
+                    ForegroundColorSpan(Color.RED),
+                    item.name.length,
+                    showText.length,
+                    SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE
+                )
+                renderQualityOptions.add(ssb)
+            } else {
+                renderQualityOptions.add(item.name)
             }
         }
 
