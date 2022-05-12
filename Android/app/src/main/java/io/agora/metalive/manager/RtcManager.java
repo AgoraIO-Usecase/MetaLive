@@ -56,7 +56,7 @@ public class RtcManager {
     private static final String TAG = "RtcManager";
 
     private static final int LOCAL_RTC_UID = 0;
-    private static final int DEFAULT_BITRATE = 700;
+    private static final int DEFAULT_BITRATE = 1000;
     public static final List<VideoEncoderConfiguration.VideoDimensions> sVideoDimensions = Arrays.asList(
             VD_320x240,
             VD_480x360,

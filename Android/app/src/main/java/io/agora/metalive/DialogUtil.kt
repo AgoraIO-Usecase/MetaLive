@@ -156,7 +156,7 @@ object DialogUtil {
                 0,
                 2000,
                 RtcManager.encoderConfiguration.bitrate,
-                "%s kbps",
+                "%s kps",
                 object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(
                         seekBar: SeekBar?,
