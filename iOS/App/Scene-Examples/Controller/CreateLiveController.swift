@@ -8,6 +8,7 @@
 import UIKit
 import AgoraRtcKit
 import AgoraSyncManager
+import AvatarSDK
 
 protocol CreateLiveControllerDelegate: NSObjectProtocol {
     func createLiveControllerDidStartButtonTap(info: LiveRoomInfo, agoraKit: AgoraRtcEngineKit)
@@ -18,6 +19,7 @@ class CreateLiveController: UIViewController {
     weak var delegate: CreateLiveControllerDelegate?
     
     private var agoraKit: AgoraRtcEngineKit?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,15 +44,23 @@ class CreateLiveController: UIViewController {
     
     private func setupAgoraKit() {
         agoraKit = CreateLiveController.createEngine()
+        avaterEngine = agoraKit?.queryAvatarEngine()
+        let avatarConfigs = AgoraAvatarConfigs()
+        avatarConfigs.mode = .avatar
+        avatarConfigs.enable_face_detection = 1
+        avatarConfigs.enable_human_detection = 0
+        avaterEngine!.enableOrUpdateLocalAvatarVideo(true, configs: avatarConfigs)
         
         /// 渲染
         let canvas = AgoraRtcVideoCanvas()
         canvas.uid = UserInfo.userId
         canvas.renderMode = .hidden
         canvas.view = createLiveView.localView
-        agoraKit?.setupLocalVideo(canvas)
+        avaterEngine.setupLocalVideoCanvas(canvas)
         agoraKit?.startPreview()
     }
+    
+    private var avaterEngine: AvatarEngineProtocol!
     
     static func createEngine() -> AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
@@ -107,6 +117,16 @@ extension CreateLiveController: CreateLiveViewDelegate {
             break
         }
     }
+}
+
+// MARK: - CAAvatarSDKDelegate
+
+extension CreateLiveController: CAAvatarSDKDelegate {
+    func onInit() {
+        
+    }
     
-    
+    func onError(_ error: String!) {
+        
+    }
 }

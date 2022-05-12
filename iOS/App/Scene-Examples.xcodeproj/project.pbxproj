@@ -11,6 +11,8 @@
 		26118AE1279E9DBE0026E27C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E79C25E7273B67DD00909CD4 /* Assets.xcassets */; };
 		2612DE1E28292BD10049998A /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2612DE1D28292BD10049998A /* VideoCell.swift */; };
 		2612DE22282A4D860049998A /* LiveViewCotroller+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2612DE21282A4D860049998A /* LiveViewCotroller+Sync.swift */; };
+		2639A6F8282D25A10037E056 /* DressUpSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2639A6F7282D25A10037E056 /* DressUpSheetVC.swift */; };
+		2639A6FA282D2EEE0037E056 /* PinchFaceSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2639A6F9282D2EEE0037E056 /* PinchFaceSheetVC.swift */; };
 		2642C2F627CF419B002B626B /* AlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2F527CF419B002B626B /* AlertVC.swift */; };
 		2642C2FA27CF5B4C002B626B /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2F927CF5B4C002B626B /* VideoView.swift */; };
 		2642C2FC27CF6AE9002B626B /* HandsUpSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */; };
@@ -86,6 +88,8 @@
 		26118AD9279A974C0026E27C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		2612DE1D28292BD10049998A /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
 		2612DE21282A4D860049998A /* LiveViewCotroller+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveViewCotroller+Sync.swift"; sourceTree = "<group>"; };
+		2639A6F7282D25A10037E056 /* DressUpSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DressUpSheetVC.swift; sourceTree = "<group>"; };
+		2639A6F9282D2EEE0037E056 /* PinchFaceSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinchFaceSheetVC.swift; sourceTree = "<group>"; };
 		2642C2F527CF419B002B626B /* AlertVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertVC.swift; sourceTree = "<group>"; };
 		2642C2F927CF5B4C002B626B /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandsUpSheetVC.swift; sourceTree = "<group>"; };
@@ -221,6 +225,8 @@
 				2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */,
 				2693C36B282BAE81007F177D /* MoreSheetVC.swift */,
 				2693C36D282BB5CE007F177D /* VideoSettingSheetVC.swift */,
+				2639A6F7282D25A10037E056 /* DressUpSheetVC.swift */,
+				2639A6F9282D2EEE0037E056 /* PinchFaceSheetVC.swift */,
 				2699848127CCC01D0053DBB8 /* SystemAlertPrensentAnimation.swift */,
 			);
 			path = Sheet;
@@ -452,12 +458,14 @@
 				26C880D627CDFF890066307D /* NotiCell.swift in Sources */,
 				2642C2F627CF419B002B626B /* AlertVC.swift in Sources */,
 				2642C2FC27CF6AE9002B626B /* HandsUpSheetVC.swift in Sources */,
+				2639A6F8282D25A10037E056 /* DressUpSheetVC.swift in Sources */,
 				26FF3299282539DC009A9590 /* LogUtils.swift in Sources */,
 				26FF328E2824F73B009A9590 /* CreateLiveController.swift in Sources */,
 				26FF329428252957009A9590 /* LiveView.swift in Sources */,
 				26C880DC27CE1A9B0066307D /* BottomView.swift in Sources */,
 				2693C36C282BAE81007F177D /* MoreSheetVC.swift in Sources */,
 				E79C2610273B689B00909CD4 /* KeyCenter.swift in Sources */,
+				2639A6FA282D2EEE0037E056 /* PinchFaceSheetVC.swift in Sources */,
 				26C880DA27CE07D00066307D /* LiveViewCotroller.swift in Sources */,
 				E79C262D273BC0CA00909CD4 /* ToastView.swift in Sources */,
 				26E4F023282BDE35005F553F /* LiveViewCotroller+Info.swift in Sources */,
@@ -692,7 +700,7 @@
 					"$(PROJECT_DIR)/Scene-Examples/OneToOne/FUManager/Lib/FaceUnity-SDK-iOS",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.scene.examplesz;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.metalive;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
