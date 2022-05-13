@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.agora.metalive.R;
@@ -125,7 +126,12 @@ public class RtcManager {
             Log.e(TAG, "onLocalUserAvatarEvent " + key + "," + value);
             if ("set_avatar_success".equalsIgnoreCase(key)) {
                 // module loaded successfully
-                onAvatarLoaded();
+                avatarEngine.setLocalUserAvatarOptions("set_quality", currRenderQuality.getStringId().getBytes());
+                avatarEngine.setLocalUserAvatarOptions("start_dress", null);
+                avatarEngine.setLocalUserAvatarOptions("send_showview", String.format(Locale.US, "{\"type\":\"%s\"}", "73").getBytes());
+                avatarEngine.setLocalUserAvatarOptions("send_dress", String.format(Locale.US, "{\"id\":\"%s\"}", "73001").getBytes());
+                avatarEngine.setLocalUserAvatarOptions("stop_dress", null);
+                mainHandler.postDelayed(() -> onAvatarLoaded(), 15000);
                 return;
             }
             DataCallback<String> callback = localAvatarEventCallbackMap.get(key);
@@ -215,7 +221,6 @@ public class RtcManager {
                     context.getString(R.string.ai_token_id));
             avatarEngine.initialize(avatarContext);
             avatarEngine.registerEventHandler(avatarEngineEventHandler);
-            setLocalAvatarQuality(currRenderQuality);
 
             AvatarConfigs avatarConfigs = new AvatarConfigs(
                     Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE,
