@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AgoraUIKit_iOS
 
 protocol CreateLiveViewDelegate: NSObjectProtocol {
     func createLiveViewDidTapAction(action: CreateLiveView.Action)
@@ -19,6 +20,19 @@ class CreateLiveView: UIView {
     private let startLiveButton = UIButton()
     private let closeButton = UIButton()
     private let beautyButton = UIButton()
+    
+    public lazy var originalView: AGEButton = {
+        let button = AGEButton()
+        button.setTitle("原图", for: .normal)
+        button.buttonStyle = .filled(backgroundColor: .gray)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = 5
+        button.shadowOffset = CGSize(width: 0, height: 0)
+        button.shadowColor = .init(hex: "#000000")
+        button.shadowRadius = 5
+        button.shadowOpacity = 0.5
+        return button
+    }()
     weak var delegate: CreateLiveViewDelegate?
     
     override init(frame: CGRect) {
@@ -55,6 +69,7 @@ class CreateLiveView: UIView {
         cameraChangeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         beautyButton.translatesAutoresizingMaskIntoConstraints = false
+        originalView.translatesAutoresizingMaskIntoConstraints = false
         
         addSubview(localView)
         addSubview(randomNameView)
@@ -63,6 +78,7 @@ class CreateLiveView: UIView {
         addSubview(beautyButton)
         addSubview(startLiveButton)
         addSubview(cameraChangeButton)
+        addSubview(originalView)
         
         closeButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
         closeButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 10).isActive = true
@@ -90,6 +106,11 @@ class CreateLiveView: UIView {
         
         beautyButton.rightAnchor.constraint(equalTo: startLiveButton.leftAnchor, constant: -25).isActive = true
         beautyButton.centerYAnchor.constraint(equalTo: startLiveButton.centerYAnchor).isActive = true
+        
+        originalView.leftAnchor.constraint(equalTo: leftAnchor, constant: 15).isActive = true
+        originalView.bottomAnchor.constraint(equalTo: startLiveButton.topAnchor, constant: 45).isActive = true
+        originalView.widthAnchor.constraint(equalToConstant: 105.fit).isActive = true
+        originalView.heightAnchor.constraint(equalToConstant: 140.fit).isActive = true
     }
     
     private func commonInit() {

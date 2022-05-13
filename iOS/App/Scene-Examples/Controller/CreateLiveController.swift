@@ -9,6 +9,7 @@ import UIKit
 import AgoraRtcKit
 import AgoraSyncManager
 import AvatarSDK
+import AgoraUIKit_iOS
 
 protocol CreateLiveControllerDelegate: NSObjectProtocol {
     func createLiveControllerDidStartButtonTap(info: LiveRoomInfo, agoraKit: AgoraRtcEngineKit)
@@ -16,10 +17,10 @@ protocol CreateLiveControllerDelegate: NSObjectProtocol {
 
 class CreateLiveController: UIViewController {
     private let createLiveView = CreateLiveView()
+    
     weak var delegate: CreateLiveControllerDelegate?
     
     private var agoraKit: AgoraRtcEngineKit?
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,17 +48,33 @@ class CreateLiveController: UIViewController {
         avaterEngine = agoraKit?.queryAvatarEngine()
         let avatarConfigs = AgoraAvatarConfigs()
         avatarConfigs.mode = .avatar
+        avatarConfigs.mediaSource = .primaryCamera
         avatarConfigs.enable_face_detection = 1
         avatarConfigs.enable_human_detection = 0
         avaterEngine!.enableOrUpdateLocalAvatarVideo(true, configs: avatarConfigs)
+        let context = AgoraAvatarContext()
+        context.aiAppId = KeyCenter.cocosAppId
+        context.aiToken = KeyCenter.cocosAppKey
+        let ret = avaterEngine.initialize(context)
+        if ret != 0 {
+            LogUtils.log(message: "initialize fail \(ret)", level: .info)
+        }
         
         /// 渲染
         let canvas = AgoraRtcVideoCanvas()
-        canvas.uid = UserInfo.userId
+        canvas.uid = 0
         canvas.renderMode = .hidden
         canvas.view = createLiveView.localView
         avaterEngine.setupLocalVideoCanvas(canvas)
+
+        let canvas0 = AgoraRtcVideoCanvas()
+        canvas0.uid = 0
+        canvas0.renderMode = .hidden
+        canvas0.view = createLiveView.originalView
+        agoraKit?.setupLocalVideo(canvas0)
         agoraKit?.startPreview()
+        
+        agoraKit?.enableVideo()
     }
     
     private var avaterEngine: AvatarEngineProtocol!
@@ -68,19 +85,12 @@ class CreateLiveController: UIViewController {
         config.channelProfile = .liveBroadcasting
         config.areaCode = .global
         
-        let videoConfig = AgoraVideoEncoderConfiguration(size: VideoSetInfo.default.resolution.size,
-                                                         frameRate: VideoSetInfo.default.fremeRate.rtcType,
-                                                         bitrate: VideoSetInfo.default.bitRate,
-                                                         orientationMode: .fixedPortrait,
-                                                         mirrorMode: .auto)
-        
         let agoraKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
         agoraKit.setClientRole(.broadcaster)
-        agoraKit.setVideoEncoderConfiguration(videoConfig)
         
         /// 开启扬声器
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
-        agoraKit.enableVideo()
+        
         return agoraKit
     }
     
