@@ -16,7 +16,7 @@
 
     <!-- AvatarToolDialog -->
     <string name="avatar_option_title">虚拟形象设置</string>
-    <string name="avatar_option_name_dress">换装</string>
+    <string name="avatar_option_name_dress">换妆</string>
     <string name="avatar_option_name_face">捏脸</string>
     <string name="avatar_option_camera">相机</string>
 
