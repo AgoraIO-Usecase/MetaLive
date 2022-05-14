@@ -30,6 +30,7 @@ class LiveView: UIView {
     
     private func setupUI() {
         backgroundColor = .white
+        
         notiView.translatesAutoresizingMaskIntoConstraints = false
         bottomView.translatesAutoresizingMaskIntoConstraints = false
         videoView.translatesAutoresizingMaskIntoConstraints = false

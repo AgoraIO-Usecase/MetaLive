@@ -9,11 +9,18 @@ import Foundation
 import AgoraEditAvatar
 import Presentr
 
+protocol PinchFaceSheetVCDelegate: NSObjectProtocol {
+    func pinchFaceSheetVCDidValueChange(infoIndex: Int,
+                                        itemIndex: Int,
+                                        value: Float)
+}
+
 public class PinchFaceSheetVC: UIViewController {
     typealias Info = PinchFaceView.Info
+    typealias Item = PinchFaceView.Item
     private var presenter: Presentr?
     private let contentView = PinchFaceView()
-    weak var delegate: HandsUpSheetVCDelegate?
+    weak var delegate: PinchFaceSheetVCDelegate?
     var infos: [Info]!
     
     init(infos: [Info]) {
@@ -41,7 +48,19 @@ public class PinchFaceSheetVC: UIViewController {
     }
     
     private func commonInit() {
-        
+        contentView.update(infos: infos,
+                           infoIndex: 0,
+                           itemIndex: 0)
+        contentView.slider.addTarget(self,
+                         action: #selector(valueChange(_:)),
+                         for: .valueChanged)
+    }
+    
+    @objc func valueChange(_ sender: UISlider) {
+        LogUtils.log(message: "value: \(sender.value)", level: .info)
+        contentView.valueLabel.text = "\(Int(sender.value))"
+        delegate?.pinchFaceSheetVCDidValueChange(infoIndex: contentView.selectedInfoIndex,
+                                                 itemIndex: contentView.selectedItemIndex, value: sender.value)
     }
     
     func show(in vc: UIViewController) {
@@ -49,11 +68,10 @@ public class PinchFaceSheetVC: UIViewController {
         presenter = Presentr(presentationType: .custom(width: .full,
                                                        height: .custom(size: Float(PinchFaceView.getHeight)),
                                                        center: .customOrigin(origin: p)))
+        presenter?.backgroundOpacity = 0.01
         vc.customPresentViewController(presenter!, viewController: self, animated: true, completion: nil)
     }
 }
-
-
 
 class PinchFaceView: UIView {
     let titleLabel = UILabel()
@@ -63,10 +81,13 @@ class PinchFaceView: UIView {
     let titleView1 = AEATitleView(infos: [])
     let titleView2 = AEATitleView(infos: [])
     var dataList = [Info]()
+    var selectedInfoIndex = 0
+    var selectedItemIndex = 0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
+        commonInit()
     }
     
     required init?(coder: NSCoder) {
@@ -127,11 +148,37 @@ class PinchFaceView: UIView {
     private func commonInit() {
         titleView1.delegate = self
         titleView2.delegate = self
+        
     }
     
-    func update(infos: [Info]) {
+    func update(infos: [Info],
+                infoIndex: Int,
+                itemIndex: Int) {
         dataList = infos
         
+        let titles = infos.map({ $0.title })
+        titleView1.updateInfos(titles)
+        
+        updateSelect1(infoIndex: infoIndex, itemIndex: itemIndex)
+    }
+    
+    func updateSelect1(infoIndex: Int,
+                      itemIndex: Int) {
+        let info = dataList[infoIndex]
+        let temp = info.items.map({ $0.title })
+        titleView2.updateInfos(temp)
+        
+        let item = info.items[itemIndex]
+        nameLabel.text = item.title
+        slider.value = item.value
+    }
+    
+    func updateSelected2(infoIndex: Int,
+                         itemIndex: Int) {
+        let info = dataList[infoIndex]
+        let item = info.items[itemIndex]
+        nameLabel.text = item.title
+        slider.value = item.value
     }
     
     static var getHeight: CGFloat {
@@ -142,10 +189,15 @@ class PinchFaceView: UIView {
 extension PinchFaceView: AEATitleBarViewDelegate {
     public func editAvatarTitleBarView(_ view: AEATitleView, didSelectedAt index: Int) {
         if view == titleView1 {
-            
+            selectedInfoIndex = index
+            selectedItemIndex = 0
+            updateSelect1(infoIndex: selectedInfoIndex,
+                          itemIndex: selectedItemIndex)
         }
         else {
-            
+            selectedItemIndex = index
+            updateSelected2(infoIndex: selectedInfoIndex,
+                            itemIndex: selectedItemIndex)
         }
     }
 }
@@ -158,6 +210,6 @@ extension PinchFaceView {
     
     struct Item {
         let title: String
-        let value: Int
+        let value: Float
     }
 }

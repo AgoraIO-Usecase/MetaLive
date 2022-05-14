@@ -20,6 +20,7 @@ class CreateLiveView: UIView {
     private let startLiveButton = UIButton()
     private let closeButton = UIButton()
     private let beautyButton = UIButton()
+    private let indicatedView = UIActivityIndicatorView()
     
     public lazy var originalView: AGEButton = {
         let button = AGEButton()
@@ -60,6 +61,9 @@ class CreateLiveView: UIView {
         startLiveButton.layer.cornerRadius = 20
         startLiveButton.layer.masksToBounds = true
         
+        indicatedView.style = .large
+        indicatedView.color = .white
+        
         backgroundColor = .init(hex: "#404B54")
         
         randomNameView.translatesAutoresizingMaskIntoConstraints = false
@@ -70,6 +74,7 @@ class CreateLiveView: UIView {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         beautyButton.translatesAutoresizingMaskIntoConstraints = false
         originalView.translatesAutoresizingMaskIntoConstraints = false
+        indicatedView.translatesAutoresizingMaskIntoConstraints = false
         
         addSubview(localView)
         addSubview(randomNameView)
@@ -79,6 +84,7 @@ class CreateLiveView: UIView {
         addSubview(startLiveButton)
         addSubview(cameraChangeButton)
         addSubview(originalView)
+        addSubview(indicatedView)
         
         closeButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
         closeButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 10).isActive = true
@@ -107,10 +113,15 @@ class CreateLiveView: UIView {
         beautyButton.rightAnchor.constraint(equalTo: startLiveButton.leftAnchor, constant: -25).isActive = true
         beautyButton.centerYAnchor.constraint(equalTo: startLiveButton.centerYAnchor).isActive = true
         
-        originalView.leftAnchor.constraint(equalTo: leftAnchor, constant: 15).isActive = true
-        originalView.bottomAnchor.constraint(equalTo: startLiveButton.topAnchor, constant: 45).isActive = true
+        originalView.leftAnchor.constraint(equalTo: leftAnchor, constant: 25).isActive = true
+        originalView.bottomAnchor.constraint(equalTo: startLiveButton.topAnchor, constant: -20).isActive = true
         originalView.widthAnchor.constraint(equalToConstant: 105.fit).isActive = true
         originalView.heightAnchor.constraint(equalToConstant: 140.fit).isActive = true
+        
+        indicatedView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        indicatedView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        
+        indicatedView.startAnimating()
     }
     
     private func commonInit() {
@@ -118,6 +129,7 @@ class CreateLiveView: UIView {
         settingButton.addTarget(self, action: #selector(buttonTap(_:)), for: .touchUpInside)
         startLiveButton.addTarget(self, action: #selector(buttonTap(_:)), for: .touchUpInside)
         closeButton.addTarget(self, action: #selector(buttonTap(_:)), for: .touchUpInside)
+        beautyButton.addTarget(self, action: #selector(buttonTap(_:)), for: .touchUpInside)
     }
     
     @objc private func buttonTap(_ sender: UIButton) {
@@ -129,6 +141,27 @@ class CreateLiveView: UIView {
         if sender == startLiveButton {
             delegate?.createLiveViewDidTapAction(action: .start)
             return
+        }
+        
+        if sender == settingButton {
+            delegate?.createLiveViewDidTapAction(action: .setting)
+            return
+        }
+        
+        if sender == beautyButton {
+            delegate?.createLiveViewDidTapAction(action: .beauty)
+            return
+        }
+    }
+    
+    func hidenIndicatedView() {
+        if Thread.isMainThread {
+            indicatedView.isHidden = true
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.indicatedView.isHidden = true
         }
     }
 }

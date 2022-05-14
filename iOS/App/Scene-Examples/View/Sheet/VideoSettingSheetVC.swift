@@ -282,10 +282,10 @@ extension VideoSettingSheetVC {
     }
     
     enum RenderQuality: Int, CustomStringConvertible, CaseIterable {
-        case high
-        case Medium
-        case low
-        case ultra
+        case high = 2
+        case Medium = 1
+        case low = 0
+        case ultra = 3
         
         var description: String {
             switch self {

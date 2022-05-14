@@ -13,6 +13,9 @@
 		2612DE22282A4D860049998A /* LiveViewCotroller+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2612DE21282A4D860049998A /* LiveViewCotroller+Sync.swift */; };
 		2639A6F8282D25A10037E056 /* DressUpSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2639A6F7282D25A10037E056 /* DressUpSheetVC.swift */; };
 		2639A6FA282D2EEE0037E056 /* PinchFaceSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2639A6F9282D2EEE0037E056 /* PinchFaceSheetVC.swift */; };
+		2639A721282F760A0037E056 /* AvatarEngineWapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2639A720282F760A0037E056 /* AvatarEngineWapper.swift */; };
+		2639A723282F92BB0037E056 /* Info+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2639A722282F92BB0037E056 /* Info+Extension.swift */; };
+		2639A725282FD8B00037E056 /* AvatarEngineWapper+Info.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2639A724282FD8B00037E056 /* AvatarEngineWapper+Info.swift */; };
 		2642C2F627CF419B002B626B /* AlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2F527CF419B002B626B /* AlertVC.swift */; };
 		2642C2FA27CF5B4C002B626B /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2F927CF5B4C002B626B /* VideoView.swift */; };
 		2642C2FC27CF6AE9002B626B /* HandsUpSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */; };
@@ -90,6 +93,9 @@
 		2612DE21282A4D860049998A /* LiveViewCotroller+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveViewCotroller+Sync.swift"; sourceTree = "<group>"; };
 		2639A6F7282D25A10037E056 /* DressUpSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DressUpSheetVC.swift; sourceTree = "<group>"; };
 		2639A6F9282D2EEE0037E056 /* PinchFaceSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinchFaceSheetVC.swift; sourceTree = "<group>"; };
+		2639A720282F760A0037E056 /* AvatarEngineWapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarEngineWapper.swift; sourceTree = "<group>"; };
+		2639A722282F92BB0037E056 /* Info+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Info+Extension.swift"; sourceTree = "<group>"; };
+		2639A724282FD8B00037E056 /* AvatarEngineWapper+Info.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AvatarEngineWapper+Info.swift"; sourceTree = "<group>"; };
 		2642C2F527CF419B002B626B /* AlertVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertVC.swift; sourceTree = "<group>"; };
 		2642C2F927CF5B4C002B626B /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		2642C2FB27CF6AE9002B626B /* HandsUpSheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandsUpSheetVC.swift; sourceTree = "<group>"; };
@@ -299,6 +305,8 @@
 				E79BEF742744FD8B009FA838 /* GCDTimer.swift */,
 				26FF3298282539DC009A9590 /* LogUtils.swift */,
 				26FF329A28265351009A9590 /* RoomManager.swift */,
+				2639A720282F760A0037E056 /* AvatarEngineWapper.swift */,
+				2639A724282FD8B00037E056 /* AvatarEngineWapper+Info.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -329,6 +337,7 @@
 				E79C2607273B689B00909CD4 /* UIColor+Extension.swift */,
 				E79C2601273B689A00909CD4 /* AgoraExtension.swift */,
 				26FF329C28267BE1009A9590 /* UIViewController+Extension.swift */,
+				2639A722282F92BB0037E056 /* Info+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -454,6 +463,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E79BEF37273D15D6009FA838 /* Screen.swift in Sources */,
+				2639A721282F760A0037E056 /* AvatarEngineWapper.swift in Sources */,
 				E79C2611273B689B00909CD4 /* SyncUtil.swift in Sources */,
 				26C880D627CDFF890066307D /* NotiCell.swift in Sources */,
 				2642C2F627CF419B002B626B /* AlertVC.swift in Sources */,
@@ -461,6 +471,7 @@
 				2639A6F8282D25A10037E056 /* DressUpSheetVC.swift in Sources */,
 				26FF3299282539DC009A9590 /* LogUtils.swift in Sources */,
 				26FF328E2824F73B009A9590 /* CreateLiveController.swift in Sources */,
+				2639A723282F92BB0037E056 /* Info+Extension.swift in Sources */,
 				26FF329428252957009A9590 /* LiveView.swift in Sources */,
 				26C880DC27CE1A9B0066307D /* BottomView.swift in Sources */,
 				2693C36C282BAE81007F177D /* MoreSheetVC.swift in Sources */,
@@ -474,6 +485,7 @@
 				2612DE1E28292BD10049998A /* VideoCell.swift in Sources */,
 				E79C2613273B689B00909CD4 /* UIColor+Extension.swift in Sources */,
 				2642C2FE27CF6D9B002B626B /* HandsUpCell.swift in Sources */,
+				2639A725282FD8B00037E056 /* AvatarEngineWapper+Info.swift in Sources */,
 				E79C2642273BE5C500909CD4 /* AlertManager.swift in Sources */,
 				26FF3292282525B4009A9590 /* CreateLiveView.swift in Sources */,
 				2699846827C8BC830053DBB8 /* MainViewController.swift in Sources */,
@@ -682,6 +694,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = MetaLive;
 				INFOPLIST_KEY_NSCameraUsageDescription = "App needs your permission to access camera for video interaction";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs your permission to access microphone for audio interaction";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = tracking;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -743,6 +756,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = MetaLive;
 				INFOPLIST_KEY_NSCameraUsageDescription = "App needs your permission to access camera for video interaction";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs your permission to access microphone for audio interaction";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = tracking;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

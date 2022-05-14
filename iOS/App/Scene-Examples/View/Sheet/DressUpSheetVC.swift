@@ -23,6 +23,7 @@ public class DressUpSheetVC: UIViewController {
     init(infos: [Info]) {
         super.init(nibName: nil, bundle: nil)
         dataList = infos
+        contentView = DressUpView(infos: infos)
     }
     
     required init?(coder: NSCoder) {
