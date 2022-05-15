@@ -208,7 +208,7 @@ class RoomDetailActivity : AppCompatActivity() {
                 // 如果是房主，举手人数+1
                 if (isRoomOwner()) {
                     mBinding.liveBottomView.setFun4Dot(true)
-                } else {
+                } else if(userInfo.userId.equals(RoomManager.getCacheUserId())){
                     mBinding.liveBottomView.isFun4Activated = true
                 }
             }
@@ -261,10 +261,10 @@ class RoomDetailActivity : AppCompatActivity() {
                     rtcManager.setPublishVideo(mRoomInfo.roomId, false, false)
                     rtcManager.enableLocalAudio(false)
                     updateBottomView()
-                }
-                if (!isRoomOwner()) {
-                    // 观众逻辑
-                    mBinding.liveBottomView.isFun4Activated = false
+                    if (!isRoomOwner()) {
+                        // 观众逻辑
+                        mBinding.liveBottomView.isFun4Activated = false
+                    }
                 }
             }
         }

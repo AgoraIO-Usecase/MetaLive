@@ -12,7 +12,7 @@ import io.agora.uiwidget.R;
 
 
 public class RandomUtil {
-    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(randomId(1, 10000));
     private static final int sGeneratedIdRandomStart = randomId(1, 10000);
     private static int sLastIndex;
 
