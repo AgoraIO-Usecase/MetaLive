@@ -7,6 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
+import AgoraEditAvatar
 
 class LiveViewCotroller: UIViewController {
     let liveView = LiveView()
@@ -17,15 +18,18 @@ class LiveViewCotroller: UIViewController {
     var members = [Member]()
     var infos = [Info]()
     var videoSetInfo: VideoSetInfo = .default
+    var avatarEngineWapper: AvatarEngineWapper!
     
     /// init
     /// - Parameters:
     ///   - agoraKit: agoraKit from create vc
     init(info: LiveRoomInfo,
-         agoraKit: AgoraRtcEngineKit?) {
+         agoraKit: AgoraRtcEngineKit?,
+         avaterEngineWapper: AvatarEngineWapper?) {
         self.info = info
         self.agoraKit = agoraKit
         self.entryType = agoraKit != nil ? .fromCrateRoom : .fromJoinRoom
+        self.avatarEngineWapper = avaterEngineWapper
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -150,11 +154,57 @@ extension LiveViewCotroller { /** show view **/
         vc.delegate = self
         vc.show(in: self)
     }
+    
+    fileprivate func showFaceUpView(list: [AvatarEngineWapper.FaceUpInfo]) {
+        avatarEngineWapper.startFaceUp()
+        let infos = list.map({ PinchFaceSheetVC.Info(info: $0) })
+        let vc = PinchFaceSheetVC(infos: infos)
+        vc.delegate = self
+        vc.show(in: self)
+    }
+    
+    fileprivate func showDressUpView(list: [AvatarEngineWapper.DressInfo]) {
+        let infos = list.map({ DressUpSheetVC.Info(info: $0) })
+        let vc = DressUpSheetVC(infos: infos)
+        vc.delegate = self
+        vc.show(in: self)
+    }
 }
 
 // MARK: - view event
 
-extension LiveViewCotroller: LiveViewDelegate, VideoViewDelegate, HandsUpSheetVCDelegate, MoreSheetVCDelegate, VideoSettingSheetVCDelegate {
+extension LiveViewCotroller: LiveViewDelegate,
+                             VideoViewDelegate,
+                             HandsUpSheetVCDelegate,
+                             MoreSheetVCDelegate,
+                             VideoSettingSheetVCDelegate,
+                             PinchFaceSheetVCDelegate,
+                             DressUpSheetVCDelegate {
+    
+    func dressUpSheetVCDidSelectedItem(index: Int,
+                                       info: AEABottomInfo) {
+        guard let infos = avatarEngineWapper.dressInfos else {
+            return
+        }
+        let tempInfo = infos[index]
+        let item = tempInfo.items[info.selectedItemIndex]
+        let id = item.id
+        let type = "\(tempInfo.type.rawValue)"
+        avatarEngineWapper.updateDerssUp(type: type, id: id)
+    }
+    
+    func pinchFaceSheetVCDidValueChange(infoIndex: Int,
+                                        itemIndex: Int,
+                                        value: Float) {
+        guard let infos = avatarEngineWapper.faceUpInfos else {
+            return
+        }
+        
+        let item = infos[infoIndex].items[itemIndex]
+        avatarEngineWapper.updateFaceUp(id: item.id,
+                                        value: value)
+    }
+    
     func liveViewDidTapButtomAction(action: BottomView.ActionType) {
         switch action {
         case .mic:
@@ -164,8 +214,10 @@ extension LiveViewCotroller: LiveViewDelegate, VideoViewDelegate, HandsUpSheetVC
             entryType! == .fromCrateRoom ? showMembersView() : sendHandsupSync()
             break
         case .more:
-            showMoreView()
+            showVideoSetView()
             break
+        case .beauty:
+            showMoreView()
         default:
             break
         }
@@ -183,10 +235,11 @@ extension LiveViewCotroller: LiveViewDelegate, VideoViewDelegate, HandsUpSheetVC
     
     func moreSheetVCDidTap(action: MoreSheetVC.Action) {
         switch action {
-        case .chang:
+        case .dress:
+            
             break
-        case .videoSet:
-            showVideoSetView()
+        case .face:
+            
             break
         }
     }
@@ -215,5 +268,3 @@ extension LiveViewCotroller: LiveViewDelegate, VideoViewDelegate, HandsUpSheetVC
         updateVideoConfig(videoInfo: videoSetInfo)
     }
 }
-
-

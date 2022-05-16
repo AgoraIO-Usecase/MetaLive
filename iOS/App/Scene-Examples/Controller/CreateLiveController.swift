@@ -13,7 +13,9 @@ import AgoraUIKit_iOS
 import AgoraEditAvatar
 
 protocol CreateLiveControllerDelegate: NSObjectProtocol {
-    func createLiveControllerDidStartButtonTap(info: LiveRoomInfo, agoraKit: AgoraRtcEngineKit)
+    func createLiveControllerDidStartButtonTap(info: LiveRoomInfo,
+                                               agoraKit: AgoraRtcEngineKit,
+                                               avaterEngineWapper: AvatarEngineWapper)
 }
 
 class CreateLiveController: UIViewController {
@@ -22,6 +24,7 @@ class CreateLiveController: UIViewController {
     private var agoraKit: AgoraRtcEngineKit?
     var videoSetInfo: VideoSetInfo = .default
     var avatarEngineWapper: AvatarEngineWapper!
+    var isAvatarLoaded = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,37 +49,10 @@ class CreateLiveController: UIViewController {
     
     private func setupAgoraKit() {
         agoraKit = CreateLiveController.createEngine()
+        avatarEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: agoraKit!)
         
-        guard let avaterEngine = agoraKit?.queryAvatarEngine() else {
-            fatalError("queryAvatarEngine fail")
-        }
-        
-        avatarEngineWapper = .init(engine: avaterEngine)
-        avatarEngineWapper.delegate = self
-        
-        let context = AgoraAvatarContext()
-        context.aiAppId = KeyCenter.cocosAppId
-        context.aiToken = KeyCenter.cocosAppKey
-        let ret = avaterEngine.initialize(context)
-        if ret != 0 {
-            LogUtils.log(message: "initialize fail \(ret)", level: .info)
-        }
-        
-        agoraKit?.setAvatarEngineDelegate(avatarEngineWapper)
-        
-        let avatarConfigs = AgoraAvatarConfigs()
-        avatarConfigs.mode = .avatar
-        avatarConfigs.mediaSource = .primaryCamera
-        avatarConfigs.enable_face_detection = 1
-        avatarConfigs.enable_human_detection = 0
-        avaterEngine.enableOrUpdateLocalAvatarVideo(true, configs: avatarConfigs)
-        
-        /// 渲染
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.uid = 0
-        canvas.renderMode = .hidden
-        canvas.view = createLiveView.localView
-        avaterEngine.setupLocalVideoCanvas(canvas)
+        avatarEngineWapper.startInit()
+        avatarEngineWapper.setupLocalVideoCanvas(view: createLiveView.localView)
 
         let canvas0 = AgoraRtcVideoCanvas()
         canvas0.uid = 0
@@ -84,6 +60,16 @@ class CreateLiveController: UIViewController {
         canvas0.view = createLiveView.originalView
         agoraKit?.setupLocalVideo(canvas0)
         agoraKit?.startPreview()
+    }
+    
+    static func createAvaterEngineWapper(agoraKit: AgoraRtcEngineKit) -> AvatarEngineWapper {
+        guard let avaterEngine = agoraKit.queryAvatarEngine() else {
+            fatalError("queryAvatarEngine fail")
+        }
+        
+        let avatarEngineWapper = AvatarEngineWapper(engine: avaterEngine)
+        agoraKit.setAvatarEngineDelegate(avatarEngineWapper)
+        return avatarEngineWapper
     }
     
     static func createEngine() -> AgoraRtcEngineKit {
@@ -102,17 +88,24 @@ class CreateLiveController: UIViewController {
     }
     
     fileprivate func startRoom() {
+        guard isAvatarLoaded else {
+            showWaitInit()
+            return
+        }
+        
         let roomName = createLiveView.randomNameView.text
         let roomId = "\(arc4random_uniform(899999) + 100000)"
         let info = LiveRoomInfo(roomName: roomName,
                                 roomId: roomId,
                                 userId: UserInfo.uid)
-        guard let engine = agoraKit else {
+        guard let engine = agoraKit, let avatatEngine = avatarEngineWapper else {
             fatalError()
         }
         
         dismiss(animated: true, completion: { [weak self] in
-            self?.delegate?.createLiveControllerDidStartButtonTap(info: info, agoraKit: engine)
+            self?.delegate?.createLiveControllerDidStartButtonTap(info: info,
+                                                                  agoraKit: engine,
+                                                                  avaterEngineWapper: avatatEngine)
         })
     }
     
@@ -132,6 +125,10 @@ class CreateLiveController: UIViewController {
     }
     
     func showFaceUpView(list: [AvatarEngineWapper.FaceUpInfo]) {
+        guard isAvatarLoaded else {
+            showWaitInit()
+            return
+        }
         avatarEngineWapper.startFaceUp()
         let infos = list.map({ PinchFaceSheetVC.Info(info: $0) })
         let vc = PinchFaceSheetVC(infos: infos)
@@ -140,9 +137,28 @@ class CreateLiveController: UIViewController {
     }
     
     func showDressUpView(list: [AvatarEngineWapper.DressInfo]) {
+        guard isAvatarLoaded else {
+            showWaitInit()
+            return
+        }
         let infos = list.map({ DressUpSheetVC.Info(info: $0) })
         let vc = DressUpSheetVC(infos: infos)
+        vc.delegate = self
         vc.show(in: self)
+    }
+    
+    func showMoreView() {
+        guard isAvatarLoaded else {
+            showWaitInit()
+            return
+        }
+        let vc = MoreSheetVC()
+        vc.delegate = self
+        vc.show(in: self)
+    }
+    
+    func showWaitInit() {
+        showHUDError(error: "请等待初始化完")
     }
 }
 
@@ -165,7 +181,7 @@ extension CreateLiveController: CreateLiveViewDelegate {
             vc.show(in: self)
             break
         case .beauty:
-            avatarEngineWapper.requestFaceUpList()
+            showMoreView()
             break
         default:
             break
@@ -180,6 +196,7 @@ extension CreateLiveController: AvatarEngineWapperDelegate {
         switch event {
         case .avatarSetSuccess:
             createLiveView.hidenIndicatedView()
+            isAvatarLoaded = true
             break
         case .avatarSetFail:
             showHUDError(error: "avatarSetFail")
@@ -196,7 +213,33 @@ extension CreateLiveController: AvatarEngineWapperDelegate {
     }
 }
 
-extension CreateLiveController: VideoSettingSheetVCDelegate, PinchFaceSheetVCDelegate {
+extension CreateLiveController: VideoSettingSheetVCDelegate,
+                                PinchFaceSheetVCDelegate,
+                                DressUpSheetVCDelegate,
+                                MoreSheetVCDelegate {
+    func moreSheetVCDidTap(action: MoreSheetVC.Action) {
+        switch action {
+        case .face:
+            avatarEngineWapper.requestFaceUpList()
+            break
+        case .dress:
+            avatarEngineWapper.requestDressUpList()
+            break
+        }
+    }
+    
+    func dressUpSheetVCDidSelectedItem(index: Int,
+                                       info: AEABottomInfo) {
+        guard let infos = avatarEngineWapper.dressInfos else {
+            return
+        }
+        let tempInfo = infos[index]
+        let item = tempInfo.items[info.selectedItemIndex]
+        let id = item.id
+        let type = "\(tempInfo.type.rawValue)"
+        avatarEngineWapper.updateDerssUp(type: type, id: id)
+    }
+    
     func pinchFaceSheetVCDidValueChange(infoIndex: Int,
                                         itemIndex: Int,
                                         value: Float) {
@@ -206,7 +249,7 @@ extension CreateLiveController: VideoSettingSheetVCDelegate, PinchFaceSheetVCDel
         
         let item = infos[infoIndex].items[itemIndex]
         avatarEngineWapper.updateFaceUp(id: item.id,
-                                        value: item.value)
+                                        value: value)
     }
     
     func videoSettingSheetVCDidTap(type: VideoSettingSheetVC.InfoType, value: Int) {

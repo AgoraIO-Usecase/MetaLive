@@ -108,7 +108,8 @@ class MainViewController: UIViewController {
             showAlert(title: "you_have_created_the_room_will_jump_into_you".localized,
                       message: "") { [weak self] in
                 let engine = CreateLiveController.createEngine()
-                let vc = LiveViewCotroller(info: info, agoraKit: engine)
+                let avaterEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: engine)
+                let vc = LiveViewCotroller(info: info, agoraKit: engine, avaterEngineWapper: avaterEngineWapper)
                 self?.navigationController?.pushViewController(vc, animated: true)
             }
             return
@@ -155,15 +156,17 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let info = infos[indexPath.row].liveInfo
-        let vc = LiveViewCotroller(info: info, agoraKit: nil)
+        let vc = LiveViewCotroller(info: info, agoraKit: nil, avaterEngineWapper: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
 }
 
 // MARK: - CreateLiveControllerDelegate
 extension MainViewController: CreateLiveControllerDelegate {
-    func createLiveControllerDidStartButtonTap(info: LiveRoomInfo, agoraKit: AgoraRtcEngineKit) {
-        let vc = LiveViewCotroller(info: info, agoraKit: agoraKit)
+    func createLiveControllerDidStartButtonTap(info: LiveRoomInfo,
+                                               agoraKit: AgoraRtcEngineKit,
+                                               avaterEngineWapper: AvatarEngineWapper) {
+        let vc = LiveViewCotroller(info: info, agoraKit: agoraKit, avaterEngineWapper: avaterEngineWapper)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

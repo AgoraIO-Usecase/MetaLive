@@ -57,8 +57,7 @@ public class PinchFaceSheetVC: UIViewController {
     }
     
     @objc func valueChange(_ sender: UISlider) {
-        LogUtils.log(message: "value: \(sender.value)", level: .info)
-        contentView.valueLabel.text = "\(Int(sender.value))"
+        contentView.valueLabel.text = "\(sender.value)"
         delegate?.pinchFaceSheetVCDidValueChange(infoIndex: contentView.selectedInfoIndex,
                                                  itemIndex: contentView.selectedItemIndex, value: sender.value)
     }

@@ -27,12 +27,20 @@ extension LiveViewCotroller {
             agoraKit?.setVideoEncoderConfiguration(videoConfig)
             agoraKit?.enableVideo()
             agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
+            
+            avatarEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: agoraKit!)
+            avatarEngineWapper.delegate = self
+            avatarEngineWapper.startInit()
             joinChannel()
             return
         }
         
         /** from create vc **/
+        avatarEngineWapper.delegate = self
         joinChannel()
+        if avatarEngineWapper.hsaStartInit {
+            avatarEngineWapper.startInit()
+        }
     }
     
     func joinChannel() {
@@ -117,9 +125,9 @@ extension LiveViewCotroller {
     }
 }
 
-// MARK: - AgoraRtcEngineDelegate
+// MARK: - AgoraRtcEngineDelegate AvatarEngineWapperDelegate
 
-extension LiveViewCotroller: AgoraRtcEngineDelegate {
+extension LiveViewCotroller: AgoraRtcEngineDelegate, AvatarEngineWapperDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
         LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
     }
@@ -148,6 +156,18 @@ extension LiveViewCotroller: AgoraRtcEngineDelegate {
                                  title: "\(uid) ",
                                  subtitle: "Leave_Live_Room".localized)
         liveView.append(noti: noti)
+    }
+    
+    func avatarEngineWapperDidRecvEvent(event: AvatarEngineWapper.Event) {
+        
+    }
+    
+    func avatarEngineWapperDidRecvDressList(list: [AvatarEngineWapper.DressInfo]) {
+        
+    }
+    
+    func avatarEngineWapperDidRecvFaceUpList(list: [AvatarEngineWapper.FaceUpInfo]) {
+        
     }
 }
 

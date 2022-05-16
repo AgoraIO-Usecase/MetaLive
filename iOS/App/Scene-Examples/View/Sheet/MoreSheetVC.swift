@@ -14,8 +14,8 @@ protocol MoreSheetVCDelegate: NSObjectProtocol {
 
 public class MoreSheetVC: UIViewController {
     enum Action {
-        case chang
-        case videoSet
+        case dress
+        case face
     }
     private var presenter: Presentr?
     private var contentView: MoreView!
@@ -48,7 +48,7 @@ public class MoreSheetVC: UIViewController {
     }
     
     @objc func buttonTap(_ sender: UIButton) {
-        let action: Action = sender == contentView.button1 ? .chang : .videoSet
+        let action: Action = sender == contentView.button1 ? .dress : .face
         dismiss(animated: true, completion: { [weak self] in
             self?.delegate?.moreSheetVCDidTap(action: action)
         })
@@ -87,9 +87,9 @@ class MoreView: UIView {
         button1.setImage(.init(named: "icon-setting"), for: .normal)
         button2.setImage(.init(named: "icon-setting"), for: .normal)
         let label1 = UILabel()
-        label1.text = "切换"
+        label1.text = "换装"
         let label2 = UILabel()
-        label2.text = "参数"
+        label2.text = "捏脸"
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         button1.translatesAutoresizingMaskIntoConstraints = false

@@ -54,6 +54,7 @@ public class DressUpSheetVC: UIViewController {
         presenter = Presentr(presentationType: .custom(width: .full,
                                                        height: .custom(size: Float(DressUpView.getHeight)),
                                                        center: .customOrigin(origin: p)))
+        presenter?.backgroundOpacity = 0.01
         vc.customPresentViewController(presenter!, viewController: self, animated: true, completion: nil)
     }
 }

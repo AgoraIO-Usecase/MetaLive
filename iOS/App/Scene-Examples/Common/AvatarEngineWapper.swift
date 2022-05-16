@@ -19,29 +19,73 @@ class AvatarEngineWapper: NSObject {
     weak var delegate: AvatarEngineWapperDelegate?
     var dressInfos: [AvatarEngineWapper.DressInfo]?
     var faceUpInfos: [AvatarEngineWapper.FaceUpInfo]?
+    var hasLoaded = false
+    var hsaStartInit = false
     
     init(engine: AvatarEngineProtocol) {
         self.engine = engine
         super.init()
     }
     
+    func startInit() {
+        let context = AgoraAvatarContext()
+        context.aiAppId = KeyCenter.cocosAppId
+        context.aiToken = KeyCenter.cocosAppKey
+        let ret = engine.initialize(context)
+        if ret != 0 {
+            LogUtils.log(message: "initialize fail \(ret)", level: .info)
+        }
+        let avatarConfigs = AgoraAvatarConfigs()
+        avatarConfigs.mode = .avatar
+        avatarConfigs.mediaSource = .primaryCamera
+        avatarConfigs.enable_face_detection = 1
+        avatarConfigs.enable_human_detection = 0
+        engine.enableOrUpdateLocalAvatarVideo(true, configs: avatarConfigs)
+    }
+    
+    func setupLocalVideoCanvas(view: UIView) {
+        /// 渲染
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.uid = 0
+        canvas.renderMode = .hidden
+        canvas.view = view
+        engine.setupLocalVideoCanvas(canvas)
+    }
+    
+    func setupRemoteVideoCanvas(view: UIView, uid: UInt) {
+        /// 渲染
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.uid = uid
+        canvas.renderMode = .hidden
+        canvas.view = view
+    }
+    
     func startDressUp() {
+        guard hasLoaded else { return }
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("start_dress", value: Data())
         if ret != 0 {
             LogUtils.log(message: "setLocalUserAvatarOptions start_dress fail \(ret)", level: .info)
         }
+        else {
+            LogUtils.log(message: "startDressUp success", level: .info)
+        }
     }
     
     func stopDressUp() {
+        guard hasLoaded else { return }
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("stop_dress", value: Data())
         if ret != 0 {
             LogUtils.log(message: "setLocalUserAvatarOptions stop_dress fail \(ret)", level: .info)
         }
+        else {
+            LogUtils.log(message: "stopDressUp success", level: .info)
+        }
     }
     
     func requestDressUpList() {
+        guard hasLoaded else { return }
         if let infos = dressInfos {
             invokeAvatarEngineWapperDidRecvDressList(list: infos)
             return
@@ -53,25 +97,37 @@ class AvatarEngineWapper: NSObject {
         if ret != 0 {
             LogUtils.log(message: "getLocalUserAvatarOptions request_dresslist fail \(ret)", level: .info)
         }
+        else {
+            LogUtils.log(message: "requestDressUpList success", level: .info)
+        }
     }
     
     func startFaceUp() {
+        guard hasLoaded else { return }
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("start_faceedit", value: Data())
         if ret != 0 {
             LogUtils.log(message: "setLocalUserAvatarOptions startFaceUp fail \(ret)", level: .info)
         }
+        else {
+            LogUtils.log(message: "startFaceUp success", level: .info)
+        }
     }
     
     func stopFaceUp() {
+        guard hasLoaded else { return }
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("stop_faceedit", value: Data())
         if ret != 0 {
             LogUtils.log(message: "setLocalUserAvatarOptions stopFaceUp fail \(ret)", level: .info)
         }
+        else {
+            LogUtils.log(message: "stopFaceUp success", level: .info)
+        }
     }
     
     func requestFaceUpList() {
+        guard hasLoaded else { return }
         if let infos = faceUpInfos {
             invokeAvatarEngineWapperDidRecvFaceUpList(list: infos)
             return
@@ -82,25 +138,83 @@ class AvatarEngineWapper: NSObject {
         if ret != 0 {
             LogUtils.log(message: "getLocalUserAvatarOptions requestFaceUpList fail \(ret)", level: .info)
         }
+        else {
+            LogUtils.log(message: "requestFaceUpList success",
+                         level: .info)
+        }
     }
     
     func updateFaceUp(id: String, value: Float) {
+        guard hasLoaded else { return }
         let dict = [id : value]
         let encoder = JSONEncoder()
         let data = try! encoder.encode(dict)
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("send_felist",
-                                         value: data)
+                                               value: data)
         if ret != 0 {
             LogUtils.log(message: "setLocalUserAvatarOptions updateFaceUp fail \(ret)", level: .info)
+        }
+        else {
+            let str = String(data: data, encoding: .utf8)!
+            LogUtils.log(message: "updateFaceUp sucess send_felist: \(str)", level: .info)
+        }
+    }
+    
+    func updateDerssUp(type: String, id: String) {
+        guard hasLoaded else { return }
+        var dict = ["type" : type]
+        let encoder = JSONEncoder()
+        var data = try! encoder.encode(dict)
+        var ret: Int32 = 0
+        ret = engine.setLocalUserAvatarOptions("send_showview",
+                                               value: data)
+        if ret != 0 {
+            LogUtils.log(message: "setLocalUserAvatarOptions updateDerssUp send_showview fail \(ret)", level: .info)
+        }
+        else {
+            let str = String(data: data, encoding: .utf8)!
+            LogUtils.log(message: "updateDerssUp type sucess send_showview: \(str)", level: .info)
+        }
+        
+        if id.isEmpty { /** 移除 **/
+            dict = ["type" : type]
+            data = try! encoder.encode(dict)
+            ret = engine.setLocalUserAvatarOptions("send_takeoff",
+                                                   value: data)
+            if ret != 0 {
+                LogUtils.log(message: "setLocalUserAvatarOptions updateDerssUp send_takeoff fail \(ret)", level: .info)
+            }
+            else {
+                let str = String(data: data, encoding: .utf8)!
+                LogUtils.log(message: "updateDerssUp value sucess send_takeoff: \(str)", level: .info)
+            }
+        }
+        else {
+            dict = ["id" : id]
+            data = try! encoder.encode(dict)
+            ret = engine.setLocalUserAvatarOptions("send_dress",
+                                                   value: data)
+            if ret != 0 {
+                LogUtils.log(message: "setLocalUserAvatarOptions updateDerssUp send_dress fail \(ret)", level: .info)
+            }
+            else {
+                let str = String(data: data, encoding: .utf8)!
+                LogUtils.log(message: "updateDerssUp value sucess send_dress: \(str)", level: .info)
+            }
         }
     }
     
     func setQuality(quality: VideoSettingSheetVC.RenderQuality) {
+        guard hasLoaded else { return }
         let value = "\(quality.rawValue)".data(using: .utf8)!
         let ret = engine.setLocalUserAvatarOptions("set_quality", value: value)
         if ret != 0 {
             LogUtils.log(message: "setQuality fail \(ret)", level: .info)
+        }
+        else {
+            LogUtils.log(message: "setQuality success",
+                         level: .info)
         }
     }
 }
@@ -116,6 +230,9 @@ extension AvatarEngineWapper: AgoraAvatarEngineEventDelegate {
             return
         }
         if let event = Event(rawValue: key) {
+            if event == .avatarSetSuccess {
+                hasLoaded = true
+            }
             invokeAvatarEngineWapperDidRecvEvent(event: event)
             return
         }
@@ -149,15 +266,26 @@ extension AvatarEngineWapper: AgoraAvatarEngineEventDelegate {
                   let type = AvatarEngineWapper.DressType(rawValue: intValue) else {
                       continue
                   }
+            guard type != .shangZhuang,
+                  type != .xiaZhuang,
+                  type != .xieZi,
+                  type != .peiShi else { /** 去掉这些类型 **/
+                      continue
+                  }
             
             var items = [AvatarEngineWapper.DressItem]()
             if let itemDicts = dic.value as? [[String : Any]] {
+                if let num = Int(dic.key) {
+                    if num < 60, num != 66 { /** 可以脱装 **/
+                        items.append(.takeOffItem)
+                    }
+                }
+                
                 for itemDict in itemDicts {
                     if let item = JSONObject.toModel(AvatarEngineWapper.DressItem.self,
                                                      value: itemDict) {
                         items.append(item)
                     }
-                    
                 }
                 let info = AvatarEngineWapper.DressInfo(type: type,
                                                         name: type.name,
