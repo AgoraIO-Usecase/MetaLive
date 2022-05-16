@@ -19,6 +19,7 @@ class LiveViewCotroller: UIViewController {
     var infos = [Info]()
     var videoSetInfo: VideoSetInfo = .default
     var avatarEngineWapper: AvatarEngineWapper!
+    var rtcConnetcion: AgoraRtcConnection!
     
     /// init
     /// - Parameters:

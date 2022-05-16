@@ -19,8 +19,12 @@ class AvatarEngineWapper: NSObject {
     weak var delegate: AvatarEngineWapperDelegate?
     var dressInfos: [AvatarEngineWapper.DressInfo]?
     var faceUpInfos: [AvatarEngineWapper.FaceUpInfo]?
-    var hasLoaded = false
-    var hsaStartInit = false
+    var didAvatarLoadSuccess = false
+    var hasStartInit = false
+    
+    deinit {
+        LogUtils.log(message: "AvatarEngineWapper deinit", level: .info)
+    }
     
     init(engine: AvatarEngineProtocol) {
         self.engine = engine
@@ -28,6 +32,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func startInit() {
+        hasStartInit = true
         let context = AgoraAvatarContext()
         context.aiAppId = KeyCenter.cocosAppId
         context.aiToken = KeyCenter.cocosAppKey
@@ -43,7 +48,7 @@ class AvatarEngineWapper: NSObject {
         engine.enableOrUpdateLocalAvatarVideo(true, configs: avatarConfigs)
     }
     
-    func setupLocalVideoCanvas(view: UIView) {
+    func setupLocalVideoCanvas(view: UIView?) {
         /// 渲染
         let canvas = AgoraRtcVideoCanvas()
         canvas.uid = 0
@@ -52,16 +57,19 @@ class AvatarEngineWapper: NSObject {
         engine.setupLocalVideoCanvas(canvas)
     }
     
-    func setupRemoteVideoCanvas(view: UIView, uid: UInt) {
+    func setupRemoteVideoCanvas(view: UIView?,
+                                uid: UInt,
+                                connection: AgoraRtcConnection) {
         /// 渲染
         let canvas = AgoraRtcVideoCanvas()
         canvas.uid = uid
         canvas.renderMode = .hidden
         canvas.view = view
+        engine.setupRemoteVideoCanvas(canvas, connection: connection)
     }
     
     func startDressUp() {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("start_dress", value: Data())
         if ret != 0 {
@@ -73,7 +81,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func stopDressUp() {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("stop_dress", value: Data())
         if ret != 0 {
@@ -85,7 +93,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func requestDressUpList() {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         if let infos = dressInfos {
             invokeAvatarEngineWapperDidRecvDressList(list: infos)
             return
@@ -103,7 +111,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func startFaceUp() {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("start_faceedit", value: Data())
         if ret != 0 {
@@ -115,7 +123,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func stopFaceUp() {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         var ret: Int32 = 0
         ret = engine.setLocalUserAvatarOptions("stop_faceedit", value: Data())
         if ret != 0 {
@@ -127,7 +135,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func requestFaceUpList() {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         if let infos = faceUpInfos {
             invokeAvatarEngineWapperDidRecvFaceUpList(list: infos)
             return
@@ -145,7 +153,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func updateFaceUp(id: String, value: Float) {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         let dict = [id : value]
         let encoder = JSONEncoder()
         let data = try! encoder.encode(dict)
@@ -162,7 +170,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func updateDerssUp(type: String, id: String) {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         var dict = ["type" : type]
         let encoder = JSONEncoder()
         var data = try! encoder.encode(dict)
@@ -206,7 +214,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func setQuality(quality: VideoSettingSheetVC.RenderQuality) {
-        guard hasLoaded else { return }
+        guard didAvatarLoadSuccess else { return }
         let value = "\(quality.rawValue)".data(using: .utf8)!
         let ret = engine.setLocalUserAvatarOptions("set_quality", value: value)
         if ret != 0 {
@@ -231,7 +239,7 @@ extension AvatarEngineWapper: AgoraAvatarEngineEventDelegate {
         }
         if let event = Event(rawValue: key) {
             if event == .avatarSetSuccess {
-                hasLoaded = true
+                didAvatarLoadSuccess = true
             }
             invokeAvatarEngineWapperDidRecvEvent(event: event)
             return

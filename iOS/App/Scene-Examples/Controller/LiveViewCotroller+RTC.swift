@@ -22,7 +22,7 @@ extension LiveViewCotroller {
                                                              orientationMode: .fixedPortrait,
                                                              mirrorMode: .auto)
             
-            agoraKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
+            agoraKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: self)
             agoraKit?.setClientRole(.broadcaster)
             agoraKit?.setVideoEncoderConfiguration(videoConfig)
             agoraKit?.enableVideo()
@@ -31,22 +31,25 @@ extension LiveViewCotroller {
             avatarEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: agoraKit!)
             avatarEngineWapper.delegate = self
             avatarEngineWapper.startInit()
+            agoraKit?.setAvatarEngineDelegate(avatarEngineWapper)
             joinChannel()
             return
         }
         
         /** from create vc **/
         avatarEngineWapper.delegate = self
-        joinChannel()
-        if avatarEngineWapper.hsaStartInit {
+        if !avatarEngineWapper.hasStartInit {
             avatarEngineWapper.startInit()
         }
+        agoraKit?.setAvatarEngineDelegate(avatarEngineWapper)
+        agoraKit?.delegate = self
+        joinChannel()
     }
     
     func joinChannel() {
         let option = AgoraRtcChannelMediaOptions()
         option.publishAudioTrack = .of(false)
-        option.publishCameraTrack = .of(true)
+        option.publishAvatarTrack = .of(true)
         option.clientRoleType = .of((Int32)(AgoraClientRole.broadcaster.rawValue))
         option.autoSubscribeVideo = .of(true)
         option.autoSubscribeAudio = .of(true)
@@ -56,58 +59,70 @@ extension LiveViewCotroller {
         }
         engine.delegate = self
         engine.enableLocalAudio(false)
-        let result = engine.joinChannel(byToken: KeyCenter.token,
-                                        channelId: info.roomId,
-                                        uid: UserInfo.userId,
-                                        mediaOptions: option,
-                                        joinSuccess: nil)
-        
+        let connection = AgoraRtcConnection()
+        connection.channelId = info.roomId
+        connection.localUid = UserInfo.userId
+        self.rtcConnetcion = connection
+        let result = engine.joinChannelEx(byToken: KeyCenter.token,
+                                          connection: connection,
+                                          delegate: self,
+                                          mediaOptions: option,
+                                          joinSuccess: nil)
         if result != 0 {
-            LogUtils.log(message: "joinChannel fail: \(result)", level: .error)
+            LogUtils.log(message: "joinChannelEx fail: \(result)", level: .error)
         }
         else {
-            LogUtils.log(message: "joinChannel success: \(info.roomId)", level: .info)
+            LogUtils.log(message: "joinChannelEx success: \(info.roomId)", level: .info)
         }
     }
     
     func closeRtc() {
-        agoraKit?.leaveChannel({ state in
+        agoraKit?.leaveChannelEx(rtcConnetcion!, leaveChannelBlock: { state in
             LogUtils.log(message: "\(state)", level: .info)
         })
-        AgoraRtcEngineKit.destroy()
+//        AgoraRtcEngineKit.destroy()
     }
     
     func resetRenderView(member: Member) {
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.view = nil
-        canvas.uid = UInt(member.userId)!
+        let uid = UInt(member.userId)!
         if member.userId == UserInfo.uid {
-            agoraKit?.setupLocalVideo(canvas)
+            avatarEngineWapper.setupLocalVideoCanvas(view: nil)
             LogUtils.log(message: "resetRenderView local \(member.userId)", level: .info)
         }
         else {
-            agoraKit?.setupRemoteVideo(canvas)
-            agoraKit?.muteRemoteVideoStream(canvas.uid, mute: true)
-            LogUtils.log(message: "resetRenderView remote \(member.userId)", level: .info)
+            guard let engine = agoraKit else {
+                return
+            }
+            let canvas = AgoraRtcVideoCanvas()
+            canvas.view = nil
+            canvas.renderMode = .hidden
+            canvas.uid = uid
+            let ret = engine.setupRemoteVideoEx(canvas, connection: rtcConnetcion!)
+            avatarEngineWapper.setupRemoteVideoCanvas(view: nil, uid: uid, connection: rtcConnetcion!)
+            agoraKit?.muteRemoteVideoStream(uid, mute: true)
+            LogUtils.log(message: "resetRenderView remote \(member.userId) \(ret)", level: .info)
         }
     }
     
     func setRenderView(info: VideoCell.Info,
                        renderView: UIView) {
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.view = renderView
-        canvas.renderMode = .hidden
+        
         if info.userId == UserInfo.uid {
-            canvas.uid = 0
-            agoraKit?.setupLocalVideo(canvas)
-            agoraKit?.startPreview()
+            avatarEngineWapper.setupLocalVideoCanvas(view: renderView)
             LogUtils.log(message: "setRenderView local \(info.userId)", level: .info)
         }
         else {
-            canvas.uid = UInt(info.userId)!
-            agoraKit?.setupRemoteVideo(canvas)
-            agoraKit?.muteRemoteVideoStream(canvas.uid, mute: false)
-            LogUtils.log(message: "setRenderView remote \(info.userId)", level: .info)
+            guard let engine = agoraKit else {
+                return
+            }
+            let uid = UInt(info.userId)!
+            let canvas = AgoraRtcVideoCanvas()
+            canvas.view = renderView
+            canvas.renderMode = .hidden
+            canvas.uid = uid
+            let ret = engine.setupRemoteVideoEx(canvas, connection: rtcConnetcion!)
+            agoraKit?.muteRemoteVideoStream(uid, mute: false)
+            LogUtils.log(message: "setRenderView remote \(uid) ret:\(ret))", level: .info)
         }
     }
     
@@ -121,7 +136,12 @@ extension LiveViewCotroller {
                                                          bitrate: videoInfo.bitRate,
                                                          orientationMode: .fixedPortrait,
                                                          mirrorMode: .auto)
-        agoraKit?.setVideoEncoderConfiguration(videoConfig)
+        if let connection = rtcConnetcion {
+            agoraKit?.setVideoEncoderConfigurationEx(videoConfig, connection: connection)
+        }
+//        else {
+//            agoraKit?.setVideoEncoderConfiguration(videoConfig)
+//        }
     }
 }
 

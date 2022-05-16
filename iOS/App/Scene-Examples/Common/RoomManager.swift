@@ -9,8 +9,8 @@ import Foundation
 import AgoraSyncManager
 
 class RoomManager {
-    static let defaultChannelName = "MetaLiveCocos"
-    static let usersKey = "Users"
+    static let defaultChannelName = "MetaLive"
+    static let usersKey = "agoraClubUsers"
     static let queue = DispatchQueue(label: "queue.RoomManager")
     static var currentMemberId: String?
     

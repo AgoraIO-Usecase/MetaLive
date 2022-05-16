@@ -26,6 +26,10 @@ class CreateLiveController: UIViewController {
     var avatarEngineWapper: AvatarEngineWapper!
     var isAvatarLoaded = false
     
+    deinit {
+        LogUtils.log(message: "CreateLiveController deinit", level: .info)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -49,10 +53,19 @@ class CreateLiveController: UIViewController {
     
     private func setupAgoraKit() {
         agoraKit = CreateLiveController.createEngine()
-        avatarEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: agoraKit!)
+        let videoConfig = AgoraVideoEncoderConfiguration(size: VideoSetInfo.default.resolution.size,
+                                                         frameRate: VideoSetInfo.default.fremeRate.rtcType,
+                                                         bitrate: VideoSetInfo.default.bitRate,
+                                                         orientationMode: .fixedPortrait,
+                                                         mirrorMode: .auto)
+        agoraKit?.setVideoEncoderConfiguration(videoConfig)
         
+        let avatarEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: agoraKit!)
         avatarEngineWapper.startInit()
+        if agoraKit!.setAvatarEngineDelegate(avatarEngineWapper) == false { fatalError("set delegate fail") }
         avatarEngineWapper.setupLocalVideoCanvas(view: createLiveView.localView)
+        avatarEngineWapper.delegate = self
+        self.avatarEngineWapper = avatarEngineWapper
 
         let canvas0 = AgoraRtcVideoCanvas()
         canvas0.uid = 0
@@ -68,7 +81,6 @@ class CreateLiveController: UIViewController {
         }
         
         let avatarEngineWapper = AvatarEngineWapper(engine: avaterEngine)
-        agoraKit.setAvatarEngineDelegate(avatarEngineWapper)
         return avatarEngineWapper
     }
     
@@ -166,6 +178,7 @@ extension CreateLiveController: CreateLiveViewDelegate {
     func createLiveViewDidTapAction(action: CreateLiveView.Action) {
         switch action {
         case .close:
+            AgoraRtcEngineKit.destroy()
             dismiss(animated: true, completion: nil)
             break
         case .start:
