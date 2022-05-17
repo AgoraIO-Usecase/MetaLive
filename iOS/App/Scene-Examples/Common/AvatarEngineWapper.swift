@@ -35,7 +35,7 @@ class AvatarEngineWapper: NSObject {
         hasStartInit = true
         let context = AgoraAvatarContext()
         context.aiAppId = KeyCenter.cocosAppId
-        context.aiToken = KeyCenter.cocosAppKey
+        context.aiLicense = KeyCenter.cocosAppLicense
         let ret = engine.initialize(context)
         if ret != 0 {
             LogUtils.log(message: "initialize fail \(ret)", level: .info)
