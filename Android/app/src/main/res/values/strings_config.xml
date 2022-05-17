@@ -6,6 +6,8 @@
     <string name="rtc_app_id" translatable="false"><==AGORA RTC APP ID==></string>
     <string name="rtc_app_token" translatable="false"/>
 
+    <string name="bugly_app_id" translatable="false"></string>
+
     <string name="ai_app_id" translatable="false"><==AVATAR APP ID==></string>
     <string name="ai_token_id" translatable="false"><==AVATAR TOKEN ID==></string>
 </resources>
