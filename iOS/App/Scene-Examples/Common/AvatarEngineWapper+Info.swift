@@ -32,7 +32,7 @@ extension AvatarEngineWapper {
         static var takeOffItem: DressItem {
             DressItem(status: 0,
                       zOrder: 0,
-                      id: "",
+                      id: "0",
                       isUsing: 0,
                       tag: 0,
                       version: 0,

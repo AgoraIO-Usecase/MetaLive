@@ -185,7 +185,7 @@ class AvatarEngineWapper: NSObject {
             LogUtils.log(message: "updateDerssUp type sucess send_showview: \(str)", level: .info)
         }
         
-        if id.isEmpty { /** 移除 **/
+        if id == "0" { /** 移除 **/
             dict = ["type" : type]
             data = try! encoder.encode(dict)
             ret = engine.setLocalUserAvatarOptions("send_takeoff",
@@ -284,7 +284,7 @@ extension AvatarEngineWapper: AgoraAvatarEngineEventDelegate {
             var items = [AvatarEngineWapper.DressItem]()
             if let itemDicts = dic.value as? [[String : Any]] {
                 if let num = Int(dic.key) {
-                    if num < 60, num != 66 { /** 可以脱装 **/
+                    if num >= 60, num != 66 { /** 可以脱装 **/
                         items.append(.takeOffItem)
                     }
                 }
