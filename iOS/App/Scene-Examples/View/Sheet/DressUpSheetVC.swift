@@ -11,6 +11,7 @@ import Presentr
 
 protocol DressUpSheetVCDelegate: NSObjectProtocol {
     func dressUpSheetVCDidSelectedItem(index: Int, info: AEABottomInfo)
+    func dressUpSheetVCDidDismiss()
 }
 
 public class DressUpSheetVC: UIViewController {
@@ -19,6 +20,10 @@ public class DressUpSheetVC: UIViewController {
     private var contentView: DressUpView!
     private var dataList = [Info]()
     weak var delegate: DressUpSheetVCDelegate?
+    
+    deinit {
+        delegate?.dressUpSheetVCDidDismiss()
+    }
     
     init(infos: [Info]) {
         super.init(nibName: nil, bundle: nil)

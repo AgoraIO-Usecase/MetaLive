@@ -109,7 +109,10 @@ class MainViewController: UIViewController {
                       message: "") { [weak self] in
                 let engine = CreateLiveController.createEngine()
                 let avaterEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: engine)
-                let vc = LiveViewCotroller(info: info, agoraKit: engine, avaterEngineWapper: avaterEngineWapper)
+                let vc = LiveViewCotroller(info: info,
+                                           agoraKit: engine,
+                                           avaterEngineWapper: avaterEngineWapper,
+                                           videoSetInfo: nil)
                 self?.navigationController?.pushViewController(vc, animated: true)
             }
             return
@@ -156,7 +159,10 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let info = infos[indexPath.row].liveInfo
-        let vc = LiveViewCotroller(info: info, agoraKit: nil, avaterEngineWapper: nil)
+        let vc = LiveViewCotroller(info: info,
+                                   agoraKit: nil,
+                                   avaterEngineWapper: nil,
+                                   videoSetInfo: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -165,8 +171,12 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
 extension MainViewController: CreateLiveControllerDelegate {
     func createLiveControllerDidStartButtonTap(info: LiveRoomInfo,
                                                agoraKit: AgoraRtcEngineKit,
-                                               avaterEngineWapper: AvatarEngineWapper) {
-        let vc = LiveViewCotroller(info: info, agoraKit: agoraKit, avaterEngineWapper: avaterEngineWapper)
+                                               avaterEngineWapper: AvatarEngineWapper,
+                                               videoSetInfo: VideoSetInfo) {
+        let vc = LiveViewCotroller(info: info,
+                                   agoraKit: agoraKit,
+                                   avaterEngineWapper: avaterEngineWapper,
+                                   videoSetInfo: videoSetInfo)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

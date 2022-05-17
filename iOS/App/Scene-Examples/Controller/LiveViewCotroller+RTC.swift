@@ -11,22 +11,8 @@ import AgoraRtcKit
 extension LiveViewCotroller {
     func setupAgoraKit() {
         if entryType == .fromJoinRoom {
-            let config = AgoraRtcEngineConfig()
-            config.appId = KeyCenter.appId
-            config.channelProfile = .liveBroadcasting
-            config.areaCode = .global
-            
-            let videoConfig = AgoraVideoEncoderConfiguration(size: VideoSetInfo.default.resolution.size,
-                                                             frameRate: VideoSetInfo.default.fremeRate.rtcType,
-                                                             bitrate: VideoSetInfo.default.bitRate,
-                                                             orientationMode: .fixedPortrait,
-                                                             mirrorMode: .auto)
-            
-            agoraKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: self)
-            agoraKit?.setClientRole(.broadcaster)
-            agoraKit?.setVideoEncoderConfiguration(videoConfig)
-            agoraKit?.enableVideo()
-            agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
+            agoraKit = CreateLiveController.createEngine()
+            agoraKit?.delegate = self
             
             avatarEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: agoraKit!)
             avatarEngineWapper.delegate = self
@@ -48,7 +34,7 @@ extension LiveViewCotroller {
     
     func joinChannel() {
         let option = AgoraRtcChannelMediaOptions()
-        option.publishAudioTrack = .of(false)
+        option.publishAudioTrack = .of(true)
         option.publishAvatarTrack = .of(true)
         option.clientRoleType = .of((Int32)(AgoraClientRole.broadcaster.rawValue))
         option.autoSubscribeVideo = .of(true)
@@ -58,7 +44,6 @@ extension LiveViewCotroller {
             fatalError("agoraKit must not nil")
         }
         engine.delegate = self
-        engine.enableLocalAudio(false)
         let connection = AgoraRtcConnection()
         connection.channelId = info.roomId
         connection.localUid = UserInfo.userId
@@ -68,6 +53,7 @@ extension LiveViewCotroller {
                                           delegate: self,
                                           mediaOptions: option,
                                           joinSuccess: nil)
+        engine.enableLocalAudio(false) /// 必须要在joinChannel之后调用
         if result != 0 {
             LogUtils.log(message: "joinChannelEx fail: \(result)", level: .error)
         }
@@ -80,7 +66,9 @@ extension LiveViewCotroller {
         agoraKit?.leaveChannelEx(rtcConnetcion!, leaveChannelBlock: { state in
             LogUtils.log(message: "\(state)", level: .info)
         })
-//        AgoraRtcEngineKit.destroy()
+        avatarEngineWapper = nil
+        AgoraRtcEngineKit.destroy()
+        agoraKit = nil
     }
     
     func resetRenderView(member: Member) {
@@ -98,7 +86,6 @@ extension LiveViewCotroller {
             canvas.renderMode = .hidden
             canvas.uid = uid
             let ret = engine.setupRemoteVideoEx(canvas, connection: rtcConnetcion!)
-            avatarEngineWapper.setupRemoteVideoCanvas(view: nil, uid: uid, connection: rtcConnetcion!)
             agoraKit?.muteRemoteVideoStream(uid, mute: true)
             LogUtils.log(message: "resetRenderView remote \(member.userId) \(ret)", level: .info)
         }
@@ -108,6 +95,7 @@ extension LiveViewCotroller {
                        renderView: UIView) {
         
         if info.userId == UserInfo.uid {
+            localRenderView = renderView
             avatarEngineWapper.setupLocalVideoCanvas(view: renderView)
             LogUtils.log(message: "setRenderView local \(info.userId)", level: .info)
         }
@@ -126,8 +114,39 @@ extension LiveViewCotroller {
         }
     }
     
+    func changeAvatarAndOriginalStream() {
+        let useAvatar = !publishAvatarStream
+        let option = AgoraRtcChannelMediaOptions()
+        option.publishAudioTrack = .of(true)
+        option.publishCameraTrack = .of(!useAvatar)
+        option.publishAvatarTrack = .of(useAvatar)
+        option.clientRoleType = .of((Int32)(AgoraClientRole.broadcaster.rawValue))
+        option.autoSubscribeVideo = .of(true)
+        option.autoSubscribeAudio = .of(true)
+        agoraKit?.updateChannelEx(with: option, connection: rtcConnetcion!)
+        publishAvatarStream = useAvatar
+        
+        if let view = localRenderView {
+            if useAvatar {
+                avatarEngineWapper.setupLocalVideoCanvas(view: view)
+            }
+            else {
+                let canvas = AgoraRtcVideoCanvas()
+                canvas.view = view
+                canvas.renderMode = .hidden
+                canvas.uid = 0
+                agoraKit?.setupLocalVideo(canvas)
+            }
+        }
+        else {
+            LogUtils.log(message: "changeAvatarAndOriginalStream can not find render view", level: .info)
+        }
+        
+    }
+    
     func openAudio(open: Bool) {
-        agoraKit?.enableLocalAudio(open)
+        let ret = agoraKit!.enableLocalAudio(open)
+        LogUtils.log(message: "enableLocalAudio \(open) \(ret)", level: .info)
     }
     
     func updateVideoConfig(videoInfo: VideoSetInfo) {
@@ -139,9 +158,6 @@ extension LiveViewCotroller {
         if let connection = rtcConnetcion {
             agoraKit?.setVideoEncoderConfigurationEx(videoConfig, connection: connection)
         }
-//        else {
-//            agoraKit?.setVideoEncoderConfiguration(videoConfig)
-//        }
     }
 }
 
@@ -179,15 +195,15 @@ extension LiveViewCotroller: AgoraRtcEngineDelegate, AvatarEngineWapperDelegate 
     }
     
     func avatarEngineWapperDidRecvEvent(event: AvatarEngineWapper.Event) {
-        
+        LogUtils.log(message: "avatarEngineWapperDidRecvEvent event \(event.rawValue)", level: .info)
     }
     
     func avatarEngineWapperDidRecvDressList(list: [AvatarEngineWapper.DressInfo]) {
-        
+        showDressUpView(list: list)
     }
     
     func avatarEngineWapperDidRecvFaceUpList(list: [AvatarEngineWapper.FaceUpInfo]) {
-        
+        showFaceUpView(list: list)
     }
 }
 

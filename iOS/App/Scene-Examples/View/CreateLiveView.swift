@@ -50,6 +50,7 @@ class CreateLiveView: UIView {
         beautyButton.setImage(.init(named: "icon-magic"), for: .normal)
         closeButton.setImage(.init(named: "icon_close_white"), for: .normal)
         cameraChangeButton.setImage(UIImage(named: "icon-camera-change"), for: .normal)
+        cameraChangeButton.isHidden = true
         
         settingButton.setImage(UIImage(named: "icon-setting-normal"), for: .normal)
         settingButton.setImage(UIImage(named: "icon-setting"), for: .selected)

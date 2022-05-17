@@ -57,16 +57,16 @@ class AvatarEngineWapper: NSObject {
         engine.setupLocalVideoCanvas(canvas)
     }
     
-    func setupRemoteVideoCanvas(view: UIView?,
-                                uid: UInt,
-                                connection: AgoraRtcConnection) {
-        /// 渲染
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.uid = uid
-        canvas.renderMode = .hidden
-        canvas.view = view
-        engine.setupRemoteVideoCanvas(canvas, connection: connection)
-    }
+//    func setupRemoteVideoCanvas(view: UIView?,
+//                                uid: UInt,
+//                                connection: AgoraRtcConnection) {
+//        /// 渲染
+//        let canvas = AgoraRtcVideoCanvas()
+//        canvas.uid = uid
+//        canvas.renderMode = .hidden
+//        canvas.view = view
+//        engine.setupRemoteVideoCanvas(canvas, connection: connection)
+//    }
     
     func startDressUp() {
         guard didAvatarLoadSuccess else { return }
@@ -295,11 +295,17 @@ extension AvatarEngineWapper: AgoraAvatarEngineEventDelegate {
                         items.append(item)
                     }
                 }
+                items = items.sorted(by: { (lsh, rsh) in
+                    return Int(lsh.id)! < Int(rsh.id)!
+                })
                 let info = AvatarEngineWapper.DressInfo(type: type,
                                                         name: type.name,
                                                         items: items)
                 infoxs.append(info)
             }
+        }
+        infoxs = infoxs.sorted { lsh, rsh in
+            return lsh.type.rawValue < rsh.type.rawValue
         }
         return infoxs
     }

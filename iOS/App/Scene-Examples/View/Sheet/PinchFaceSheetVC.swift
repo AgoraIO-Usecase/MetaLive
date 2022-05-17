@@ -13,6 +13,7 @@ protocol PinchFaceSheetVCDelegate: NSObjectProtocol {
     func pinchFaceSheetVCDidValueChange(infoIndex: Int,
                                         itemIndex: Int,
                                         value: Float)
+    func pinchFaceSheetVCDidDismiss()
 }
 
 public class PinchFaceSheetVC: UIViewController {
@@ -22,6 +23,10 @@ public class PinchFaceSheetVC: UIViewController {
     private let contentView = PinchFaceView()
     weak var delegate: PinchFaceSheetVCDelegate?
     var infos: [Info]!
+    
+    deinit {
+        delegate?.pinchFaceSheetVCDidDismiss()
+    }
     
     init(infos: [Info]) {
         super.init(nibName: nil, bundle: nil)

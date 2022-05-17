@@ -15,7 +15,8 @@ import AgoraEditAvatar
 protocol CreateLiveControllerDelegate: NSObjectProtocol {
     func createLiveControllerDidStartButtonTap(info: LiveRoomInfo,
                                                agoraKit: AgoraRtcEngineKit,
-                                               avaterEngineWapper: AvatarEngineWapper)
+                                               avaterEngineWapper: AvatarEngineWapper,
+                                               videoSetInfo: VideoSetInfo)
 }
 
 class CreateLiveController: UIViewController {
@@ -53,12 +54,6 @@ class CreateLiveController: UIViewController {
     
     private func setupAgoraKit() {
         agoraKit = CreateLiveController.createEngine()
-        let videoConfig = AgoraVideoEncoderConfiguration(size: VideoSetInfo.default.resolution.size,
-                                                         frameRate: VideoSetInfo.default.fremeRate.rtcType,
-                                                         bitrate: VideoSetInfo.default.bitRate,
-                                                         orientationMode: .fixedPortrait,
-                                                         mirrorMode: .auto)
-        agoraKit?.setVideoEncoderConfiguration(videoConfig)
         
         let avatarEngineWapper = CreateLiveController.createAvaterEngineWapper(agoraKit: agoraKit!)
         avatarEngineWapper.startInit()
@@ -93,6 +88,13 @@ class CreateLiveController: UIViewController {
         let agoraKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
         agoraKit.setClientRole(.broadcaster)
         
+        let videoConfig = AgoraVideoEncoderConfiguration(size: VideoSetInfo.default.resolution.size,
+                                                         frameRate: VideoSetInfo.default.fremeRate.rtcType,
+                                                         bitrate: VideoSetInfo.default.bitRate,
+                                                         orientationMode: .fixedPortrait,
+                                                         mirrorMode: .auto)
+        agoraKit.setVideoEncoderConfiguration(videoConfig)
+        
         /// 开启扬声器
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
         agoraKit.enableVideo()
@@ -110,6 +112,7 @@ class CreateLiveController: UIViewController {
         let info = LiveRoomInfo(roomName: roomName,
                                 roomId: roomId,
                                 userId: UserInfo.uid)
+        let videoSetInfo = self.videoSetInfo
         guard let engine = agoraKit, let avatatEngine = avatarEngineWapper else {
             fatalError()
         }
@@ -117,17 +120,20 @@ class CreateLiveController: UIViewController {
         dismiss(animated: true, completion: { [weak self] in
             self?.delegate?.createLiveControllerDidStartButtonTap(info: info,
                                                                   agoraKit: engine,
-                                                                  avaterEngineWapper: avatatEngine)
+                                                                  avaterEngineWapper: avatatEngine,
+                                                                  videoSetInfo: videoSetInfo)
         })
     }
     
     func updateVideoConfig(videoInfo: VideoSetInfo) {
+        guard let engine = agoraKit else { return }
         let videoConfig = AgoraVideoEncoderConfiguration(size: videoInfo.resolution.size,
                                                          frameRate: videoInfo.fremeRate.rtcType,
                                                          bitrate: videoInfo.bitRate,
                                                          orientationMode: .fixedPortrait,
                                                          mirrorMode: .auto)
-        agoraKit?.setVideoEncoderConfiguration(videoConfig)
+        let ret = engine.setVideoEncoderConfiguration(videoConfig)
+        LogUtils.log(message: "setVideoEncoderConfiguration \(ret)", level: .info)
         
         avatarEngineWapper.setQuality(quality: videoInfo.renderQuality)
     }
@@ -164,7 +170,17 @@ class CreateLiveController: UIViewController {
             showWaitInit()
             return
         }
-        let vc = MoreSheetVC()
+        let vc = MoreSheetVC(infos: [.init(action: .dress), .init(action: .face)])
+        vc.delegate = self
+        vc.show(in: self)
+    }
+    
+    func showVideoSetView() {
+        guard isAvatarLoaded else {
+            showWaitInit()
+            return
+        }
+        let vc = VideoSettingSheetVC(videoInfo: videoSetInfo)
         vc.delegate = self
         vc.show(in: self)
     }
@@ -178,6 +194,7 @@ extension CreateLiveController: CreateLiveViewDelegate {
     func createLiveViewDidTapAction(action: CreateLiveView.Action) {
         switch action {
         case .close:
+            avatarEngineWapper = nil
             AgoraRtcEngineKit.destroy()
             dismiss(animated: true, completion: nil)
             break
@@ -185,13 +202,7 @@ extension CreateLiveController: CreateLiveViewDelegate {
             startRoom()
             break
         case .setting:
-            let info = VideoSetInfo(resolution: .v640x480,
-                                    fremeRate: .fps30,
-                                    renderQuality: .high,
-                                    bitRate: 7000)
-            let vc = VideoSettingSheetVC(videoInfo: info)
-            vc.delegate = self
-            vc.show(in: self)
+            showVideoSetView()
             break
         case .beauty:
             showMoreView()
@@ -230,13 +241,25 @@ extension CreateLiveController: VideoSettingSheetVCDelegate,
                                 PinchFaceSheetVCDelegate,
                                 DressUpSheetVCDelegate,
                                 MoreSheetVCDelegate {
+    func pinchFaceSheetVCDidDismiss() {
+        avatarEngineWapper.stopDressUp()
+    }
+    
+    func dressUpSheetVCDidDismiss() {
+        avatarEngineWapper.stopDressUp()
+    }
+    
     func moreSheetVCDidTap(action: MoreSheetVC.Action) {
         switch action {
         case .face:
             avatarEngineWapper.requestFaceUpList()
+            avatarEngineWapper.startFaceUp()
             break
         case .dress:
             avatarEngineWapper.requestDressUpList()
+            avatarEngineWapper.stopDressUp()
+            break
+        default:
             break
         }
     }

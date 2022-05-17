@@ -20,17 +20,22 @@ class LiveViewCotroller: UIViewController {
     var videoSetInfo: VideoSetInfo = .default
     var avatarEngineWapper: AvatarEngineWapper!
     var rtcConnetcion: AgoraRtcConnection!
+    /// 当前使用avatar or 原图视频流
+    var publishAvatarStream = true
+    weak var localRenderView: UIView?
     
     /// init
     /// - Parameters:
     ///   - agoraKit: agoraKit from create vc
     init(info: LiveRoomInfo,
          agoraKit: AgoraRtcEngineKit?,
-         avaterEngineWapper: AvatarEngineWapper?) {
+         avaterEngineWapper: AvatarEngineWapper?,
+         videoSetInfo: VideoSetInfo?) {
         self.info = info
         self.agoraKit = agoraKit
         self.entryType = agoraKit != nil ? .fromCrateRoom : .fromJoinRoom
         self.avatarEngineWapper = avaterEngineWapper
+        self.videoSetInfo = videoSetInfo ?? .default
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -150,13 +155,19 @@ extension LiveViewCotroller { /** show view **/
         vc.show(in: self)
     }
     
-    fileprivate func showMoreView() {
-        let vc = MoreSheetVC()
+    fileprivate func showMoreViewForBeauty() {
+        let vc = MoreSheetVC(infos: [.init(action: .dress), .init(action: .face)])
         vc.delegate = self
         vc.show(in: self)
     }
     
-    fileprivate func showFaceUpView(list: [AvatarEngineWapper.FaceUpInfo]) {
+    fileprivate func showMoreViewForSet() {
+        let vc = MoreSheetVC(infos: [.init(action: .change), .init(action: .videoSet)])
+        vc.delegate = self
+        vc.show(in: self)
+    }
+    
+    func showFaceUpView(list: [AvatarEngineWapper.FaceUpInfo]) {
         avatarEngineWapper.startFaceUp()
         let infos = list.map({ PinchFaceSheetVC.Info(info: $0) })
         let vc = PinchFaceSheetVC(infos: infos)
@@ -164,11 +175,15 @@ extension LiveViewCotroller { /** show view **/
         vc.show(in: self)
     }
     
-    fileprivate func showDressUpView(list: [AvatarEngineWapper.DressInfo]) {
+    func showDressUpView(list: [AvatarEngineWapper.DressInfo]) {
         let infos = list.map({ DressUpSheetVC.Info(info: $0) })
         let vc = DressUpSheetVC(infos: infos)
         vc.delegate = self
         vc.show(in: self)
+    }
+    
+    func showWaitInit() {
+        showHUDError(error: "请等待初始化完")
     }
 }
 
@@ -181,6 +196,13 @@ extension LiveViewCotroller: LiveViewDelegate,
                              VideoSettingSheetVCDelegate,
                              PinchFaceSheetVCDelegate,
                              DressUpSheetVCDelegate {
+    func pinchFaceSheetVCDidDismiss() {
+        avatarEngineWapper.stopDressUp()
+    }
+    
+    func dressUpSheetVCDidDismiss() {
+        avatarEngineWapper.stopDressUp()
+    }
     
     func dressUpSheetVCDidSelectedItem(index: Int,
                                        info: AEABottomInfo) {
@@ -206,6 +228,30 @@ extension LiveViewCotroller: LiveViewDelegate,
                                         value: value)
     }
     
+    func moreSheetVCDidTap(action: MoreSheetVC.Action) {
+        guard avatarEngineWapper.didAvatarLoadSuccess else {
+            showWaitInit()
+            return
+        }
+        
+        switch action {
+        case .dress:
+            avatarEngineWapper.startDressUp()
+            avatarEngineWapper.requestDressUpList()
+            break
+        case .face:
+            avatarEngineWapper.startFaceUp()
+            avatarEngineWapper.requestFaceUpList()
+            break
+        case .change:
+            changeAvatarAndOriginalStream()
+            break
+        case .videoSet:
+            showVideoSetView()
+            break
+        }
+    }
+    
     func liveViewDidTapButtomAction(action: BottomView.ActionType) {
         switch action {
         case .mic:
@@ -215,10 +261,10 @@ extension LiveViewCotroller: LiveViewDelegate,
             entryType! == .fromCrateRoom ? showMembersView() : sendHandsupSync()
             break
         case .more:
-            showVideoSetView()
+            showMoreViewForSet()
             break
         case .beauty:
-            showMoreView()
+            showMoreViewForBeauty()
         default:
             break
         }
@@ -232,17 +278,6 @@ extension LiveViewCotroller: LiveViewDelegate,
     func handsUpSheetVC(vc: HandsUpSheetVC, didTap action: HandsUpCell.Action, at index: Int) {
         let member = members[index]
         updateMember(member: member, action: action)
-    }
-    
-    func moreSheetVCDidTap(action: MoreSheetVC.Action) {
-        switch action {
-        case .dress:
-            
-            break
-        case .face:
-            
-            break
-        }
     }
     
     func videoSettingSheetVCDidTap(type: VideoSettingSheetVC.InfoType, value: Int) {

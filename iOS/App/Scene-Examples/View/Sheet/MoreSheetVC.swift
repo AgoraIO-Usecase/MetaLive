@@ -16,15 +16,52 @@ public class MoreSheetVC: UIViewController {
     enum Action {
         case dress
         case face
+        case change
+        case videoSet
+    }
+    
+    struct Info {
+        let title: String
+        let action: Action
+        
+        init(action: Action) {
+            switch action {
+            case .dress:
+                title = "换装"
+                break
+            case .face:
+                title = "捏脸"
+                break
+            case .change:
+                title = "切换"
+                break
+            case .videoSet:
+                title = "设置"
+                break
+            }
+            self.action = action
+        }
     }
     private var presenter: Presentr?
     private var contentView: MoreView!
+    private var infos = [Info]()
     
     weak var delegate: MoreSheetVCDelegate?
     
+    init(infos: [Info]) {
+        self.infos = infos
+        let title1 = infos.first?.title ?? "none"
+        let title2 = infos.last?.title ?? "none"
+        contentView = MoreView(title1: title1, title2: title2)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        contentView = MoreView()
         setup()
         commonInit()
     }
@@ -48,7 +85,9 @@ public class MoreSheetVC: UIViewController {
     }
     
     @objc func buttonTap(_ sender: UIButton) {
-        let action: Action = sender == contentView.button1 ? .dress : .face
+        guard let action: Action = sender == contentView.button1 ? infos.first?.action : infos.last?.action else {
+            return
+        }
         dismiss(animated: true, completion: { [weak self] in
             self?.delegate?.moreSheetVCDidTap(action: action)
         })
@@ -67,9 +106,13 @@ class MoreView: UIView {
     fileprivate let titleLabel = UILabel()
     fileprivate let button1 = UIButton()
     fileprivate let button2 = UIButton()
+    let title1: String
+    let title2: String
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(title1: String, title2: String) {
+        self.title1 = title1
+        self.title2 = title2
+        super.init(frame: .zero)
         setup()
     }
     
@@ -87,9 +130,9 @@ class MoreView: UIView {
         button1.setImage(.init(named: "icon-setting"), for: .normal)
         button2.setImage(.init(named: "icon-setting"), for: .normal)
         let label1 = UILabel()
-        label1.text = "换装"
+        label1.text = title1
         let label2 = UILabel()
-        label2.text = "捏脸"
+        label2.text = title2
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         button1.translatesAutoresizingMaskIntoConstraints = false

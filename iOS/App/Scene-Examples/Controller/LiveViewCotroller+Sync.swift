@@ -47,7 +47,7 @@ extension LiveViewCotroller {
         guard let objId = RoomManager.currentMemberId, let member = infos.first(where: { $0.isMe })?.member else {
             return
         }
-        guard member.status != .accept , member.status != .inviting else {
+        guard member.status != .accept else {
             return
         }
         var temp = member

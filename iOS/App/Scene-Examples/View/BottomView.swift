@@ -20,7 +20,6 @@ class BottomView: UIView {
     let micButton = UIButton()
     let beautyButton = UIButton()
     let moreButton = UIButton()
-    let giftButton = UIButton()
     let handupsButton = UIButton()
     let textBgViewWidthMin = 130.0
     let textBgViewWidthMax = UIScreen.main.bounds.width - 15 - 15
@@ -48,14 +47,12 @@ class BottomView: UIView {
         micButton.setImage(UIImage(named: "icon-mic-on"), for: .selected)
         beautyButton.setImage(UIImage(named: "icon-magic-grap"), for: .normal)
         moreButton.setImage(UIImage(named: "icon-more"), for: .normal)
-        giftButton.setImage(UIImage(named: "icon-gift-gray"), for: .normal)
         handupsButton.setImage(UIImage(named: "icon-raisehand"), for: .normal)
         
         textBgView.translatesAutoresizingMaskIntoConstraints = false
         textField.translatesAutoresizingMaskIntoConstraints = false
         micButton.translatesAutoresizingMaskIntoConstraints = false
         beautyButton.translatesAutoresizingMaskIntoConstraints = false
-        giftButton.translatesAutoresizingMaskIntoConstraints = false
         handupsButton.translatesAutoresizingMaskIntoConstraints = false
         moreButton.translatesAutoresizingMaskIntoConstraints = false
         
@@ -64,7 +61,6 @@ class BottomView: UIView {
         addSubview(micButton)
         addSubview(beautyButton)
         addSubview(moreButton)
-        addSubview(giftButton)
         addSubview(handupsButton)
         
         textBgView.leftAnchor.constraint(equalTo: leftAnchor, constant: 15).isActive = true
@@ -80,10 +76,7 @@ class BottomView: UIView {
         handupsButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -17).isActive = true
         handupsButton.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         
-        giftButton.rightAnchor.constraint(equalTo: handupsButton.leftAnchor, constant: -5).isActive = true
-        giftButton.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        
-        moreButton.rightAnchor.constraint(equalTo: giftButton.leftAnchor, constant: -5).isActive = true
+        moreButton.rightAnchor.constraint(equalTo: handupsButton.leftAnchor, constant: -5).isActive = true
         moreButton.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         
         beautyButton.rightAnchor.constraint(equalTo: moreButton.leftAnchor, constant: -5).isActive = true
@@ -105,7 +98,6 @@ class BottomView: UIView {
         textField.delegate = self
         micButton.addTarget(self, action: #selector(buttonTap(button:)), for: .touchUpInside)
         beautyButton.addTarget(self, action: #selector(buttonTap(button:)), for: .touchUpInside)
-        giftButton.addTarget(self, action: #selector(buttonTap(button:)), for: .touchUpInside)
         handupsButton.addTarget(self, action: #selector(buttonTap(button:)), for: .touchUpInside)
         moreButton.addTarget(self, action: #selector(buttonTap(button:)), for: .touchUpInside)
         textField.isUserInteractionEnabled = false
@@ -154,12 +146,6 @@ class BottomView: UIView {
             return
         }
         
-        if button == giftButton {
-            actionType = .mic
-            delegate?.bottomView(view: self, didTap: actionType)
-            return
-        }
-        
         if button == handupsButton {
             actionType = .handsup
             delegate?.bottomView(view: self, didTap: actionType)
@@ -176,7 +162,6 @@ class BottomView: UIView {
             micButton.isHidden = true
             beautyButton.isHidden = true
             moreButton.isHidden = true
-            giftButton.isHidden = true
             handupsButton.isHidden = true
             textBgViewWidthConstraint.constant = textBgViewWidthMax
         }
@@ -184,7 +169,6 @@ class BottomView: UIView {
             micButton.isHidden = false
             beautyButton.isHidden = false
             moreButton.isHidden = false
-            giftButton.isHidden = false
             handupsButton.isHidden = false
             textBgViewWidthConstraint.constant = textBgViewWidthMin
         }

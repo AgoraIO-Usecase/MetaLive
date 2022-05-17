@@ -50,11 +50,7 @@ class VideoSettingSheetVC: UIViewController {
         contentView.tableView.dataSource = self
         contentView.tableView.delegate = self
         contentView.slider.addTarget(self, action: #selector(valueChange(_:)), for: .valueChanged)
-        
-        dataList = [Info(infoType: .resolution, value: Resolution.v640x480.rawValue),
-                    Info(infoType: .fremeRate, value: FremeRate.fps30.rawValue),
-                    Info(infoType: .renderQuality, value: RenderQuality.high.rawValue)]
-        contentView.tableView.reloadData()
+        udpateViewData()
     }
     
     func show(in vc: UIViewController) {
@@ -94,6 +90,15 @@ class VideoSettingSheetVC: UIViewController {
         
         vc.addAction(.init(title: "取消", style: .cancel, handler: nil))
         present(vc, animated: true, completion: nil)
+    }
+    
+    private func udpateViewData() {
+        contentView.slider.value = Float(videoInfo.bitRate)
+        contentView.nameLabel.text = "码率  \(Int(videoInfo.bitRate)) kps"
+        dataList.append(Info(infoType: .resolution, value: videoInfo.resolution.rawValue))
+        dataList.append(Info(infoType: .fremeRate, value: videoInfo.fremeRate.rawValue))
+        dataList.append(Info(infoType: .renderQuality, value: videoInfo.renderQuality.rawValue))
+        contentView.tableView.reloadData()
     }
     
     private func udpate(type: InfoType, value: Int) {
