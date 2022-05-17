@@ -131,7 +131,7 @@ class CreateLiveController: UIViewController {
                                                          frameRate: videoInfo.fremeRate.rtcType,
                                                          bitrate: videoInfo.bitRate,
                                                          orientationMode: .fixedPortrait,
-                                                         mirrorMode: .auto)
+                                                         mirrorMode: .enabled)
         let ret = engine.setVideoEncoderConfiguration(videoConfig)
         LogUtils.log(message: "setVideoEncoderConfiguration \(ret)", level: .info)
         
@@ -221,6 +221,7 @@ extension CreateLiveController: AvatarEngineWapperDelegate {
         case .avatarSetSuccess:
             createLiveView.hidenIndicatedView()
             isAvatarLoaded = true
+            updateVideoConfig(videoInfo: videoSetInfo)
             break
         case .avatarSetFail:
             showHUDError(error: "avatarSetFail")

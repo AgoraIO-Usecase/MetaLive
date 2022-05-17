@@ -16,7 +16,7 @@ extension LiveViewCotroller {
                 self?.subscribeEventSync()
                 LogUtils.log(message: "createAndJoin success", level: .info)
             } fail: { [weak self](error) in
-                self?.showHUDError(error: error.description)
+                self?.showError(error: error.description)
             }
         }
         else {
@@ -25,7 +25,7 @@ extension LiveViewCotroller {
                 self?.subscribeEventSync()
                 LogUtils.log(message: "join success", level: .info)
             } fail: { [weak self](error) in
-                self?.showHUDError(error: error.description)
+                self?.showError(error: error.description)
             }
         }
     }
@@ -39,7 +39,7 @@ extension LiveViewCotroller {
                                     onUpdated: addOrUpdate(_:),
                                     onDeleted: remove(_:),
                                     fail: { [weak self](error) in
-            self?.showHUDError(error: error.description)
+            self?.showError(error: error.description)
         })
     }
     
@@ -47,20 +47,20 @@ extension LiveViewCotroller {
         guard let objId = RoomManager.currentMemberId, let member = infos.first(where: { $0.isMe })?.member else {
             return
         }
-        guard member.status != .accept else {
-            return
-        }
         var temp = member
-        temp.status = .inviting
-        showWaitHUD(title: "举手中")
+        temp.status = member.status == .accept ?  .end : .raising
+        let text = temp.status == .raising ? "举手中" : "下麦中"
+        showWaitHUD(title: text)
         RoomManager.updateMember(roomId: info.roomId,
                                  objectId: objId,
                                  member: temp) { [weak self] in
             self?.hideHUD()
-            self?.showHUD(title: "举手成功", duration: 3)
+            if temp.status == .raising {
+                self?.showHUD(title: "举手成功", duration: 3)
+            }
         } fail: { [weak self](error) in
             self?.hideHUD()
-            self?.showHUDError(error: error.description)
+            self?.showError(error: error.description)
         }
     }
     
@@ -79,7 +79,7 @@ extension LiveViewCotroller {
             self?.openAudio(open: state)
             self?.hideHUD()
         } fail: { [weak self](error) in
-            self?.showHUDError(error: error.description)
+            self?.showError(error: error.description)
         }
     }
     
@@ -108,7 +108,7 @@ extension LiveViewCotroller {
                                  member: member,
                                  success: {
         }, fail: { [weak self](error) in
-            self?.showHUDError(error: error.localizedDescription)
+            self?.showError(error: error.localizedDescription)
         })
     }
     
@@ -147,7 +147,7 @@ extension LiveViewCotroller { /** Handle member update **/
         
         switch entryType! {
         case .fromCrateRoom:
-            if info.member.status == .inviting { /** 有房客举手了 **/
+            if info.member.status == .raising { /** 有房客举手了 **/
                 showHUD(title: "举手了(\(info.userId))", duration: 2)
             }
             break
@@ -164,7 +164,7 @@ extension LiveViewCotroller { /** Handle member update **/
                 if info.member.status == .end,
                    let old = oldInfo,
                    old.hasVideo { /** 房客被移出麦位 **/
-                    showHUD(title: "房主移出您的麦位", duration: 2)
+                    showHUD(title: "麦位已移除", duration: 2)
                 }
             }
             break
@@ -185,5 +185,9 @@ extension LiveViewCotroller { /** Handle member update **/
         
         /// add info
         infos.append(info)
+        let roomOwnedId = self.info.userId
+        infos = infos.sorted(by: { (lsh, rsh) in
+            lsh.userId == roomOwnedId
+        })
     }
 }

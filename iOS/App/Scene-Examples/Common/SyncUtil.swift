@@ -36,7 +36,7 @@ class SyncUtil: NSObject {
                          success: SuccessBlockVoid? = nil,
                          fail: FailBlock? = nil) {
         guard let manager = manager else { return }
-        manager.joinScene(sceneId: id, success: { ref in
+        manager.joinScene(sceneId: id, success: { (ref) in
             sceneRefs[id] = ref
             success?()
         }, fail: fail)

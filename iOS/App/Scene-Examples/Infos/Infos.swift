@@ -21,19 +21,20 @@ struct Member: Codable {
     let userName: String
     var status: Status
     var hasAudio: Bool
+    var hasVideo: Bool = false
 }
 
 enum Status: Int, Codable {
-    // 邀请中
-    case inviting = 1
+    // 举手中
+    case raising = 5
     // 已接受
     case accept = 2
     // 已拒绝
     case refuse = 3
     // 已结束
     case end = 4
-    // 举手中
-    case raising = 5
+    // 邀请中
+    case inviting = 1
 }
 
 struct VideoSetInfo {
@@ -45,6 +46,7 @@ struct VideoSetInfo {
     static var `default`: VideoSetInfo {
         return VideoSetInfo(resolution: .v640x480,
                             fremeRate: .fps30,
-                            renderQuality: .high,bitRate: 700)
+                            renderQuality: .high,
+                            bitRate: 700)
     }
 }

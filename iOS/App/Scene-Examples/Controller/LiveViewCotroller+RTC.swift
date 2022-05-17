@@ -154,7 +154,7 @@ extension LiveViewCotroller {
                                                          frameRate: videoInfo.fremeRate.rtcType,
                                                          bitrate: videoInfo.bitRate,
                                                          orientationMode: .fixedPortrait,
-                                                         mirrorMode: .auto)
+                                                         mirrorMode: .enabled)
         if let connection = rtcConnetcion {
             agoraKit?.setVideoEncoderConfigurationEx(videoConfig, connection: connection)
         }
@@ -196,6 +196,9 @@ extension LiveViewCotroller: AgoraRtcEngineDelegate, AvatarEngineWapperDelegate 
     
     func avatarEngineWapperDidRecvEvent(event: AvatarEngineWapper.Event) {
         LogUtils.log(message: "avatarEngineWapperDidRecvEvent event \(event.rawValue)", level: .info)
+        if event == .avatarSetSuccess {
+            updateVideoConfig(videoInfo: videoSetInfo)
+        }
     }
     
     func avatarEngineWapperDidRecvDressList(list: [AvatarEngineWapper.DressInfo]) {

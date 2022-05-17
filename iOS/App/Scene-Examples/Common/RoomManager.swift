@@ -74,7 +74,7 @@ class RoomManager {
     }
     
     static func leaveRoom(roomId: String) {
-        deleteLocalUser()
+        deleteLocalUser(roomId: roomId)
         currentMemberId = nil
         SyncUtil.leaveScene(id: roomId)
     }
@@ -203,11 +203,11 @@ class RoomManager {
         SyncUtil.unsubscribeScene(id: roomId, fail: nil)
     }
     
-    static func deleteLocalUser() {
+    static func deleteLocalUser(roomId: String) {
         guard let objectId = RoomManager.currentMemberId else {
             return
         }
-        SyncUtil.deleteDocument(id: defaultChannelName,
+        SyncUtil.deleteDocument(id: roomId,
                                 className: usersKey,
                                 objectId: objectId,
                                 success: nil,
@@ -265,29 +265,3 @@ class RoomManager {
         SyncUtil.unsubscribeCollection(id: roomId, className: usersKey)
     }
 }
-
-
-//额头
-//颧⻣
-//苹果肌
-//下颚⻆
-//下颚
-//下唇肌
-//下巴
-//眼睛整体
-//内上眼皮
-//外上眼皮
-//内眼⻆
-//外眼⻆
-//眉头
-//眉心
-//眉中
-//眉尾
-//鼻梁
-//外上眼皮
-//瞳孔
-//鼻头
-//嘴巴整体
-//嘴⻆
-//上唇两侧
-//唇珠

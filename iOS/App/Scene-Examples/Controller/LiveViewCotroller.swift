@@ -134,9 +134,9 @@ extension LiveViewCotroller { /** show view **/
         showWaitHUD()
         getMembers(success: { [weak self](members) in
             guard let self = self else { return }
-            self.members = members.filter({ ($0.status == .inviting || $0.status == .accept) && $0.userId != UserInfo.uid })
+            self.members = members.filter({ ($0.status == .raising || $0.status == .accept) && $0.userId != UserInfo.uid })
             let list = self.members.map({ HandsUpSheetVC.Info(id: $0.userId,
-                                                              style: $0.status == .inviting ? .normal : .isUp,
+                                                              style: $0.status == .raising ? .normal : .isUp,
                                                               title: $0.userName,
                                                               imageName: "portrait01") })
             let vc = HandsUpSheetVC()
@@ -184,6 +184,17 @@ extension LiveViewCotroller { /** show view **/
     
     func showWaitInit() {
         showHUDError(error: "请等待初始化完")
+    }
+    
+    func showError(error: String) {
+        if Thread.isMainThread {
+            showHUDError(error: error)
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.showHUDError(error: error)
+        }
     }
 }
 
