@@ -34,6 +34,7 @@ public class RoomManager {
     private static final String SYNC_MANAGER_GIFT_INFO = "giftInfo";
     private static final String SYNC_MANAGER_USER_INFO_LIST = "agoraClubUsers";
     private static final int ROOM_MAX_USER = 4;
+    private static String cacheUserId;
 
     private static volatile RoomManager INSTANCE;
     private static volatile boolean isInitialized = false;
@@ -464,12 +465,10 @@ public class RoomManager {
     }
 
     public static String getCacheUserId() {
-        String userId = PreferenceUtil.get(PREFERENCE_KEY_USER_ID, "");
-        if (TextUtils.isEmpty(userId)) {
-            userId = RandomUtil.randomId() + 10000 + "";
-            PreferenceUtil.put(PREFERENCE_KEY_USER_ID, userId);
+        if (TextUtils.isEmpty(cacheUserId)) {
+            cacheUserId = RandomUtil.randomId() + 10000 + "";
         }
-        return userId;
+        return cacheUserId;
     }
 
     public static String getRandomRoomId() {

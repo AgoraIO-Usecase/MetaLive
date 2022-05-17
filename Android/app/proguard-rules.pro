@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keeppackagenames io.agora
+
+# Agora sdk
+-keep class io.agora.**{*;}
+
+# cocos
+-keep class com.cocos.arts.**{*;}
+-keep class com.cocos.game.**{*;}
+-keep class a.a.**{*;}
+-keep class customhttp3.**{*;}
+
+# benben
+-keep class com.benben.**{*;}
+
+# bugly
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}
