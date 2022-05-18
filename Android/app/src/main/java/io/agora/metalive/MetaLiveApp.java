@@ -13,7 +13,7 @@ public class MetaLiveApp extends Application {
         super.onCreate();
         String buglyAppId = getString(R.string.bugly_app_id);
         if(!TextUtils.isEmpty(buglyAppId)){
-            CrashReport.initCrashReport(getApplicationContext(), buglyAppId, false);
+            CrashReport.initCrashReport(getApplicationContext(), buglyAppId, BuildConfig.DEBUG);
         }
     }
 
