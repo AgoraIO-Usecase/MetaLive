@@ -84,7 +84,7 @@ public class RoomManager {
     }
 
     public void createRoom(RoomInfo roomInfo, DataCallback<RoomInfo> callback) {
-        checkInitialized();
+        if(!checkInitialized())return;
         roomInfo.userId = getCacheUserId();
         Scene room = new Scene();
         room.setId(roomInfo.roomId);
@@ -106,7 +106,7 @@ public class RoomManager {
     }
 
     public void getAllRooms(DataListCallback<RoomInfo> callback) {
-        checkInitialized();
+        if(!checkInitialized())return;
         Sync.Instance().getScenes(new Sync.DataListCallback() {
             @Override
             public void onSuccess(List<IObject> result) {
@@ -138,7 +138,7 @@ public class RoomManager {
     }
 
     public void joinRoom(String roomId, @Status int status, DataListCallback<UserInfo> successRun, DataCallback<Exception> failure) {
-        checkInitialized();
+        if(!checkInitialized())return;
         Runnable onJoinSuccess = () -> {
             getUserList(roomId, dataList -> {
                 for (UserInfo userInfo : dataList) {
@@ -224,7 +224,7 @@ public class RoomManager {
     }
 
     private void updateUserStatus(String roomId, UserInfo userInfo, @Status int status) {
-        checkInitialized();
+        if(!checkInitialized())return;
         SceneReference sceneReference = sceneMap.get(roomId);
         if (sceneReference == null) {
             return;
@@ -259,7 +259,7 @@ public class RoomManager {
 
     public void destroyRoom(String roomId){
         deleteLocalUser(roomId);
-        checkInitialized();
+        if(!checkInitialized())return;
         SceneReference sceneReference = sceneMap.get(roomId);
         if (sceneReference == null) {
             return;
@@ -278,7 +278,7 @@ public class RoomManager {
     }
 
     public void getUserList(String roomId, DataListCallback<UserInfo> callback) {
-        checkInitialized();
+        if(!checkInitialized())return;
         SceneReference sceneReference = sceneMap.get(roomId);
         if (sceneReference == null) {
             return;
@@ -312,7 +312,7 @@ public class RoomManager {
     }
 
     private void addLocalUser(String roomId, @Status int status, DataCallback<UserInfo> success) {
-        checkInitialized();
+        if(!checkInitialized())return;
         SceneReference sceneReference = sceneMap.get(roomId);
         if (sceneReference == null) {
             return;
@@ -339,7 +339,7 @@ public class RoomManager {
 
     private void deleteLocalUser(String roomId) {
 
-        checkInitialized();
+        if(!checkInitialized())return;
         SceneReference sceneReference = sceneMap.get(roomId);
         if (sceneReference == null) {
             return;
@@ -361,7 +361,7 @@ public class RoomManager {
     public void subscribeUserChangeEvent(String roomId,
                                          WeakReference<DataCallback<UserInfo>> addOrUpdateCallback,
                                          WeakReference<DataCallback<UserInfo>> deleteCallback) {
-        checkInitialized();
+        if(!checkInitialized())return;
         SceneReference sceneReference = sceneMap.get(roomId);
         if (sceneReference == null) {
             return;
@@ -411,7 +411,7 @@ public class RoomManager {
     }
 
     public void sendGift(String roomId, GiftInfo giftInfo) {
-        checkInitialized();
+        if(!checkInitialized())return;
         SceneReference sceneReference = sceneMap.get(roomId);
         if (sceneReference == null) {
             return;
@@ -430,7 +430,7 @@ public class RoomManager {
     }
 
     public void subscribeGiftReceiveEvent(String roomId, WeakReference<DataCallback<GiftInfo>> callback) {
-        checkInitialized();
+        if(!checkInitialized())return;
         SceneReference sceneReference = sceneMap.get(roomId);
         if (sceneReference == null) {
             return;
@@ -475,10 +475,16 @@ public class RoomManager {
         return RandomUtil.randomId() + 10000 + "";
     }
 
-    private void checkInitialized() {
+    private boolean checkInitialized() {
         if (!isInitialized) {
-            throw new RuntimeException("The roomManager must be initialized firstly.");
+            Log.e(TAG, "The roomManager must be initialized firstly.");
+            return false;
         }
+        return true;
+    }
+
+    public static boolean isIsInitialized() {
+        return isInitialized;
     }
 
     private static final Map<String, Integer> IconNameResMap;
