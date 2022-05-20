@@ -58,21 +58,21 @@ class VideoCell: UICollectionViewCell {
     
     func update(info: Info) {
         titleLabel.text = info.title
-        micImageView.image = info.havAudio ? UIImage(named: "icon-mic-on") : UIImage(named: "icon-mic-off")
+        micImageView.image = info.hasAudio ? UIImage(named: "icon-mic-on") : UIImage(named: "icon-mic-off")
     }
 }
 
 extension VideoCell {
     struct Info {
         let title: String
-        let havAudio: Bool
-        let havVideo: Bool
+        let hasAudio: Bool
+        let hasVideo: Bool
         let userId: String
         
         static var empty: Info {
             Info(title: "",
-                 havAudio: false,
-                 havVideo: false,
+                 hasAudio: false,
+                 hasVideo: false,
                  userId: "")
         }
     }

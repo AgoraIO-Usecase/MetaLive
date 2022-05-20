@@ -14,6 +14,14 @@ extension DressUpSheetVC.Info {
         self.title = info.name
         self.itemSizeType = .small
         self.colors = []
+        selectedItemIndex = -1
+        for index in 0..<info.items.count {
+            let temp = info.items[index]
+            if temp.isUsing == 1 {
+                selectedItemIndex = index
+                break
+            }
+        }
         self.items = info.items.map({ .init(info: $0) })
     }
 }

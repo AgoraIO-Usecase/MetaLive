@@ -93,12 +93,7 @@ class AvatarEngineWapper: NSObject {
     }
     
     func requestDressUpList() {
-        guard didAvatarLoadSuccess else { return }
-        if let infos = dressInfos {
-            invokeAvatarEngineWapperDidRecvDressList(list: infos)
-            return
-        }
-        
+        guard didAvatarLoadSuccess else { return }        
         var rerult: NSString?
         var ret: Int32 = 0
         ret = engine.getLocalUserAvatarOptions("request_dresslist", args: "", result: &rerult)
@@ -277,7 +272,8 @@ extension AvatarEngineWapper: AgoraAvatarEngineEventDelegate {
             guard type != .shangZhuang,
                   type != .xiaZhuang,
                   type != .xieZi,
-                  type != .peiShi else { /** 去掉这些类型 **/
+                  type != .peiShi,
+                  type != .lianYiQun else { /** 去掉这些类型 **/
                       continue
                   }
             

@@ -93,7 +93,6 @@ class DressUpView: UIView {
         titleLabel.font = .systemFont(ofSize: 17)
         titleLabel.text = "换装"
         
-        
         addSubview(titleLabel)
         addSubview(bottomView)
         

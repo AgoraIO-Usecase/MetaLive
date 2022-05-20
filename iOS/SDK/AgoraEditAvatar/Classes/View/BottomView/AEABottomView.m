@@ -166,12 +166,14 @@
     _collectionView.showsHorizontalScrollIndicator = isBigType;
     
     /// scorll to selected index
-    NSInteger selectedIndex = _currentInfo.selectedItemIndex;
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:selectedIndex inSection:0];
-    UICollectionViewScrollPosition position = isBigType ? UICollectionViewScrollPositionCenteredHorizontally : UICollectionViewScrollPositionCenteredVertically;
-    [_collectionView scrollToItemAtIndexPath:indexPath
-                            atScrollPosition:position
-                                    animated:NO];
+    if (_currentInfo.selectedItemIndex >0) {
+        NSInteger selectedIndex = _currentInfo.selectedItemIndex;
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:selectedIndex inSection:0];
+        UICollectionViewScrollPosition position = isBigType ? UICollectionViewScrollPositionCenteredHorizontally : UICollectionViewScrollPositionCenteredVertically;
+        [_collectionView scrollToItemAtIndexPath:indexPath
+                                atScrollPosition:position
+                                        animated:NO];
+    }
 }
 
 #pragma mark -- AEAColorSelectedViewDelegate

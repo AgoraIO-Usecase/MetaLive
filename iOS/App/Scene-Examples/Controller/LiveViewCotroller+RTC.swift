@@ -96,8 +96,26 @@ extension LiveViewCotroller {
         
         if info.userId == UserInfo.uid {
             localRenderView = renderView
-            avatarEngineWapper.setupLocalVideoCanvas(view: renderView)
-            LogUtils.log(message: "setRenderView local \(info.userId)", level: .info)
+            if publishAvatarStream {
+                avatarEngineWapper.setupLocalVideoCanvas(view: renderView)
+                LogUtils.log(message: "setRenderView local avatar \(info.userId)", level: .info)
+                
+                let canvas = AgoraRtcVideoCanvas()
+                canvas.view = nil
+                canvas.renderMode = .hidden
+                canvas.uid = 0
+                agoraKit?.setupLocalVideo(canvas)
+            }
+            else {
+                let canvas = AgoraRtcVideoCanvas()
+                canvas.view = renderView
+                canvas.renderMode = .hidden
+                canvas.uid = 0
+                agoraKit?.setupLocalVideo(canvas)
+                LogUtils.log(message: "setRenderView local original \(info.userId)", level: .info)
+                
+                avatarEngineWapper.setupLocalVideoCanvas(view: nil)
+            }
         }
         else {
             guard let engine = agoraKit else {
@@ -126,17 +144,13 @@ extension LiveViewCotroller {
         agoraKit?.updateChannelEx(with: option, connection: rtcConnetcion!)
         publishAvatarStream = useAvatar
         
-        if let view = localRenderView {
-            if useAvatar {
-                avatarEngineWapper.setupLocalVideoCanvas(view: view)
-            }
-            else {
-                let canvas = AgoraRtcVideoCanvas()
-                canvas.view = view
-                canvas.renderMode = .hidden
-                canvas.uid = 0
-                agoraKit?.setupLocalVideo(canvas)
-            }
+        if localRenderView != nil {
+            let list = infos.map({ VideoCell.Info(title: $0.title,
+                                                  hasAudio: $0.hasAudio,
+                                                  hasVideo: $0.hasVideo,
+                                                  userId: $0.userId) })
+                .filter({ $0.hasVideo })
+            liveView.videoView.update(infos: list)
         }
         else {
             LogUtils.log(message: "changeAvatarAndOriginalStream can not find render view", level: .info)
@@ -229,8 +243,8 @@ extension VideoSettingSheetVC.Resolution {
             return .init(width: 640, height: 360)
         case .v640x480:
             return .init(width: 640, height: 480)
-        case .v960x549:
-            return .init(width: 960, height: 549)
+        case .v960x540:
+            return .init(width: 960, height: 540)
         case .v960x720:
             return .init(width: 960, height: 720)
         case .v1280x720:

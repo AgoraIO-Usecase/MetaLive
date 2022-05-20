@@ -62,7 +62,7 @@ public class PinchFaceSheetVC: UIViewController {
     }
     
     @objc func valueChange(_ sender: UISlider) {
-        contentView.valueLabel.text = "\(sender.value)"
+        contentView.valueLabel.text = "\(sender.value.keep1)"
         delegate?.pinchFaceSheetVCDidValueChange(infoIndex: contentView.selectedInfoIndex,
                                                  itemIndex: contentView.selectedItemIndex, value: sender.value)
     }
@@ -133,7 +133,7 @@ class PinchFaceView: UIView {
         
         slider.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor).isActive = true
         slider.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 15).isActive = true
-        slider.rightAnchor.constraint(equalTo: valueLabel.leftAnchor, constant: -15).isActive = true
+        slider.rightAnchor.constraint(equalTo: valueLabel.leftAnchor, constant: -25).isActive = true
         
         valueLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
         valueLabel.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor).isActive = true

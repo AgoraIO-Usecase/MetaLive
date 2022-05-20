@@ -73,9 +73,11 @@ extension VideoView: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VideoCell", for: indexPath) as! VideoCell
         let info = infos[indexPath.row]
         cell.update(info: info)
-        if info.havVideo {
-            LogUtils.log(message: "需要渲染 \(indexPath.row)", level: .info)
-            delegate?.videoViewShouldRender(info: info, renderView: cell.renderView)
+        if info.hasVideo {
+            LogUtils.log(message: "需要渲染 \(indexPath.row)",
+                         level: .info)
+            delegate?.videoViewShouldRender(info: info,
+                                            renderView: cell.renderView)
         }
         return cell
     }

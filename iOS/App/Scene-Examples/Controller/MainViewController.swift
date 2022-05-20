@@ -125,14 +125,7 @@ class MainViewController: UIViewController {
     }
     
     @objc func pullRefreshHandler() {
-        loadData()        
-//        let vc = DressUpSheetVC(infos: [])
-//        vc.show(in: self)
-        
-//        let info = PinchFaceSheetVC.Info(title: "123", items: ["1111", "222", "333"])
-//        let info2 = PinchFaceSheetVC.Info(title: "456", items: ["999", "0909", "6767"])
-//        let vc = PinchFaceSheetVC(infos: [info, info2, info, info2, info, info2, info])
-//        vc.show(in: self)
+        loadData()
     }
 }
 
@@ -149,7 +142,8 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MainCell
         let info = infos[indexPath.row]
-        cell.set(title: info.title)
+        let text = "\(info.title) (\(info.roomId))"
+        cell.set(title: text)
         return cell
     }
     

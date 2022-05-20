@@ -11,5 +11,5 @@ target 'Scene-Examples' do
   pod 'AgoraEditAvatar', :path => '../SDK/AgoraEditAvatar/AgoraEditAvatarLocal.podspec'
   pod 'MBProgressHUD'
   pod 'Presentr'
-  pod 'AgoraRtcEngine_iOS', :path => '/Users/zyp/Agora/PodSpec/Avatar Cocos/AgoraRtcEngine_iOS.podspec'
+#  pod 'AgoraRtcEngine_iOS', :path => '/Users/zyp/Agora/PodSpec/Avatar Cocos/AgoraRtcEngine_iOS.podspec'
 end

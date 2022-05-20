@@ -251,7 +251,7 @@ extension VideoSettingSheetVC {
         case v480x360
         case v640x360
         case v640x480
-        case v960x549
+        case v960x540
         case v960x720
         case v1280x720
         
@@ -265,8 +265,8 @@ extension VideoSettingSheetVC {
                 return "640x360"
             case .v640x480:
                 return "640x480"
-            case .v960x549:
-                return "960x549"
+            case .v960x540:
+                return "960x540"
             case .v960x720:
                 return "960x720"
             case .v1280x720:

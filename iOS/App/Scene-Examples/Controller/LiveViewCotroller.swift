@@ -79,10 +79,10 @@ class LiveViewCotroller: UIViewController {
     
     func updateView() {
         let list = infos.map({ VideoCell.Info(title: $0.title,
-                                              havAudio: $0.hasAudio,
-                                              havVideo: $0.hasVideo,
+                                              hasAudio: $0.hasAudio,
+                                              hasVideo: $0.hasVideo,
                                               userId: $0.userId) })
-            .filter({ $0.havVideo })
+            .filter({ $0.hasVideo })
         
         let currentMicState = infos.first(where: { $0.userId == UserInfo.uid })?.member.status == .accept
         
