@@ -59,6 +59,7 @@ class VideoCell: UICollectionViewCell {
     func update(info: Info) {
         titleLabel.text = info.title
         micImageView.image = info.hasAudio ? UIImage(named: "icon-mic-on") : UIImage(named: "icon-mic-off")
+        renderView.isHidden = !info.hasVideo
     }
 }
 
