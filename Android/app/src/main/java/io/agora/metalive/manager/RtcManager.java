@@ -218,7 +218,7 @@ public class RtcManager {
 
             AvatarContext avatarContext = new AvatarContext(
                     context.getString(R.string.ai_app_id),
-                    context.getString(R.string.ai_token_id));
+                    context.getString(R.string.ai_license));
             avatarEngine.initialize(avatarContext);
             avatarEngine.registerEventHandler(avatarEngineEventHandler);
 
