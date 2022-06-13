@@ -220,6 +220,36 @@ class AvatarEngineWapper: NSObject {
                          level: .info)
         }
     }
+    
+    func setDress() { /** 穿衣服 **/
+        var ret: Int32 = 0
+        ret = engine.setLocalUserAvatarOptions("start_dress", value: Data())
+        if ret != 0 {
+            LogUtils.log(message: "start_dress fail \(ret)", level: .error)
+        }
+        
+        var dict = ["type" : "73"]
+        let encoder = JSONEncoder()
+        var data = Data()
+        
+        data = try! encoder.encode(dict)
+        ret = engine.setLocalUserAvatarOptions("send_showview", value: data)
+        if ret != 0 {
+            LogUtils.log(message: "send_showview fail \(ret)", level: .error)
+        }
+        
+        dict = ["id" : "73001"]
+        data = try! encoder.encode(dict)
+        ret = engine.setLocalUserAvatarOptions("send_dress", value: data)
+        if ret != 0 {
+            LogUtils.log(message: "send_dress fail \(ret)", level: .error)
+        }
+        
+        ret = engine.setLocalUserAvatarOptions("stop_dress", value: Data())
+        if ret != 0 {
+            LogUtils.log(message: "stop_dress fail \(ret)", level: .error)
+        }
+    }
 }
 
 extension AvatarEngineWapper: AgoraAvatarEngineEventDelegate {

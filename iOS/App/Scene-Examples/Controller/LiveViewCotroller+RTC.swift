@@ -98,7 +98,7 @@ extension LiveViewCotroller {
             localRenderView = renderView
             if publishAvatarStream {
                 avatarEngineWapper.setupLocalVideoCanvas(view: renderView)
-                LogUtils.log(message: "setRenderView local avatar \(info.userId)", level: .info)
+                LogUtils.log(message: "setRenderView local avatar \(info.userId) \(renderView)", level: .info)
                 
                 let canvas = AgoraRtcVideoCanvas()
                 canvas.view = nil
@@ -168,7 +168,7 @@ extension LiveViewCotroller {
                                                          frameRate: videoInfo.fremeRate.rtcType,
                                                          bitrate: videoInfo.bitRate,
                                                          orientationMode: .fixedPortrait,
-                                                         mirrorMode: .enabled)
+                                                         mirrorMode: .auto)
         if let connection = rtcConnetcion {
             agoraKit?.setVideoEncoderConfigurationEx(videoConfig, connection: connection)
         }
@@ -212,6 +212,7 @@ extension LiveViewCotroller: AgoraRtcEngineDelegate, AvatarEngineWapperDelegate 
         LogUtils.log(message: "avatarEngineWapperDidRecvEvent event \(event.rawValue)", level: .info)
         if event == .avatarSetSuccess {
             updateVideoConfig(videoInfo: videoSetInfo)
+            avatarEngineWapper.setDress()
         }
     }
     
@@ -239,8 +240,8 @@ extension VideoSettingSheetVC.Resolution {
             return .init(width: 320, height: 240)
         case .v480x360:
             return .init(width: 480, height: 360)
-        case .v640x360:
-            return .init(width: 640, height: 360)
+        case .v360x640:
+            return .init(width: 360, height: 640)
         case .v640x480:
             return .init(width: 640, height: 480)
         case .v960x540:

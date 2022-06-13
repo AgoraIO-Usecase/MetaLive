@@ -44,9 +44,9 @@ struct VideoSetInfo {
     var bitRate: Int
     
     static var `default`: VideoSetInfo {
-        return VideoSetInfo(resolution: .v640x480,
+        return VideoSetInfo(resolution: .v360x640,
                             fremeRate: .fps30,
-                            renderQuality: .high,
-                            bitRate: 700)
+                            renderQuality: .ultra,
+                            bitRate: 1000)
     }
 }

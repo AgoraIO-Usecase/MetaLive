@@ -249,7 +249,7 @@ extension VideoSettingSheetVC {
     enum Resolution: Int, CustomStringConvertible, CaseIterable {
         case v320x240
         case v480x360
-        case v640x360
+        case v360x640
         case v640x480
         case v960x540
         case v960x720
@@ -261,8 +261,8 @@ extension VideoSettingSheetVC {
                 return "320x240"
             case .v480x360:
                 return "480x360"
-            case .v640x360:
-                return "640x360"
+            case .v360x640:
+                return "360x640"
             case .v640x480:
                 return "640x480"
             case .v960x540:

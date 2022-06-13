@@ -51,7 +51,6 @@ class VideoView: UIView {
     }
     
     private func commonInit() {
-        collectionView.register(VideoCell.self, forCellWithReuseIdentifier: "VideoCell")
         collectionView.dataSource = self
     }
     
@@ -70,7 +69,9 @@ extension VideoView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VideoCell", for: indexPath) as! VideoCell
+        let idf = "VideoCell\(indexPath.row)"
+        collectionView.register(VideoCell.self, forCellWithReuseIdentifier: idf)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: idf, for: indexPath) as! VideoCell
         let info = infos[indexPath.row]
         cell.update(info: info)
         if info.hasVideo {

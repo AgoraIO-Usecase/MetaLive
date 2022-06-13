@@ -33,16 +33,16 @@
 		26C880D827CE02FA0066307D /* NotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C880D727CE02FA0066307D /* NotiView.swift */; };
 		26C880DA27CE07D00066307D /* LiveViewCotroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C880D927CE07D00066307D /* LiveViewCotroller.swift */; };
 		26C880DC27CE1A9B0066307D /* BottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C880DB27CE1A9B0066307D /* BottomView.swift */; };
-		26D1C406283498FC000D4C6F /* Agoraffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FE283498A3000D4C6F /* Agoraffmpeg.framework */; platformFilter = ios; };
-		26D1C407283498FC000D4C6F /* Agoraffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FE283498A3000D4C6F /* Agoraffmpeg.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		26D1C40A28349900000D4C6F /* AvatarSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FC283498A1000D4C6F /* AvatarSDK.framework */; platformFilter = ios; };
-		26D1C40B28349900000D4C6F /* AvatarSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FC283498A1000D4C6F /* AvatarSDK.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		26D1C40C28349902000D4C6F /* BenBenFaceSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FB283498A1000D4C6F /* BenBenFaceSDK.framework */; platformFilter = ios; };
-		26D1C40D28349902000D4C6F /* BenBenFaceSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FB283498A1000D4C6F /* BenBenFaceSDK.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		26D1C40E28349905000D4C6F /* BeQuic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FD283498A3000D4C6F /* BeQuic.framework */; platformFilter = ios; };
-		26D1C40F28349905000D4C6F /* BeQuic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FD283498A3000D4C6F /* BeQuic.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		26D1C41128349985000D4C6F /* AgoraRtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FA283498A0000D4C6F /* AgoraRtcKit.framework */; platformFilter = ios; };
-		26D1C41228349985000D4C6F /* AgoraRtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D1C3FA283498A0000D4C6F /* AgoraRtcKit.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		26D0CB382840720A0073498A /* Agoraffmpeg.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB24283FC2150073498A /* Agoraffmpeg.xcframework */; };
+		26D0CB392840720A0073498A /* Agoraffmpeg.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB24283FC2150073498A /* Agoraffmpeg.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		26D0CB3B2840720B0073498A /* AgoraRtcKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB26283FC2250073498A /* AgoraRtcKit.xcframework */; };
+		26D0CB3C2840720B0073498A /* AgoraRtcKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB26283FC2250073498A /* AgoraRtcKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		26D0CB3D2840720D0073498A /* AvatarSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB28283FC2350073498A /* AvatarSDK.xcframework */; };
+		26D0CB3E2840720D0073498A /* AvatarSDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB28283FC2350073498A /* AvatarSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		26D0CB3F2840720E0073498A /* BenBenFaceSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB2A283FC2400073498A /* BenBenFaceSDK.xcframework */; };
+		26D0CB402840720E0073498A /* BenBenFaceSDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB2A283FC2400073498A /* BenBenFaceSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		26D0CB41284072110073498A /* BeQuic.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB2C283FC24A0073498A /* BeQuic.xcframework */; };
+		26D0CB42284072110073498A /* BeQuic.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 26D0CB2C283FC24A0073498A /* BeQuic.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		26D1C41428362EB4000D4C6F /* Float+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D1C41328362EB4000D4C6F /* Float+Extension.swift */; };
 		26E4F023282BDE35005F553F /* LiveViewCotroller+Info.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E4F022282BDE35005F553F /* LiveViewCotroller+Info.swift */; };
 		26FF328E2824F73B009A9590 /* CreateLiveController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF328D2824F73B009A9590 /* CreateLiveController.swift */; };
@@ -75,17 +75,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		26D7159427882EA80079D430 /* Embed Frameworks */ = {
+		26D0CB3A2840720A0073498A /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				26D1C40F28349905000D4C6F /* BeQuic.framework in Embed Frameworks */,
-				26D1C41228349985000D4C6F /* AgoraRtcKit.framework in Embed Frameworks */,
-				26D1C407283498FC000D4C6F /* Agoraffmpeg.framework in Embed Frameworks */,
-				26D1C40D28349902000D4C6F /* BenBenFaceSDK.framework in Embed Frameworks */,
-				26D1C40B28349900000D4C6F /* AvatarSDK.framework in Embed Frameworks */,
+				26D0CB392840720A0073498A /* Agoraffmpeg.xcframework in Embed Frameworks */,
+				26D0CB3E2840720D0073498A /* AvatarSDK.xcframework in Embed Frameworks */,
+				26D0CB3C2840720B0073498A /* AgoraRtcKit.xcframework in Embed Frameworks */,
+				26D0CB402840720E0073498A /* BenBenFaceSDK.xcframework in Embed Frameworks */,
+				26D0CB42284072110073498A /* BeQuic.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -129,11 +129,11 @@
 		26C880D727CE02FA0066307D /* NotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiView.swift; sourceTree = "<group>"; };
 		26C880D927CE07D00066307D /* LiveViewCotroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveViewCotroller.swift; sourceTree = "<group>"; };
 		26C880DB27CE1A9B0066307D /* BottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomView.swift; sourceTree = "<group>"; };
-		26D1C3FA283498A0000D4C6F /* AgoraRtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AgoraRtcKit.framework; sourceTree = "<group>"; };
-		26D1C3FB283498A1000D4C6F /* BenBenFaceSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = BenBenFaceSDK.framework; sourceTree = "<group>"; };
-		26D1C3FC283498A1000D4C6F /* AvatarSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AvatarSDK.framework; sourceTree = "<group>"; };
-		26D1C3FD283498A3000D4C6F /* BeQuic.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = BeQuic.framework; sourceTree = "<group>"; };
-		26D1C3FE283498A3000D4C6F /* Agoraffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Agoraffmpeg.framework; sourceTree = "<group>"; };
+		26D0CB24283FC2150073498A /* Agoraffmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Agoraffmpeg.xcframework; sourceTree = "<group>"; };
+		26D0CB26283FC2250073498A /* AgoraRtcKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = AgoraRtcKit.xcframework; sourceTree = "<group>"; };
+		26D0CB28283FC2350073498A /* AvatarSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = AvatarSDK.xcframework; sourceTree = "<group>"; };
+		26D0CB2A283FC2400073498A /* BenBenFaceSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = BenBenFaceSDK.xcframework; sourceTree = "<group>"; };
+		26D0CB2C283FC24A0073498A /* BeQuic.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = BeQuic.xcframework; sourceTree = "<group>"; };
 		26D1C41328362EB4000D4C6F /* Float+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Float+Extension.swift"; sourceTree = "<group>"; };
 		26E4F022282BDE35005F553F /* LiveViewCotroller+Info.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveViewCotroller+Info.swift"; sourceTree = "<group>"; };
 		26FF328D2824F73B009A9590 /* CreateLiveController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateLiveController.swift; sourceTree = "<group>"; };
@@ -182,14 +182,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26D1C40C28349902000D4C6F /* BenBenFaceSDK.framework in Frameworks */,
-				26D1C40A28349900000D4C6F /* AvatarSDK.framework in Frameworks */,
-				26D1C406283498FC000D4C6F /* Agoraffmpeg.framework in Frameworks */,
 				B5DF969B7ED11BACA57C6864 /* Pods_Scene_Examples.framework in Frameworks */,
-				26D1C41128349985000D4C6F /* AgoraRtcKit.framework in Frameworks */,
+				26D0CB3B2840720B0073498A /* AgoraRtcKit.xcframework in Frameworks */,
+				26D0CB41284072110073498A /* BeQuic.xcframework in Frameworks */,
+				26D0CB3F2840720E0073498A /* BenBenFaceSDK.xcframework in Frameworks */,
 				26C7A6002787F48C009A8DA5 /* CoreML.framework in Frameworks */,
+				26D0CB3D2840720D0073498A /* AvatarSDK.xcframework in Frameworks */,
+				26D0CB382840720A0073498A /* Agoraffmpeg.xcframework in Frameworks */,
 				26118ADA279A974C0026E27C /* Foundation.framework in Frameworks */,
-				26D1C40E28349905000D4C6F /* BeQuic.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,11 +287,11 @@
 		E79C25D2273B67DB00909CD4 = {
 			isa = PBXGroup;
 			children = (
-				26D1C3FE283498A3000D4C6F /* Agoraffmpeg.framework */,
-				26D1C3FA283498A0000D4C6F /* AgoraRtcKit.framework */,
-				26D1C3FC283498A1000D4C6F /* AvatarSDK.framework */,
-				26D1C3FB283498A1000D4C6F /* BenBenFaceSDK.framework */,
-				26D1C3FD283498A3000D4C6F /* BeQuic.framework */,
+				26D0CB2C283FC24A0073498A /* BeQuic.xcframework */,
+				26D0CB2A283FC2400073498A /* BenBenFaceSDK.xcframework */,
+				26D0CB28283FC2350073498A /* AvatarSDK.xcframework */,
+				26D0CB26283FC2250073498A /* AgoraRtcKit.xcframework */,
+				26D0CB24283FC2150073498A /* Agoraffmpeg.xcframework */,
 				E79C25DD273B67DB00909CD4 /* Scene-Examples */,
 				E79C25DC273B67DB00909CD4 /* Products */,
 				E79C263D273BCC0A00909CD4 /* Localizable.strings */,
@@ -388,7 +388,7 @@
 				E79C25D9273B67DB00909CD4 /* Resources */,
 				287CCFAC88F667361821CF5F /* [CP] Embed Pods Frameworks */,
 				E79BF023274B6902009FA838 /* Embed App Extensions */,
-				26D7159427882EA80079D430 /* Embed Frameworks */,
+				26D0CB3A2840720A0073498A /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -706,7 +706,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -727,7 +727,9 @@
 				);
 				INFOPLIST_FILE = "Scene-Examples/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MetaLive;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = bth;
 				INFOPLIST_KEY_NSCameraUsageDescription = "App needs your permission to access camera for video interaction";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = location;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs your permission to access microphone for audio interaction";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = tracking;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -769,7 +771,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -790,7 +792,9 @@
 				);
 				INFOPLIST_FILE = "Scene-Examples/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MetaLive;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = bth;
 				INFOPLIST_KEY_NSCameraUsageDescription = "App needs your permission to access camera for video interaction";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = location;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs your permission to access microphone for audio interaction";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = tracking;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
