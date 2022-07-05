@@ -42,9 +42,21 @@
         android:layout_height="@dimen/video_setting_dialog_content_height">
 
         <FrameLayout
-            android:id="@+id/video_setting_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:id="@+id/item_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"/>
+
+            <FrameLayout
+                android:id="@+id/next_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </FrameLayout>
 
 
     </ScrollView>

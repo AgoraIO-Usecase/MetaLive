@@ -42,6 +42,8 @@
     <string name="live_tool_name_rotate">翻转</string>
     <string name="live_tool_name_camera">摄像头</string>
 
+
+
     <!-- GiftGridDialog -->
     <string name="gift_grid_title">礼物</string>
     <string name="gift_grid_send">赠送</string>

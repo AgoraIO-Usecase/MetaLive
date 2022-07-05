@@ -41,7 +41,7 @@
     <!-- Video Setting -->
     <dimen name="video_setting_dialog_height">243dp</dimen>
     <dimen name="video_setting_dialog_text_item_height">48dp</dimen>
-    <dimen name="video_setting_dialog_margin">24dp</dimen>
+    <dimen name="video_setting_dialog_margin">18dp</dimen>
     <dimen name="video_setting_dialog_arrow_size">30dp</dimen>
     <dimen name="video_setting_dialog_text_size">16sp</dimen>
     <dimen name="video_setting_dialog_item_divider_height">1dp</dimen>

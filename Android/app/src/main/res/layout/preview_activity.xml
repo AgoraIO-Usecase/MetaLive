@@ -9,6 +9,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/camera_view_container"
+        android:layout_width="130dp"
+        android:layout_height="200dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="220dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="12dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true"
+        app:contentPaddingTop="0dp"
+        app:contentPaddingBottom="0dp"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/preview_control_shadow_height"
@@ -44,6 +58,8 @@
             android:text="MultiHost" />
 
     </com.google.android.material.tabs.TabLayout>
+
+
 
 
 

@@ -26,6 +26,7 @@
             android:src="@drawable/room_list_btn_edit"
             android:padding="?attr/iconPadding"
             android:layout_gravity="end|center_vertical"
+            android:visibility="gone"
             android:background="@drawable/room_list_top_btn_bg"/>
 
     </FrameLayout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/face_edit_dialog_item_background">
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/face_edit_list_item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:textAlignment="gravity"
+        android:gravity="center"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:textSize="14dp"
+        android:textColor="#9e9e9e"/>
+</FrameLayout>

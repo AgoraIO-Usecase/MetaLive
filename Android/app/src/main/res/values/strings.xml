@@ -11,5 +11,13 @@
     <string name="room_detail_accept">Accept</string>
     <string name="room_detail_offline">Offline</string>
     <string name="room_detail_raisehand_title">Raise Hands</string>
+    <string name="room_detail_avatar_effect_click_tip">You can not change your makeup in a real image</string>
+    <string name="room_detail_exit_tip">The room is closed</string>
+
+    <!-- AvatarToolDialog -->
+    <string name="avatar_option_title">Avatar Setting</string>
+    <string name="avatar_option_name_dress">Dress</string>
+    <string name="avatar_option_name_face">Face Edit</string>
+    <string name="avatar_option_camera">Camera</string>
 
 </resources>

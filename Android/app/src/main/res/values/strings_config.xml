@@ -5,4 +5,11 @@
 
     <string name="rtc_app_id" translatable="false"><==AGORA RTC APP ID==></string>
     <string name="rtc_app_token" translatable="false"/>
+
+    <string name="bugly_app_id" translatable="false"/>
+
+    <!-- io.agora.metalive -->
+    <string name="ai_app_id" translatable="false"><==AI APP ID==></string>
+    <string name="ai_license" translatable="false"><==AI LICENSE==></string>
+
 </resources>

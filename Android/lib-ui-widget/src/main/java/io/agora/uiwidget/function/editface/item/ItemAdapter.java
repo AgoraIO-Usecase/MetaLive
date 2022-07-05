@@ -22,6 +22,8 @@ public abstract class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemH
 
     private ItemSelectListener itemSelectListener;
 
+    private ItemImageListener itemImageListener;
+
     public ItemAdapter(Context context, @LayoutRes int layoutId) {
         mContext = context;
         mLayoutId = layoutId;
@@ -40,7 +42,10 @@ public abstract class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemH
     @Override
     public void onBindViewHolder(@NonNull ItemHolder holder, int pos) {
         final int position = holder.getLayoutPosition();
-        holder.mItemImg.setImageResource(getRes(position));
+        if (itemImageListener != null && !itemImageListener.onSetItemImage(holder.mItemImg, position)) {
+            holder.mItemImg.setImageResource(getRes(position));
+        }
+
         holder.mSelect.setVisibility(mSelectPosition == position ? View.VISIBLE : View.GONE);
 
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mItemImg.getLayoutParams();
@@ -90,13 +95,25 @@ public abstract class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemH
         this.itemSelectListener = itemSelectListener;
     }
 
-    public interface ItemSelectListener {
+    public void setItemImageListener(ItemImageListener itemImageListener) {
+        this.itemImageListener = itemImageListener;
+    }
 
+    public interface ItemSelectListener {
         boolean itemSelectListener(int lastPos, int position);
+    }
+
+    public interface ItemImageListener {
+        /**
+         * @param imageView
+         * @param position
+         * @return true if the item is drawn by this callback; false if
+         * the event is not consumed, and can be set by later procedures.
+         */
+        boolean onSetItemImage(ImageView imageView, int position);
     }
 
     public abstract int getRes(int pos);
 
     public abstract int getSize();
-
 }

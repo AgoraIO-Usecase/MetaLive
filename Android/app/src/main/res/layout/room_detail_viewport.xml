@@ -17,7 +17,7 @@
         app:layout_constraintVertical_weight="1"
         app:cardUseCompatPadding="false"
         app:cardBackgroundColor="#F9F9F9"
-        app:cardCornerRadius="55dp"
+        app:cardCornerRadius="0dp"
         app:contentPaddingTop="0dp"
         app:contentPaddingBottom="0dp"
         app:cardElevation="0dp"

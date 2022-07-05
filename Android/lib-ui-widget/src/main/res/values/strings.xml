@@ -46,6 +46,7 @@
     <string name="live_tool_name_rotate">Rotate</string>
     <string name="live_tool_name_camera">Camera</string>
 
+
     <!-- GiftGridDialog -->
     <string name="gift_grid_title">Presents</string>
     <string name="gift_grid_send">Send</string>

@@ -11,6 +11,13 @@
     <string name="room_detail_accept">接受</string>
     <string name="room_detail_offline">下麦</string>
     <string name="room_detail_raisehand_title">举手列表</string>
+    <string name="room_detail_avatar_effect_click_tip">真实形象无法换妆哦</string>
+    <string name="room_detail_exit_tip">房间已关闭</string>
 
+    <!-- AvatarToolDialog -->
+    <string name="avatar_option_title">虚拟形象设置</string>
+    <string name="avatar_option_name_dress">换妆</string>
+    <string name="avatar_option_name_face">捏脸</string>
+    <string name="avatar_option_camera">相机</string>
 
 </resources>

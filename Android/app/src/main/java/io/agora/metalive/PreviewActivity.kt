@@ -1,54 +1,75 @@
 package io.agora.metalive
 
 import android.os.Bundle
-import android.util.Size
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import io.agora.metalive.databinding.PreviewActivityBinding
 import io.agora.metalive.manager.RoomManager
 import io.agora.metalive.manager.RoomManager.RoomInfo
 import io.agora.metalive.manager.RtcManager
-import io.agora.rtc2.video.VideoEncoderConfiguration.VideoDimensions
-import io.agora.uiwidget.function.VideoSettingDialog
-import io.agora.uiwidget.function.VideoSettingDialog.OnValuesChangeListener
 import io.agora.uiwidget.utils.StatusBarUtil
 
 class PreviewActivity : AppCompatActivity() {
-    private val rtcManager = RtcManager()
+    private val rtcManager = RtcManager.getInstance()
     private val mBinding by lazy {
         PreviewActivityBinding.inflate(LayoutInflater.from(this))
     }
-    private lateinit var faceEditLauncher: ActivityResultLauncher<String>
 
+    private lateinit var handler: Handler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         StatusBarUtil.hideStatusBar(window, false)
-        faceEditLauncher = FaceEditActivity.launcher(this){
-            rtcManager.renderLocalAvatarVideo(mBinding.surfaceViewContainer)
-        }
+
+        handler = Handler(mainLooper)
         initView()
         initPreview()
     }
 
     private fun initView() {
+        mBinding.root.tag = true
+        mBinding.root.setOnClickListener {
+            val visible = !(mBinding.root.tag as Boolean)
+            mBinding.root.tag = visible
+
+            mBinding.previewControlView.isVisible = visible
+            mBinding.cameraViewContainer.isVisible = visible
+        }
+        // Currently go to multi-host scene by default,
+        // remove bottom tab layout.
+        // Modify this if multi-scenes is supported.
+        mBinding.tabLayout.isVisible = false
+
         mBinding.previewControlView.apply {
-            setBackIcon(true) { v: View? -> onBackPressed() }
-            setCameraIcon(true) { v: View? -> }
-            setBeautyIcon(false){
-                faceEditLauncher.launch(FaceEditActivity.FROM_ROOM_PREVIEW)
+            setBackIcon(true) { onBackPressed() }
+
+            setCameraIcon(false) {
+                // No camera switching for this scene.
             }
-            setSettingIcon(true) { v: View? ->
-                // 视频参数设置弹窗
-                showSettingDialog()
+
+            setBeautyIcon(true) {
+                // By default do nothing for this callback
+                // when entering this activity for the first
+                // several seconds.
+                showAvatarOptionDialog()
             }
+
+            setSettingIcon(true) {
+                DialogUtil.showSettingDialog(this@PreviewActivity, false)
+            }
+
             setGoLiveBtn { _: View?, randomName: String? ->
                 RoomManager.getInstance().createRoom(RoomInfo(randomName).apply {
-                    roomType = mBinding.tabLayout.selectedTabPosition + 1
+                    roomType = RoomManager.RoomType.MULTI_HOST
                 }) { data: RoomInfo ->
+                    // Only multi-host room is supported now,
+                    // remove if other room types are supported in future versions.
                     runOnUiThread { goToRoomDetail(data) }
                 }
             }
@@ -60,51 +81,17 @@ class PreviewActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun showSettingDialog() {
-        val resolutions: MutableList<Size> = ArrayList()
-        for (sVideoDimension in RtcManager.sVideoDimensions) {
-            resolutions.add(Size(sVideoDimension.width, sVideoDimension.height))
-        }
-        val frameRates: MutableList<Int> = ArrayList()
-        for (sFrameRate in RtcManager.sFrameRates) {
-            frameRates.add(sFrameRate.value)
-        }
-        VideoSettingDialog(this@PreviewActivity)
-            .setResolutions(resolutions)
-            .setFrameRates(frameRates)
-            .setBitRateRange(0, 2000)
-            .setDefaultValues(
-                Size(
-                    RtcManager.encoderConfiguration.dimensions.width,
-                    RtcManager.encoderConfiguration.dimensions.height
-                ),
-                RtcManager.encoderConfiguration.frameRate,
-                RtcManager.encoderConfiguration.bitrate
-            )
-            .setOnValuesChangeListener(object : OnValuesChangeListener {
-                override fun onResolutionChanged(resolution: Size) {
-                    RtcManager.encoderConfiguration.dimensions =
-                        VideoDimensions(resolution.width, resolution.height)
-                }
-
-                override fun onFrameRateChanged(framerate: Int) {
-                    RtcManager.encoderConfiguration.frameRate = framerate
-                }
-
-                override fun onBitrateChanged(bitrate: Int) {
-                    RtcManager.encoderConfiguration.bitrate = bitrate
-                }
-            })
-            .show()
+    private fun showAvatarOptionDialog() {
+        DialogUtil.showAvatarOptionDialog(this, false, {
+            mBinding.cameraViewContainer.isVisible = false
+        }, {
+            mBinding.cameraViewContainer.isVisible = true
+        })
     }
 
     private fun initPreview() {
-        rtcManager.init(this, getString(R.string.rtc_app_id), null)
         rtcManager.renderLocalAvatarVideo(mBinding.surfaceViewContainer)
+        rtcManager.renderLocalCameraVideo(mBinding.cameraViewContainer)
     }
 
-    override fun onBackPressed() {
-        rtcManager.destroy()
-        super.onBackPressed()
-    }
 }

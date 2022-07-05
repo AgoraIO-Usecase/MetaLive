@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <Button
+        android:id="@+id/btn_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@drawable/avatar_btn_bg"
+        android:minWidth="20dp"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone"
+        android:text="重置"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/live_tool_layout_bg">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/face_edit_dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/live_tool_title_text_height"
+            android:gravity="center"
+            android:text="@string/avatar_option_name_face"
+            android:textAlignment="gravity"
+            android:textColor="@color/live_tool_title_text_color"
+            android:textSize="@dimen/live_tool_title_text_size" />
+
+        <View
+            android:id="@+id/face_edit_dialog_divider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/live_tool_divider_height"
+            android:layout_marginHorizontal="@dimen/live_tool_divider_margin_h"
+            android:background="@color/live_tool_divider_color" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:visibility="gone"
+                android:layout_gravity="center"/>
+
+            <LinearLayout
+                android:id="@+id/content_layout"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/face_edit_progress_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_below="@id/face_edit_dialog_divider"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="10dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/face_edit_item_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_alignParentStart="true"
+                        android:gravity="center_vertical"
+                        android:textAlignment="gravity"
+                        android:textSize="12dp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/face_edit_item_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="center_vertical"
+                        android:textAlignment="gravity"
+                        android:textSize="12dp" />
+
+                    <androidx.appcompat.widget.AppCompatSeekBar
+                        android:id="@+id/face_edit_item_seek_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_toStartOf="@id/face_edit_item_value"
+                        android:layout_toEndOf="@id/face_edit_item_name"
+                        android:max="100" />
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/face_edit_sub_item_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_marginHorizontal="@dimen/edit_face_select_item_corner_radius"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/face_edit_dialog_tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_marginHorizontal="@dimen/edit_face_select_item_corner_radius"
+                    android:layout_marginBottom="16dp"
+                    android:background="@android:color/transparent"
+                    app:tabIndicator="@drawable/edit_face_select_indicator"
+                    app:tabMode="scrollable" />
+            </LinearLayout>
+
+        </FrameLayout>
+
+
+    </LinearLayout>
+</LinearLayout>
